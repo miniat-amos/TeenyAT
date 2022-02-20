@@ -29,6 +29,51 @@ typedef union tny_word tny_word;
 /** While the TeenyAT has a 16 bit address space, RAM is only 32K words */
 #define TNY_RAM_SIZE (1 << 15)
 
+union tny_word {
+	struct {
+		int16_t immed4  : 4;
+		uint16_t reg2   : 3;
+		uint16_t reg1   : 3;
+		uint16_t teeny  : 1;
+		uint16_t opcode : 5;
+	} instruction;
+
+	struct {
+		uint16_t greater  : 1;
+		uint16_t less     : 1;
+		uint16_t equals   : 1;
+		uint16_t carry    : 1;
+		uint16_t reserved : 12;
+	} inst_flags;
+
+	struct {
+		uint16_t byte0 : 8;
+		uint16_t byte1 : 8;
+	} bytes;
+
+	tny_uword u;
+	tny_sword s;
+
+	struct {
+		uint16_t bit0  : 1;
+		uint16_t bit1  : 1;
+		uint16_t bit2  : 1;
+		uint16_t bit3  : 1;
+		uint16_t bit4  : 1;
+		uint16_t bit5  : 1;
+		uint16_t bit6  : 1;
+		uint16_t bit7  : 1;
+		uint16_t bit8  : 1;
+		uint16_t bit9  : 1;
+		uint16_t bit10 : 1;
+		uint16_t bit11 : 1;
+		uint16_t bit12 : 1;
+		uint16_t bit13 : 1;
+		uint16_t bit14 : 1;
+		uint16_t bit15 : 1;
+	} bits;
+};
+
 struct teenyat {
 	/** Has this TeenyAT ever been initialized */
 	bool initialized;
@@ -87,51 +132,6 @@ struct teenyat {
 	 * previous instruction.
 	 */
 	unsigned int delay_cycles;
-};
-
-union tny_word {
-	struct {
-		int16_t immed4  : 4;
-		uint16_t reg2   : 3;
-		uint16_t reg1   : 3;
-		uint16_t teeny  : 1;
-		uint16_t opcode : 5;
-	} instruction;
-
-	struct {
-		uint16_t greater  : 1;
-		uint16_t less     : 1;
-		uint16_t equals   : 1;
-		uint16_t carry    : 1;
-		uint16_t reserved : 12;
-	} inst_flags;
-
-	struct {
-		uint16_t byte0 : 8;
-		uint16_t byte1 : 8;
-	} bytes;
-
-	tny_uword u;
-	tny_sword s;
-
-	struct {
-		uint16_t bit0  : 1;
-		uint16_t bit1  : 1;
-		uint16_t bit2  : 1;
-		uint16_t bit3  : 1;
-		uint16_t bit4  : 1;
-		uint16_t bit5  : 1;
-		uint16_t bit6  : 1;
-		uint16_t bit7  : 1;
-		uint16_t bit8  : 1;
-		uint16_t bit9  : 1;
-		uint16_t bit10 : 1;
-		uint16_t bit11 : 1;
-		uint16_t bit12 : 1;
-		uint16_t bit13 : 1;
-		uint16_t bit14 : 1;
-		uint16_t bit15 : 1;
-	} bits;
 };
 
 #define TNY_OPCODE_SET 0

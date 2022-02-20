@@ -29,14 +29,14 @@ bool tny_reset(teenyat *t) {
 	/* restore ram to it's initial post-bin-load state */
 	memcpy(t->ram, t->bin_image, TNY_RAM_SIZE);
 
-	t->reg[TNY_REG_PC] = 0x0;
-	t->reg[TNY_REG_SP] = 0x7FFF;
-	t->reg[TNY_REG_ZERO] = 0;
-	t->reg[TNY_REG_A] = 0;
-	t->reg[TNY_REG_B] = 0;
-	t->reg[TNY_REG_C] = 0;
-	t->reg[TNY_REG_D] = 0;
-	t->reg[TNY_REG_E] = 0;
+	t->reg[TNY_REG_PC].u = 0x0;
+	t->reg[TNY_REG_SP].u = 0x7FFF;
+	t->reg[TNY_REG_ZERO].u = 0;
+	t->reg[TNY_REG_A].u = 0;
+	t->reg[TNY_REG_B].u = 0;
+	t->reg[TNY_REG_C].u = 0;
+	t->reg[TNY_REG_D].u = 0;
+	t->reg[TNY_REG_E].u = 0;
 
 	t->flags.carry = false;
 	t->flags.equals = false;
