@@ -28,6 +28,7 @@ typedef union tny_word tny_word;
 
 /** While the TeenyAT has a 16 bit address space, RAM is only 32K words */
 #define TNY_RAM_SIZE (1 << 15)
+#define TNY_MAX_RAM_ADDRESS (TNY_RAM_SIZE - 1)
 
 union tny_word {
 	struct {
@@ -110,14 +111,6 @@ struct teenyat {
 		/** Set if CMP or ALU result is positive and non-zero */
 		bool greater;
 	} flags;
-	/** The first encoded word of the current instruction */
-	tny_word instruction;
-	/**
-	 * The immediate to be used by the instruction.  May come from the immed4
-	 * field if the instruction is teeny, otherwise it comes from a second
-	 * instruction word.
-	 */
-	tny_word immed;
 	/** Stores information about current bus requests */
 	struct {
 		/** The target device address of the most recent request */
@@ -132,6 +125,11 @@ struct teenyat {
 	 * previous instruction.
 	 */
 	unsigned int delay_cycles;
+	/**
+	 * The number of cycles this instance has been running since initialization
+	 * or reset.
+	 */
+	uint64_t cycle_cnt;
 };
 
 #define TNY_OPCODE_SET 0
