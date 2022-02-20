@@ -51,6 +51,11 @@ struct teenyat {
 	} flags;
 	tny_word instruction;
 	tny_word immed;
+	struct {
+		tny_uword address;
+		tny_word data;
+		char state;  /* 'R': reading/LOD, 'W': writing/STR, 'X': no access */
+	} bus;
 	unsigned int delay_cycles;  /* remaining cycles for previous instruction */
 };
 
@@ -124,7 +129,8 @@ union tny_word {
 #define TNY_OPCODE_DJZ 22
 
 /**
- * Initialize a TeenyAT instance and buffer the file for future resets
+ * @brief
+ *   Initialize a TeenyAT instance and buffer the file for future resets
  *
  * @param t
  *   The TeenyAT instance to initialize
@@ -138,6 +144,9 @@ union tny_word {
 bool tny_init_from_file(teenyat *t, FILE *bin_file);
 
 /**
+ * @brief
+ *   Reinitialize the TeenyAT
+ *
  * Restore the TeenyAT to its initialized state as if it had just been done so
  * from the original .bin file
  *
@@ -146,26 +155,83 @@ bool tny_init_from_file(teenyat *t, FILE *bin_file);
  *
  * @return
  *   True on success, flase otherwise.
+ *   Attempting to reset an unitialized TeenyAT will always return false.
  */
 bool tny_reset(teenyat *t);
 
 /**
- * Advance the TeenyAT instance by one clock cycle
+ * @brief
+ *   Advance the TeenyAT instance by one clock cycle
+ *
+ * This function provides the TeenyAT with something similar to a CPU clock
+ * pulse.  The TeenyAT will handle all the internals of the traditional Fetch,
+ * Decode, and Execute processes, but it is the caller's responsibility to
+ * check whether an any bus requests were made after EVERY cycle.
+ *
+ * The caller MUST check t's bus state for whether the access is a read or
+ * write.  Read/writes from/to external devices must be handled immediately...
+ * before calling tny_clock() again.  Check the character in t->bus.state to
+ * determine the type of bus access request.  'R' indicates t was trying to read
+ * from the device at the address t->bus.address.  'W' indicates t was trying to
+ * write the data in t->bus.data to the device at the address t->bus.address.
+ * the state member may also contain 'X', indicating no request at all.
+ *
+ * On read requests, the caller MUST satisfy the request via tny_lod_result().
+ *
+ * On write requests, the caller MUST satisfy the request via tny_str_result().
  *
  * @param t
  *   The TeenyAT instance
  *
  * @return
- *   True if the TeenyAT instance is making a bus access, false otherwise.
- *   Attempting to reset an unitialized TeenyAT will always return false.
- *
- * @note
- *   The caller MUST check t's bus state for whether the access is a read or
- *   write.  Read/writes to/from external devices must be handled immediately
- *   (before calling tny_clock() again.  On read requests, however, the caller
- *   must satisfy the request via tny_read_result().
+ *   True if the TeenyAT instance is making a bus request, false otherwise.
  */
 bool tny_clock(teenyat *t);
+
+/**
+ * @brief
+ *   Satisfy a LOD (read from a device) request from the TeenyAT
+ *
+ * @param t
+ *   The TeenyAT instance
+ *
+ * @param data
+ *   The data being sent back to the TeenyAT
+ *
+ * @param delay
+ *   Use this to tell the TeenyAT how many additional cycles of cost you want
+ *   associated with this read request.  For example, if you want the device
+ *   being read from to have a penalty of 9 clock cycles on top of the particular
+ *   LOD instruction used, pass 9 as the delay.  The TeenyAT will ensure this
+ *   many cycles pass before the next instruction is executed.
+ *
+ * @note
+ *   It is important the caller has already determined both the device being
+ *   read from via its address before calling this function.  This
+ *   can be acquired from t->bus.address.
+ */
+void tny_lod_result(teenyat *t, tny_word data, uint16_t delay);
+
+/**
+ * @brief
+ *   Satisfy a STR (write to a device) request from the TeenyAT
+ *
+ * @param t
+ *   The TeenyAT instance
+ *
+ * @param delay
+ *   Use this to tell the TeenyAT how many additional cycles of cost you want
+ *   associated with this write request.  For example, if you want the device
+ *   being written to to have a penalty of 7 clock cycles on top of the particular
+ *   STR instruction used, pass 7 as the delay.  The TeenyAT will ensure this
+ *   many cycles pass before the next instruction is executed.
+ *
+ * @note
+ *   It is important the caller has already determined both the device being
+ *   written to as well as the data to write before calling this function.  These
+ *   can be acquired from t->bus.address and t->bus.data, respectively.
+ */
+void tny_str_result(teenyat *t, uint16_t delay);
 
 #ifdef __cplusplus
 }
