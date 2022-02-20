@@ -31,7 +31,7 @@ typedef union tny_word tny_word;
 
 struct teenyat {
 	/** Has this TeenyAT ever been initialized */
-	bool initilized;
+	bool initialized;
 	/** Memory used for a program's code/data */
 	tny_word ram[TNY_RAM_SIZE];
 	/** copy of original bin file for resets */
@@ -158,9 +158,18 @@ union tny_word {
 #define TNY_OPCODE_JMP 21
 #define TNY_OPCODE_DJZ 22
 
+#define TNY_REG_PC   0
+#define TNY_REG_SP   1
+#define TNY_REG_ZERO 2
+#define TNY_REG_A    3
+#define TNY_REG_B    4
+#define TNY_REG_C    5
+#define TNY_REG_D    6
+#define TNY_REG_E    7
+
 /**
  * @brief
- *   Initialize a TeenyAT instance and buffer the file for future resets
+ *   Initialize a TeenyAT instance and buffer the file for future resets.
  *
  * @param t
  *   The TeenyAT instance to initialize
@@ -170,6 +179,10 @@ union tny_word {
  *
  * @return
  *   True on success, flase otherwise.
+ *
+ * @note
+ *   Upon failed initialization, the t->initialized member can be assumed false,
+ *   but the state of all other members is undefined.
  */
 bool tny_init_from_file(teenyat *t, FILE *bin_file);
 
