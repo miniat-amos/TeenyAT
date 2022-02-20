@@ -29,7 +29,7 @@ typedef union tny_word tny_word;
 #define TNY_RAM_SIZE (1 << 15)
 
 struct teenyat {
-	bool initilized;  /* has this TeenyAT ever been initialized from file */
+	bool initilized;  /* has this TeenyAT ever been initialized */
 	tny_word ram[TNY_RAM_SIZE];
 	tny_word bin_image[TNY_RAM_SIZE];  /* copy of original bin file for resets */
 	/*
@@ -133,7 +133,7 @@ union tny_word {
  *   The pre-assembled .bin file to load and execute
  *
  * @return
- *   true on success, flase otherwise.
+ *   True on success, flase otherwise.
  */
 bool tny_init_from_file(teenyat *t, FILE *bin_file);
 
@@ -145,7 +145,7 @@ bool tny_init_from_file(teenyat *t, FILE *bin_file);
  *   The TeenyAT instance to reset
  *
  * @return
- *   true on success, flase otherwise.
+ *   True on success, flase otherwise.
  */
 bool tny_reset(teenyat *t);
 
@@ -156,7 +156,8 @@ bool tny_reset(teenyat *t);
  *   The TeenyAT instance
  *
  * @return
- *   true if the TeenyAT instance is making a bus access, false otherwise.
+ *   True if the TeenyAT instance is making a bus access, false otherwise.
+ *   Attempting to reset an unitialized TeenyAT will always return false.
  *
  * @note
  *   The caller MUST check t's bus state for whether the access is a read or
