@@ -26,37 +26,67 @@ typedef uint16_t tny_uword;
 typedef int16_t tny_sword;
 typedef union tny_word tny_word;
 
+/** While the TeenyAT has a 16 bit address space, RAM is only 32K words */
 #define TNY_RAM_SIZE (1 << 15)
 
 struct teenyat {
-	bool initilized;  /* has this TeenyAT ever been initialized */
+	/** Has this TeenyAT ever been initialized */
+	bool initilized;
+	/** Memory used for a program's code/data */
 	tny_word ram[TNY_RAM_SIZE];
-	tny_word bin_image[TNY_RAM_SIZE];  /* copy of original bin file for resets */
-	/*
+	/** copy of original bin file for resets */
+	tny_word bin_image[TNY_RAM_SIZE];
+	/**
 	 * Registers...
+	 *
 	 * reg[0]: Program Counter (PC)
+	 *
 	 * reg[1]: Stack Pointer (SP)... address of the next top
+	 *
 	 * reg[2]: Zero Register (rZ)... always contains zero and is read only
+	 *
 	 * reg[3]-[7]: General Purpose Registers (rA -- rE)
 	 */
 	tny_word reg[8];
+	/**
+	 * Flag bits are set by CMP and all ALU instructions.
+	 */
 	struct {
-		/*
-		 * Flag bits are set by CMP and all ALU instructions.
-		 */
+		/**
+		 * Carry is set/cleared by arithmetic, shift and rotate instructions.
+		 * For shift/rotate instructions, the final bit shifted out of storage
+		 * determines the flag.  If the shift length is zero, the flag is
+		 * unchanged. */
 		bool carry;
+		/** Set/cleared if the result of a CMP or ALU instruction is 0 or not */
 		bool equals;
+		/** This flag is effectively the sign bit of the CMP or ALU result */
 		bool less;
+		/** Set if CMP or ALU result is positive and non-zero */
 		bool greater;
 	} flags;
+	/** The first encoded word of the current instruction */
 	tny_word instruction;
+	/**
+	 * The immediate to be used by the instruction.  May come from the immed4
+	 * field if the instruction is teeny, otherwise it comes from a second
+	 * instruction word.
+	 */
 	tny_word immed;
+	/** Stores information about current bus requests */
 	struct {
+		/** The target device address of the most recent request */
 		tny_uword address;
+		/** The data written to or read from the most recent request */
 		tny_word data;
-		char state;  /* 'R': reading/LOD, 'W': writing/STR, 'X': no access */
+		/** 'R': reading/LOD, 'W': writing/STR, 'X': no request */
+		char state;
 	} bus;
-	unsigned int delay_cycles;  /* remaining cycles for previous instruction */
+	/**
+	 * The number of remaining cycles to delay to simulate the cost of the
+	 * previous instruction.
+	 */
+	unsigned int delay_cycles;
 };
 
 union tny_word {
