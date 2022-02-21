@@ -133,7 +133,6 @@ void tny_clock(teenyat *t) {
 		t->reg[reg1].s = t->reg[reg2].s + immed;
 		break;
 	case TNY_OPCODE_LOD:
-		/***************************************/
 		{
 			tny_uword addr = t->reg[reg2].s + immed;
 			if(addr > TNY_MAX_RAM_ADDRESS) {
@@ -146,7 +145,7 @@ void tny_clock(teenyat *t) {
 			}
 			else {
 				/* read from RAM */
-				t->reg[reg1].s = t->ram[t->reg[reg2].s + immed].s;
+				t->reg[reg1] = t->ram[addr];
 			}
 			/*
 			 * To promote student use of registers, all bus operations,
@@ -156,12 +155,23 @@ void tny_clock(teenyat *t) {
 		}
 		break;
 	case TNY_OPCODE_STR:
-		/***************************************/
 		{
 			tny_uword addr = t->reg[reg1].s + immed;
 			if(addr > TNY_MAX_RAM_ADDRESS) {
-				//t->state
+				/* write to peripheral address */
+				uint16_t delay = 0;
+				t->bus_write(t, addr, t->reg[reg2], &delay);
+				t->delay_cycles += delay;
 			}
+			else {
+				/* write to RAM */
+				t->ram[addr] = t->reg[reg2];
+			}
+			/*
+			 * To promote student use of registers, all bus operations,
+			 * including RAM access comes with an extra penalty.
+			 */
+			t->delay_cycles += TNY_BUS_DELAY;
 		}
 		break;
 	case TNY_OPCODE_PSH:
