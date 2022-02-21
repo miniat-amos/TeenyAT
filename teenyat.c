@@ -293,18 +293,26 @@ void tny_clock(teenyat *t) {
 		}
 		break;
 	case TNY_OPCODE_ROT:
-
-
-
-
-
-		/* TODO */
-
-
-
-
-
-
+		{
+			/* calculate remainder as rotate could go around many times */
+			tny_sword bits_to_rotate = (t->reg[reg2].s + immed) % 16;
+			if(bits_to_rotate < 0) {
+				/* rotate left */
+				bits_to_rotate *= -1;
+				tny_uword main_part = t->reg[reg1].u << bits_to_rotate;
+				tny_uword wrap_part = t->reg[reg1].u >> (16 - bits_to_rotate);
+				t->reg[reg1].u = main_part | wrap_part;
+				t->flags.carry = t->reg[reg1].u & (1 << 0);
+			}
+			else if(bits_to_rotate > 0) {
+				/* rotate right */
+				tny_uword main_part = t->reg[reg1].u >> bits_to_rotate;
+				tny_uword wrap_part = t->reg[reg1].u << (16 - bits_to_rotate);
+				t->reg[reg1].u = main_part | wrap_part;
+				t->flags.carry = t->reg[reg1].u & (1 << 15);
+			}
+			set_elg_flags(t, t->reg[reg1].s);
+		}
 		break;
 	case TNY_OPCODE_NEG:
 		tmp = (uint32_t)0 - (uint32_t)(t->reg[reg1].s);
