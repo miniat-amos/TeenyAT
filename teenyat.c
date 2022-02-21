@@ -186,6 +186,7 @@ void tny_clock(teenyat *t) {
 			tny_sword bit = t->reg[reg2].s + immed;
 			if(bit >= 0 && bit <= 15) {
 				t->reg[reg2].s |= (1 << bit);
+				set_elg_flags(t, t->reg[reg2].s);
 			}
 		}
 		break;
@@ -194,6 +195,7 @@ void tny_clock(teenyat *t) {
 			tny_sword bit = t->reg[reg2].s + immed;
 			if(bit >= 0 && bit <= 15) {
 				t->reg[reg2].s &= ~(1 << bit);
+				set_elg_flags(t, t->reg[reg2].s);
 			}
 		}
 		break;
@@ -202,6 +204,7 @@ void tny_clock(teenyat *t) {
 			tny_sword bit = t->reg[reg2].s + immed;
 			if(bit >= 0 && bit <= 15) {
 				t->reg[reg2].s ^= (1 << bit);
+				set_elg_flags(t, t->reg[reg2].s);
 			}
 		}
 		break;
