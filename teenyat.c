@@ -256,7 +256,9 @@ void tny_clock(teenyat *t) {
 	case TNY_OPCODE_SHF:
 		{
 			tny_sword bits_to_shift = t->reg[reg2].s + immed;
-			if(bits_to_shift > 0) {
+			if(bits_to_shift < 0) {
+				/* shift left */
+				bits_to_shift *= -1;
 				if(bits_to_shift <= 15) {
 					t->reg[reg1].u <<= bits_to_shift - 1;
 					t->flags.carry = t->reg[reg1].u & (1 << 15);
@@ -272,8 +274,8 @@ void tny_clock(teenyat *t) {
 					t->reg[reg1].u = 0;
 				}
 			}
-			else if(bits_to_shift < 0) {
-				bits_to_shift *= -1;
+			else if(bits_to_shift > 0) {
+				/* shift right */
 				if(bits_to_shift <= 15) {
 					t->reg[reg1].u >>= bits_to_shift - 1;
 					t->flags.carry = t->reg[reg1].u & (1 << 0);
