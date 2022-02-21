@@ -328,7 +328,7 @@ void tny_clock(teenyat *t) {
 	}
 
 	/* Ensure the zero register still has a zero in it */
-	t->reg[TNY_REG_ZERO] = 0;
+	t->reg[TNY_REG_ZERO].u = 0;
 
 	return;
 }
