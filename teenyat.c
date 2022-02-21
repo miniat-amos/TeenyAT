@@ -147,6 +147,7 @@ void tny_clock(teenyat *t) {
 				/* read from RAM */
 				t->reg[reg1] = t->ram[addr];
 			}
+
 			/*
 			 * To promote student use of registers, all bus operations,
 			 * including RAM access comes with an extra penalty.
@@ -325,6 +326,9 @@ void tny_clock(teenyat *t) {
 		        opcode, orig_PC, t->cycle_cnt);
 		break;
 	}
+
+	/* Ensure the zero register still has a zero in it */
+	t->reg[TNY_REG_ZERO] = 0;
 
 	return;
 }
