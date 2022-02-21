@@ -78,6 +78,7 @@ typedef void(*TNY_WRITE_TO_BUS_FNPTR)(teenyat *t, tny_uword addr, tny_word data,
 /** While the TeenyAT has a 16 bit address space, RAM is only 32K words */
 #define TNY_RAM_SIZE (1 << 15)
 #define TNY_MAX_RAM_ADDRESS (TNY_RAM_SIZE - 1)
+#define TNY_BUS_DELAY 3
 
 union tny_word {
 	struct {
@@ -279,11 +280,8 @@ bool tny_reset(teenyat *t);
  *
  * @param t
  *   The TeenyAT instance
- *
- * @return
- *   True if the TeenyAT instance is making a bus request, false otherwise.
  */
-bool tny_clock(teenyat *t);
+void tny_clock(teenyat *t);
 
 #ifdef __cplusplus
 }

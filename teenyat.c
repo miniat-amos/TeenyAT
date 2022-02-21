@@ -67,7 +67,7 @@ bool tny_reset(teenyat *t) {
 	return true;
 }
 
-bool tny_clock(teenyat *t) {
+void tny_clock(teenyat *t) {
 	t->cycle_cnt++;
 
 	/*
@@ -76,7 +76,6 @@ bool tny_clock(teenyat *t) {
 	 */
 	if(t->delay_cycles) {
 		t->delay_cycles--;
-		return false;
 	}
 
 	/*
@@ -128,7 +127,6 @@ bool tny_clock(teenyat *t) {
 	 */
 
 	uint32_t tmp;  /* for quick use to determine carry */
-	bool bus_access = false;
 
 	switch(opcode) {
 	case TNY_OPCODE_SET:
@@ -136,7 +134,26 @@ bool tny_clock(teenyat *t) {
 		break;
 	case TNY_OPCODE_LOD:
 		/***************************************/
-		t->reg[reg1].s = t->ram[t->reg[reg2].s + immed].s;
+		{
+			tny_uword addr = t->reg[reg2].s + immed;
+			if(addr > TNY_MAX_RAM_ADDRESS) {
+				/* read from peripheral address */
+				tny_word data = {.u = 0};
+				uint16_t delay = 0;
+				t->bus_read(t, addr, &data, &delay);
+				t->reg[reg1] = data;
+				t->delay_cycles += delay;
+			}
+			else {
+				/* read from RAM */
+				t->reg[reg1].s = t->ram[t->reg[reg2].s + immed].s;
+			}
+			/*
+			 * To promote student use of registers, all bus operations,
+			 * including RAM access comes with an extra penalty.
+			 */
+			t->delay_cycles += TNY_BUS_DELAY;
+		}
 		break;
 	case TNY_OPCODE_STR:
 		/***************************************/
@@ -299,5 +316,5 @@ bool tny_clock(teenyat *t) {
 		break;
 	}
 
-	return bus_access;
+	return;
 }
