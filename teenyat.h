@@ -26,6 +26,55 @@ typedef uint16_t tny_uword;
 typedef int16_t tny_sword;
 typedef union tny_word tny_word;
 
+/**
+ * @brief
+ *   System calllback function to handle TeenyAT read requests
+ *
+ * @param t
+ *   The TeenyAT instance making the request
+ *
+ * @param addr
+ *   Address of the read request
+ *
+ * @param[out] data
+ *   Output the data result of the request.  If the requested address is not
+ *   simulated or otherwise illegal (eg, not meant as an input address) it is
+ *   up to the callback function what value to return here.
+ *
+ * @param delay
+ *   Use this to tell the TeenyAT how many additional cycles of cost you want
+ *   associated with this read request.  For example, if you want the device
+ *   being read from to have a penalty of 9 clock cycles on top of the particular
+ *   instruction used, pass 9 as the delay.  The TeenyAT will ensure this
+ *   many cycles pass before the next instruction is executed.
+ */
+typedef void(*TNY_READ_FROM_BUS_FNPTR)(teenyat *t, tny_uword addr, tny_word *data, uint16_t *delay);
+
+/**
+ * @brief
+ *   System calllback function to handle TeenyAT write requests
+ *
+ * @param t
+ *   The TeenyAT instance making the request
+ *
+ * @param addr
+ *   Address of the write request
+ *
+ * @param data
+ *   The data to be sent to the address.  If the requested address is not
+ *   simulated or otherwise illegal (eg, not meant as an input address) it is
+ *   up to the callback function whether to ignore the request or do something
+ * else.
+ *
+ * @param delay
+ *   Use this to tell the TeenyAT how many additional cycles of cost you want
+ *   associated with this write request.  For example, if you want the device
+ *   being written to to have a penalty of 7 clock cycles on top of the particular
+ *   instruction used, pass 7 as the delay.  The TeenyAT will ensure this
+ *   many cycles pass before the next instruction is executed.
+ */
+typedef void(*TNY_WRITE_TO_BUS_FNPTR)(teenyat *t, tny_uword addr, tny_word data, uint16_t *delay);
+
 /** While the TeenyAT has a 16 bit address space, RAM is only 32K words */
 #define TNY_RAM_SIZE (1 << 15)
 #define TNY_MAX_RAM_ADDRESS (TNY_RAM_SIZE - 1)
@@ -111,15 +160,14 @@ struct teenyat {
 		/** Set if CMP or ALU result is positive and non-zero */
 		bool greater;
 	} flags;
-	/** Stores information about current bus requests */
-	struct {
-		/** The target device address of the most recent request */
-		tny_uword address;
-		/** The data written to or read from the most recent request */
-		tny_word data;
-		/** 'R': reading/LOD, 'W': writing/STR, 'X': no request */
-		char state;
-	} bus;
+	/**
+	 * System calllback function to handle TeenyAT read requests
+	 */
+	TNY_READ_FROM_BUS_FNPTR bus_read;
+	/**
+	 * System calllback function to handle TeenyAT write requests
+	 */
+	TNY_WRITE_TO_BUS_FNPTR bus_write;
 	/**
 	 * The number of remaining cycles to delay to simulate the cost of the
 	 * previous instruction.
@@ -175,6 +223,12 @@ struct teenyat {
  * @param bin_file
  *   The pre-assembled .bin file to load and execute
  *
+ * @param bus_read
+ *   Callback function for handling read requests
+ *
+ * @param bus_write
+ *   Callback function for handling write requests
+ *
  * @return
  *   True on success, flase otherwise.
  *
@@ -182,7 +236,9 @@ struct teenyat {
  *   Upon failed initialization, the t->initialized member can be assumed false,
  *   but the state of all other members is undefined.
  */
-bool tny_init_from_file(teenyat *t, FILE *bin_file);
+bool tny_init_from_file(teenyat *t, FILE *bin_file,
+                        TNY_READ_FROM_BUS_FNPTR bus_read,
+                        TNY_WRITE_TO_BUS_FNPTR bus_write);
 
 /**
  * @brief
@@ -228,51 +284,6 @@ bool tny_reset(teenyat *t);
  *   True if the TeenyAT instance is making a bus request, false otherwise.
  */
 bool tny_clock(teenyat *t);
-
-/**
- * @brief
- *   Satisfy a LOD (read from a device) request from the TeenyAT
- *
- * @param t
- *   The TeenyAT instance
- *
- * @param data
- *   The data being sent back to the TeenyAT
- *
- * @param delay
- *   Use this to tell the TeenyAT how many additional cycles of cost you want
- *   associated with this read request.  For example, if you want the device
- *   being read from to have a penalty of 9 clock cycles on top of the particular
- *   LOD instruction used, pass 9 as the delay.  The TeenyAT will ensure this
- *   many cycles pass before the next instruction is executed.
- *
- * @note
- *   It is important the caller has already determined both the device being
- *   read from via its address before calling this function.  This
- *   can be acquired from t->bus.address.
- */
-void tny_lod_result(teenyat *t, tny_word data, uint16_t delay);
-
-/**
- * @brief
- *   Satisfy a STR (write to a device) request from the TeenyAT
- *
- * @param t
- *   The TeenyAT instance
- *
- * @param delay
- *   Use this to tell the TeenyAT how many additional cycles of cost you want
- *   associated with this write request.  For example, if you want the device
- *   being written to to have a penalty of 7 clock cycles on top of the particular
- *   STR instruction used, pass 7 as the delay.  The TeenyAT will ensure this
- *   many cycles pass before the next instruction is executed.
- *
- * @note
- *   It is important the caller has already determined both the device being
- *   written to as well as the data to write before calling this function.  These
- *   can be acquired from t->bus.address and t->bus.data, respectively.
- */
-void tny_str_result(teenyat *t, uint16_t delay);
 
 #ifdef __cplusplus
 }

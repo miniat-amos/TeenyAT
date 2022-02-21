@@ -14,10 +14,13 @@ static void set_elg_flags(teenyat *t, tny_sword alu_result) {
 	return;
 }
 
-bool tny_init_from_file(teenyat *t, FILE *bin_file) {
+bool tny_init_from_file(teenyat *t, FILE *bin_file,
+                        TNY_READ_FROM_BUS_FNPTR bus_read,
+                        TNY_WRITE_TO_BUS_FNPTR bus_write) {
 	if(!t) return false;
 	t->initialized = false;
 	if(!bin_file) return false;
+	if(!bus_read || !bus_write) return false;
 
 	/* Clear the entire instance */
 	memset(t, 0, sizeof(teenyat));
@@ -25,6 +28,10 @@ bool tny_init_from_file(teenyat *t, FILE *bin_file) {
 	/* backup .bin file */
 	fread(t->bin_image, sizeof(tny_word), TNY_RAM_SIZE, bin_file);
 	if(ferror(bin_file)) return false;
+
+	/* store bus callbacks */
+	t->bus_read = bus_read;
+	t->bus_write = bus_write;
 
 	if(!tny_reset(t)) return false;
 
@@ -54,8 +61,6 @@ bool tny_reset(teenyat *t) {
 
 	/* "instruction" and "immediate" members do not need initialization */
 
-	/* bus "address" and "data" members do not need initialization */
-	t->bus.state = 'X';
 	t->delay_cycles = 0;
 	t->cycle_cnt = 0;
 
@@ -295,25 +300,4 @@ bool tny_clock(teenyat *t) {
 	}
 
 	return bus_access;
-}
-
-void tny_lod_result(teenyat *t, tny_word data, uint16_t delay) {
-	assert(t);
-	assert(t->bus.state == 'R');
-
-	t->bus.data = data;
-	t->bus.state = 'X';
-	t->delay_cycles += delay;
-
-	return;
-}
-
-void tny_str_result(teenyat *t, uint16_t delay) {
-	assert(t);
-	assert(t->bus.state == 'W');
-
-	t->bus.state = 'X';
-	t->delay_cycles += delay;
-
-	return;
 }
