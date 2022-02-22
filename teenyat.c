@@ -348,7 +348,29 @@ void tny_clock(teenyat *t) {
 		set_elg_flags(t, (tny_sword)tmp);
 		break;
 	case TNY_OPCODE_JMP:
-
+		{
+			bool flags_checked = false;
+			bool condition_satisfied = false;
+			if(carry) {
+				flags_checked = true;
+				condition_satisfied |= t->flags.carry;
+			}
+			if(equals) {
+				flags_checked = true;
+				condition_satisfied |= t->flags.equals;
+			}
+			if(less) {
+				flags_checked = true;
+				condition_satisfied |= t->flags.less;
+			}
+			if(greater) {
+				flags_checked = true;
+				condition_satisfied |= t->flags.greater;
+			}
+			if(!flags_checked || condition_satisfied) {
+				t->reg[TNY_REG_PC].u = (t->reg[reg2].s + immed) & TNY_MAX_RAM_ADDRESS;
+			}
+		}
 		break;
 	case TNY_OPCODE_DJZ:
 
