@@ -63,6 +63,7 @@ bool tny_init_from_file(teenyat *t, FILE *bin_file,
 	if(!tny_reset(t)) return false;
 
 	t->initialized = true;
+
 	return true;
 }
 
