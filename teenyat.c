@@ -14,6 +14,33 @@ static void set_elg_flags(teenyat *t, tny_sword alu_result) {
 	return;
 }
 
+static inline void trunc_pc(teenyat *t) {
+	assert(t != NULL);
+	t->reg[TNY_REG_PC].u &= TNY_MAX_RAM_ADDRESS;
+
+	return;
+}
+
+static inline void set_pc(teenyat *t, tny_uword addr) {
+	assert(t != NULL);
+	t->reg[TNY_REG_PC].u = addr;
+	trunc_pc(t);
+
+	return;
+}
+
+static inline void inc_pc(teenyat *t) {
+	set_pc(t, t->reg[TNY_REG_PC].u + 1);
+
+	return;
+}
+
+static inline void dec_pc(teenyat *t) {
+	set_pc(t, t->reg[TNY_REG_PC].u - 1);
+
+	return;
+}
+
 bool tny_init_from_file(teenyat *t, FILE *bin_file,
                         TNY_READ_FROM_BUS_FNPTR bus_read,
                         TNY_WRITE_TO_BUS_FNPTR bus_write) {
@@ -85,19 +112,14 @@ void tny_clock(teenyat *t) {
 	 * at 0x7FFF and has its second word retrieved from 0x0000.  This almost
 	 * certainly not something anyone would want, but it's how it works :-)
 	 */
-	t->reg[TNY_REG_PC].u &= TNY_MAX_RAM_ADDRESS;
+	trunc_pc(t);
 
 	tny_uword orig_PC = t->reg[TNY_REG_PC].u; /* backup for error reporting */
 
- 	tny_word IR = t->ram[t->reg[TNY_REG_PC].u++];
-	t->reg[TNY_REG_PC].u &= TNY_MAX_RAM_ADDRESS;
-	tny_sword immed = t->ram[t->reg[TNY_REG_PC].u++].s;
-
-	/*
-	 * We're not masking the PC immediately here, because the instruction may
-	 * bee "teeny", in which case we'll have to modify the PC again, so we'll
-	 * wait until after that to mask it within range.
-	 */
+ 	tny_word IR = t->ram[t->reg[TNY_REG_PC].u];
+	inc_pc(t);
+	tny_sword immed = t->ram[t->reg[TNY_REG_PC].u].s;
+	inc_pc(t);
 
 	tny_uword opcode = IR.instruction.opcode;
 	bool teeny = IR.instruction.teeny;
@@ -112,15 +134,13 @@ void tny_clock(teenyat *t) {
 		/*
 		 * This is a single word instruction encoding
 		 */
-		t->reg[TNY_REG_PC].u--;
+		dec_pc(t);
 		immed = IR.instruction.immed4;
 	}
 	else {
 		/* double word instructions cost one extra cycle */
 		t->delay_cycles++;
 	}
-	/* mask the PC into range, whether teeny or not */
-	t->reg[TNY_REG_PC].u &= TNY_MAX_RAM_ADDRESS;
 
 	/*
 	 * EXECUTE
@@ -228,7 +248,7 @@ void tny_clock(teenyat *t) {
 		t->ram[t->reg[TNY_REG_SP].u] = t->reg[TNY_REG_PC];
 		t->reg[TNY_REG_SP].u--;
 		t->reg[TNY_REG_SP].u &= TNY_MAX_RAM_ADDRESS;
-		t->reg[TNY_REG_PC].u = (t->reg[reg2].s + immed) & TNY_MAX_RAM_ADDRESS;
+		set_pc(t, t->reg[reg2].s + immed);
 		/*
 		 * To promote student use of registers, all bus operations,
 		 * including RAM access comes with an extra penalty.
@@ -368,7 +388,7 @@ void tny_clock(teenyat *t) {
 				condition_satisfied |= t->flags.greater;
 			}
 			if(!flags_checked || condition_satisfied) {
-				t->reg[TNY_REG_PC].u = (t->reg[reg2].s + immed) & TNY_MAX_RAM_ADDRESS;
+				set_pc(t, t->reg[reg2].s + immed);
 			}
 		}
 		break;
@@ -378,7 +398,7 @@ void tny_clock(teenyat *t) {
 		t->reg[reg1].s = tmp;
 		set_elg_flags(t, (tny_sword)tmp);
 		if(tmp == 0) {
-			t->reg[TNY_REG_PC].u = (t->reg[reg2].s + immed) & TNY_MAX_RAM_ADDRESS;
+			set_pc(t, t->reg[reg2].s + immed);
 		}
 		break;
 	default:
