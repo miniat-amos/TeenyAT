@@ -373,9 +373,14 @@ void tny_clock(teenyat *t) {
 		}
 		break;
 	case TNY_OPCODE_DJZ:
-
+		tmp = (uint32_t)(t->reg[reg1].s) - 1;
+		t->flags.carry = tmp & (1 << 16);
+		t->reg[reg1].s = tmp;
+		set_elg_flags(t, (tny_sword)tmp);
+		if(tmp == 0) {
+			t->reg[TNY_REG_PC].u = (t->reg[reg2].s + immed) & TNY_MAX_RAM_ADDRESS;
+		}
 		break;
-
 	default:
 		fprintf(stderr, "Uknown opcode (%d) encountered at 0x%04X on cycle %" PRIu64 "\n",
 		        opcode, orig_PC, t->cycle_cnt);
