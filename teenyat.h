@@ -10,8 +10,9 @@
 
 #ifndef __cplusplus
 
-#include <stdint.h>
 #include <stdbool.h>
+#include <stdint.h>
+#include <stdio.h>
 
 #else  // __cplusplus
 extern "C" {
