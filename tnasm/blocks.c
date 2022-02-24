@@ -9,7 +9,7 @@ list *blocks = &blocks_list;
 list flat_block_words_list;
 list *flat_block_words = &flat_block_words_list;
 
-m_uword next_word_address;
+tny_uword next_word_address;
 
 void block_destructor(void *item) {
 
@@ -59,7 +59,7 @@ void blocks_init() {
 	return;
 }
 
-void block_new(m_uword address) {
+void block_new(tny_uword address) {
 
 	block *b;
 
@@ -80,7 +80,7 @@ void block_new(m_uword address) {
 	return;
 }
 
-void block_new_word(int line_number, m_uword data) {
+void block_new_word(int line_number, tny_uword data) {
 
 	/* TODO: do we need 2 words or can we share the first instance? */
 	block_word *w1;

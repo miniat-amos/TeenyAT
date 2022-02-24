@@ -10,19 +10,17 @@ bool option_parser_info      = false;
 bool option_tokenizer_info   = false;
 bool option_verbose_info     = false;
 
-bool mode_nop_delay = true;
-
 int stage_error_cnt = 0;
 
 int pass;
-m_word address;
-bool inline_variables;
-m_word variable_address;
+tny_uword address;
 
 static const char *lvl_string[] = {
 		"", /* Info messages have no lead */
 		"Error: ",
-		"Impossible: "
+		"Impossible: ",
+		"Error: ",
+		"",
 };
 
 void util_print(util_print_level lvl, FILE *out, const char *filename, int lineno, const char *fmt, ...) {

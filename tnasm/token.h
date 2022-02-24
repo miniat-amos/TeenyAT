@@ -1,6 +1,8 @@
 #ifndef _TOKEN_H_
 #define _TOKEN_H_
 
+#include <stdint.h>
+
 #include "list.h"
 #include "../teenyat.h"
 
@@ -12,11 +14,10 @@ struct Token {
 	char *token_str;
 	int line_num;
 	int type;
-	m_word data;
+	tny_uword data;
 };
 
 extern token_list *tokens;
-//extern token_list *extra_tokens;
 
 /*
  * token_list_init()

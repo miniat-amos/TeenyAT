@@ -5,12 +5,7 @@
 #include "token.h"
 
 symbol_table labels_table;
-symbol_table constants_table;
-symbol_table variables_table;
-
 symbol_table *labels = &labels_table;
-symbol_table *constants = &constants_table;
-symbol_table *variables = &variables_table;
 
 void symbol_free(void *item) {
 
@@ -49,14 +44,14 @@ void symbol_table_init(symbol_table *t) {
 	return;
 }
 
-symbol *symbol_table_add(symbol_table *t, char *str, m_word value) {
+symbol *symbol_table_add(symbol_table *t, char *str, tny_uword value) {
 
 	symbol *s;
-	INFO_VERBOSE("adding \"%s\"=0x%08X to a symbol table... ", str, value.u);
+	INFO_VERBOSE("adding \"%s\"=0x%04X to a symbol table... ", str, value);
 	SAFE_MALLOC(s, symbol *, sizeof(symbol));
 	SAFE_MALLOC(s->str, char *, sizeof(char) * (strlen(str) + 1));
 	strcpy(s->str, str);
-	s->value = value;
+	s->value.u = value;
 
 	if(list_search((list *)t, (void *)s)) {
 		symbol_free(s);  // it's already there, so we don't want another
@@ -75,7 +70,7 @@ symbol *symbol_table_search(symbol_table *t, char *str) {
 	symbol *result;
 
 	SAFE_MALLOC(s.str, char *, sizeof(char) * (strlen(str) + 1));
-    strcpy(s.str, str);
+	strcpy(s.str, str);
 	result = list_search((list *)t, (void *)&s);
 	free(s.str);
 
@@ -84,33 +79,32 @@ symbol *symbol_table_search(symbol_table *t, char *str) {
 
 void symbol_table_print(symbol_table *t, char *header) {
 
-    printf("\nContents of symbol table, \"%s\":\n", header);
+	printf("\nContents of symbol table, \"%s\":\n", header);
 
-    if(t->size <= 0) {
-        printf("\t<empty>\n");
-    }
-    else {
-        symbol *s;
-        list_node *current = t->head;
+	if(t->size <= 0) {
+		printf("\t<empty>\n");
+	}
+	else {
+		symbol *s;
+		list_node *current = t->head;
 
-        while(current) {
-            if(current->item) {
-                s = (symbol *)(current->item);
-                if(s->str) {
-                    printf("\t\"%s\" : 0x%08X (hex): %d (signed) : %u (unsigned)\n", s->str, s->value.u, s->value.s, s->value.u);
-                }
-                else {
-                    IMPOSSIBLE("A symbol in \"%s\" with a value of 0x%08X has a NULL string!", header, s->value.u);
-                }
+		while(current) {
+			if(current->item) {
+				s = (symbol *)(current->item);
+				if(s->str) {
+					printf("\t\"%s\" : 0x%04X (hex): %d (signed) : %u (unsigned)\n", s->str, s->value.u, s->value.s, s->value.u);
+				}
+				else {
+					IMPOSSIBLE("A symbol in \"%s\" with a value of 0x%04X has a NULL string!", header, s->value.u);
+				}
+			}
+			else {
+				IMPOSSIBLE("A symbol in \"%s\" has no item!", header);
+			}
+			current = current->next;
+		}
+	}
+	printf("\n");
 
-            }
-            else {
-                IMPOSSIBLE("A symbol in \"%s\" has no item!", header);
-            }
-            current = current->next;
-        }
-    }
-    printf("\n");
-
-    return;
+	return;
 }

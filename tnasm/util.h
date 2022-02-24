@@ -11,8 +11,7 @@
 typedef struct instruction instruction;
 
 struct instruction {
-	m_low_word_layout low;
-	m_word high;
+	tm_instruction inst;
 	int line_num;
 };
 
@@ -24,20 +23,18 @@ extern bool option_parser_info;
 extern bool option_tokenizer_info;
 extern bool option_verbose_info;
 
-extern bool mode_nop_delay;
-
 extern int stage_error_cnt;
 
 extern int pass;
-extern m_word address;
-extern bool inline_variables;
-extern m_word variable_address;
+extern tny_uword address;
 
 typedef enum util_print_level util_print_level;
 enum util_print_level {
 	util_print_level_info = 0,
 	util_print_level_error,
-	util_print_level_impossible
+	util_print_level_impossible,
+	util_print_level_stage_error1,
+	util_print_level_stage_error2,
 };
 
 #define __FILENAME__ (strrchr(__FILE__, (int)'/') ? (strrchr(__FILE__, (int)'/') + 1) : \
@@ -64,7 +61,6 @@ enum util_print_level {
 #define IMPOSSIBLE(fmt, ...) \
 	do { \
 		util_print(util_print_level_impossible, stderr, __FILENAME__, __LINE__, fmt, ##__VA_ARGS__); \
-		fprintf(stderr, "\n"); \
 		exit(1); \
 	} while(0)
 
@@ -133,8 +129,8 @@ enum util_print_level {
  */
 #define STAGE_ERROR(line_num, fmt, ...) \
 	do { \
-		util_print(util_print_level_error, stderr, NULL, 0, "line %d - ", line_num); \
-		util_print(util_print_level_info, stderr, NULL, 0, fmt, ##__VA_ARGS__); \
+		util_print(util_print_level_stage_error1, stderr, NULL, 0, "Line %d -- ", line_num); \
+		util_print(util_print_level_stage_error2, stderr, NULL, 0, fmt, ##__VA_ARGS__); \
 		fprintf(stderr, "\n"); \
 		stage_error_cnt++; \
 		if(stage_error_cnt >= STAGE_ERROR_MAX) { \
@@ -143,17 +139,16 @@ enum util_print_level {
 	} while(0)
 
 /**
- * prints an error message to a specified stream
- * @param lvl
- *  the error level
- * @param out
- *  file to output the message too
- * @param filename
- *  The filename of the current file, a NULL filename causes it to not print file and line
- * @param lineno
- *  The line number the error occurred on
- * @param fmt
- *  The format specifier consistent with printf
+ * util_print()
+ *
+ * Prints an error message to a specified stream.
+ *
+ * lvl:      the error level
+ * out:      file to output the message to
+ * filename: The filename of the current file, a NULL filename causes it to not
+ *           print file and line.
+ * lineno:   The line number the error occurred on
+ * fmt:      The format specifier consistent with printf
  */
 extern void util_print(util_print_level lvl, FILE *out, const char *filename, int lineno, const char *fmt, ...)
 		__attribute__ ((format (printf, 5, 6)));

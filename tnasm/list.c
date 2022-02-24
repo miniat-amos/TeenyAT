@@ -3,7 +3,7 @@
 
 #include "list.h"
 
-void list_init(list *x, /* void *(*constructor)(void *),*/ void (*destructor)(void *), int (*compare)(void *, void *)) {
+void list_init(list *x, void (*destructor)(void *), int (*compare)(void *, void *)) {
 
 	if(!x) ERROR("Cannot initialize unallocated list");
 	if(!destructor) ERROR(" required to initialize list");
@@ -64,7 +64,7 @@ list_node *list_append(list *x, void *item) {
 void *list_search(list *x, void *item) {
 
 	list_node *current;
-    list_node *result = NULL;
+	list_node *result = NULL;
 
 	if(!x) ERROR("Cannot append to an unallocated list");
 	if(!item) ERROR("Cannot search list for nothing");
@@ -74,9 +74,9 @@ void *list_search(list *x, void *item) {
 		current = current->next;
 	}
 
-    if(current != NULL) {
-        result = current->item;
-    }
+	if(current != NULL) {
+		result = current->item;
+	}
 
-    return result;
+	return result;
 }

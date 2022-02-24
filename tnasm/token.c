@@ -5,11 +5,10 @@
 #include "token.h"
 #include "util.h"
 #include "list.h"
- #include "tnasm.h"
+#include "tnasm.h"
 
 token_list tokens_list;
 token_list *tokens = &tokens_list;
-//token_list *extra_tokens;
 
 void token_free(void *item) {
 

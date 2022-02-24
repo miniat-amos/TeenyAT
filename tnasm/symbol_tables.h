@@ -12,12 +12,10 @@ typedef struct list symbol_table;
 
 struct symbol {
 	char *str;
-	m_word value;
+	tny_word value;
 };
 
 extern symbol_table *labels;
-extern symbol_table *constants;
-extern symbol_table *variables;
 
 /*
  * symbol_table_init()
@@ -33,7 +31,7 @@ extern void symbol_table_init(symbol_table *t);
  * Adds the string::value pair to the symbol table if it isn't there already.
  * Returns the address of the symbol in the table if added, NULL otherwise.
  */
-extern symbol *symbol_table_add(symbol_table *t, char *str, m_word value);
+extern symbol *symbol_table_add(symbol_table *t, char *str, tny_uword value);
 
 /*
  * symbol_table_search()

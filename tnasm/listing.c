@@ -208,51 +208,51 @@ void generate_listing() {
 		if(!n || !w) {
 			/* no words for this line */
 			if(current_line_number % 5 == 0) {
-				fprintf(listing_file, " . . . . . . . . . . . . . . . .");
-				INFO_VERBOSE(" . . . . . . . . . . . . . . . .");
+				fprintf(listing_file, " . . . . . . . . . . . .");
+				INFO_VERBOSE(" . . . . . . . . . . . .");
 			}
 			else {
-				fprintf(listing_file, "                                ");
-				INFO_VERBOSE("                                ");
+				fprintf(listing_file, "                        ");
+				INFO_VERBOSE("                        ");
 			}
 		}
 		else {
 			if(current_line_number < w->line_number) {
 				/* no words for this line */
 				if(current_line_number % 5 == 0) {
-					fprintf(listing_file, " . . . . . . . . . . . . . . . .");
-					INFO_VERBOSE(" . . . . . . . . . . . . . . . .");
+					fprintf(listing_file, " . . . . . . . . . . . .");
+					INFO_VERBOSE(" . . . . . . . . . . . .");
 				}
 				else {
-					fprintf(listing_file, "                                ");
-					INFO_VERBOSE("                                ");
+					fprintf(listing_file, "                        ");
+					INFO_VERBOSE("                        ");
 				}
 			}
 			else if(current_line_number > w->line_number) {
 				/* the first word for a line should always be >= actual line */
-				IMPOSSIBLE("Tip the barrel to see if it spills!");
+				IMPOSSIBLE("Tip the barrel to see if it spills!\n");
 			}
 			else {
 				/* this word is for this line */
-				fprintf(listing_file, "[0x%04X]  0x%08X", w->address, w->data);
-				INFO_VERBOSE("[0x%04X]  0x%08X", w->address, w->data);
+				fprintf(listing_file, "[0x%04X]  0x%04X", w->address, w->data);
+				INFO_VERBOSE("[0x%04X]  0x%04X", w->address, w->data);
 
 				/* now print the second word if applicable */
 				if((n = n->next) && (w = (block_word *)n->item)) {
 					if(current_line_number == w->line_number) {
-						fprintf(listing_file, "  0x%08X", w->data);
-						INFO_VERBOSE("  0x%08X", w->data);
+						fprintf(listing_file, "  0x%04X", w->data);
+						INFO_VERBOSE("  0x%04X", w->data);
 						n && (n = n->next) && (w = (block_word *)n->item);
 					}
 					else {
-						fprintf(listing_file, "            ");
-						INFO_VERBOSE("            ");
+						fprintf(listing_file, "        ");
+						INFO_VERBOSE("        ");
 					}
 				}
 				else {
 					w = NULL;
-					fprintf(listing_file, "            ");
-					INFO_VERBOSE("            ");
+					fprintf(listing_file, "        ");
+					INFO_VERBOSE("        ");
 				}
 			}
 		}
@@ -277,8 +277,8 @@ void generate_listing() {
 				INFO_VERBOSE("[0x%04X]", w->address);
 			}
 
-			fprintf(listing_file, "  0x%08X", w->data);
-			INFO_VERBOSE("  0x%08X", w->data);
+			fprintf(listing_file, "  0x%04X", w->data);
+			INFO_VERBOSE("  0x%04X", w->data);
 
 			n && (n = n->next) && (w = (block_word *)n->item);
 			line_word_cnt++;
