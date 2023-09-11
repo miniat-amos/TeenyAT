@@ -104,6 +104,7 @@ void tny_clock(teenyat *t) {
 	 */
 	if(t->delay_cycles) {
 		t->delay_cycles--;
+		return;
 	}
 
 	/*
