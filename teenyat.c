@@ -276,12 +276,22 @@ void tny_clock(teenyat *t) {
 		set_elg_flags(t, t->reg[reg1].s);
 		break;
 	case TNY_OPCODE_DIV:
-		t->reg[reg1].s /= t->reg[reg2].s + immed;
-		set_elg_flags(t, t->reg[reg1].s);
+		if(t->reg[reg2].s + immed != 0) {
+			t->reg[reg1].s /= t->reg[reg2].s + immed;
+			set_elg_flags(t, t->reg[reg1].s);
+		}
+		else {
+			/* No behavior defined on divide-by-zero */
+		}
 		break;
 	case TNY_OPCODE_MOD:
-		t->reg[reg1].s %= t->reg[reg2].s + immed;
-		set_elg_flags(t, t->reg[reg1].s);
+		if(t->reg[reg2].s + immed != 0) {
+			t->reg[reg1].s %= t->reg[reg2].s + immed;
+			set_elg_flags(t, t->reg[reg1].s);
+		}
+		else {
+			/* No behavior defined on divide-by-zero */
+		}
 		break;
 	case TNY_OPCODE_AND:
 		t->reg[reg1].s &= t->reg[reg2].s + immed;
