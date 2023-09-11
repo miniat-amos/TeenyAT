@@ -414,7 +414,7 @@ void tny_clock(teenyat *t) {
 		}
 		break;
 	default:
-		fprintf(stderr, "Unkown opcode (%d) encountered at 0x%04X on cycle %" PRIu64 "\n",
+		fprintf(stderr, "Unknown opcode (%d) encountered at 0x%04X on cycle %" PRIu64 "\n",
 		        opcode, orig_PC, t->cycle_cnt);
 		break;
 	}
