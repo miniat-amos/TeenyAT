@@ -126,7 +126,7 @@ void tny_clock(teenyat *t) {
 	tny_uword opcode = IR.instruction.opcode;
 	bool teeny = IR.instruction.teeny;
 	tny_uword reg1 = IR.instruction.reg1;
-	tny_uword reg2 = IR.instruction.reg1;
+	tny_uword reg2 = IR.instruction.reg2;
 	bool carry = IR.inst_flags.carry;
 	bool equals = IR.inst_flags.equals;
 	bool less = IR.inst_flags.less;
