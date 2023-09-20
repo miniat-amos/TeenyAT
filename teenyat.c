@@ -400,7 +400,7 @@ void tny_clock(teenyat *t) {
 				condition_satisfied |= t->flags.greater;
 			}
 			if(!flags_checked || condition_satisfied) {
-				set_pc(t, t->reg[reg2].s + immed);
+				set_pc(t, t->reg[reg1].s + immed);
 			}
 		}
 		break;
