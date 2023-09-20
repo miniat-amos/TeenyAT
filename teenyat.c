@@ -1,3 +1,10 @@
+/*
+ * Name	   : teenyat.c
+ * Author	 : William "Amos" Confer
+ *
+ * License	: Copyright (C) 2023 All rights reserved
+ */
+
 #include <assert.h>
 #include <inttypes.h>
 #include <stdint.h>

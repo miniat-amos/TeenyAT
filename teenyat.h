@@ -2,7 +2,7 @@
  * Name	   : teenyat.h
  * Author	 : William "Amos" Confer
  *
- * License	: Copyright (C) 2022 All rights reserved
+ * License	: Copyright (C) 2023 All rights reserved
  */
 
 #ifndef __TEENYAT_H__

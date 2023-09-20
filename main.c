@@ -1,3 +1,17 @@
+/*
+ * Name	   : main.c
+ * Author	 : William "Amos" Confer
+ *
+ * License	: Copyright (C) 2023 All rights reserved
+ *
+ * This brief program is meant to serve as an ultra simplistic example of
+ * how the TeenyAT header and source can be quickly used to create a
+ * simulated system.  In this case, the system loads whatever binary image
+ * is provided and runs it for up 123456 cycles.  Any attempt to read from
+ * the bus will result in a 9-cycle access to the number 42, and writes to
+ * the bus will have no side effect other than wasting 7 cycles.
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 
