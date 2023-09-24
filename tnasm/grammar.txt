@@ -1,5 +1,3 @@
-%token_prefix T_
-
 lang ::= loc EOL.
 
 loc ::= variable_line.
@@ -8,7 +6,6 @@ loc ::= raw_line.
 loc ::= label_line.
 loc ::= code_1_line.
 loc ::= code_2_line.
-/*
 loc ::= code_3_line.
 loc ::= code_4_line.
 loc ::= code_5_line.
@@ -21,7 +18,7 @@ loc ::= code_11_line.
 loc ::= code_12_line.
 loc ::= code_13_line.
 loc ::= code_14_line.
-*/
+
 variable_line ::= VARIABLE IDENTIFIER immediate.
 
 constant_line ::= CONSTANT IDENTIFIER immediate.
@@ -40,7 +37,6 @@ number ::= NUMBER.
 
 code_1_line ::= code_1_inst REGISTER COMMA REGISTER.
 code_2_line ::= code_2_inst REGISTER COMMA REGISTER add_or_subtract immediate.
-/*
 code_3_line ::= code_3_inst REGISTER COMMA immediate.
 code_4_line ::= code_4_inst REGISTER.
 code_5_line ::= code_5_inst REGISTER.
@@ -53,7 +49,6 @@ code_11_line ::= code_11_inst.
 code_12_line ::= code_12_inst REGISTER.
 code_13_line ::= code_13_inst REGISTER add_or_subtract immediate.
 code_14_line ::= code_14_inst immediate.
-*/
 
 add_or_subtract ::= PLUS.
 add_or_subtract ::= MINUS.
@@ -91,7 +86,6 @@ code_2_inst ::= BTF.
 code_2_inst ::= CMP.
 code_2_inst ::= DJZ.
 
-/*
 code_3_inst ::= ADD.
 code_3_inst ::= SUB.
 code_3_inst ::= MPY.
@@ -152,44 +146,3 @@ code_14_inst ::= JL.
 code_14_inst ::= JLE.
 code_14_inst ::= JG.
 code_14_inst ::= JGE.
-*/
-
-/*
-T_SET
-T_LOD
-T_STR
-T_PSH
-T_POP
-T_BTS
-T_BTC
-T_BTF
-T_CAL
-T_ADD
-T_SUB
-T_MPY
-T_DIV
-T_MOD
-T_AND
-T_OR
-T_XOR
-T_SHF
-T_ROT
-T_NEG
-T_CMP
-T_JMP
-T_DJZ
-T_INC
-T_DEC
-T_RET
-T_LABEL
-T_VARIABLE
-T_CONSTANT
-T_REGISTER
-T_IDENTIFIER
-T_NUMBER
-T_PLUS
-T_MINUS
-T_COMMA
-T_LBRACKET
-T_RBRACKET
-*/
