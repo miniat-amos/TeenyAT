@@ -1,5 +1,13 @@
 # TeenyAT Instruction Set Overview
 
+
+### Registers
+- PC - is the program counter, contains address of _next_ instruction, initially 0x0000
+- SP - is the stack pointer, contains address of the _next_ top element, initially 0x7FFF (empty)
+	- _stack grows down in memory_
+- rZ - is the "Zero" register, which always contains the value 0
+	- _all attempts to modify rZ are ignored_
+- rA through rE are general purpose registers
 ### Instructions by Type
 
 #####  Logical Instructions
