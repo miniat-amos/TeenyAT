@@ -2,12 +2,22 @@
 
 
 ### Registers
+##### All 8 registers are available to register-use instructions
 - PC - is the program counter, contains address of _next_ instruction, initially 0x0000
 - SP - is the stack pointer, contains address of the _next_ top element, initially 0x7FFF (empty)
 	- _stack grows down in memory_
 - rZ - is the "Zero" register, which always contains the value 0
 	- _all attempts to modify rZ are ignored_
 - rA through rE are general purpose registers
+
+### Flags
+
+##### All flags are set by both ALU & CMP instructions
+- C- carry flag
+- E - equals or zero flag
+- L - less than flag
+- G - greater than flag
+
 ### Instructions by Type
 
 #####  Logical Instructions
@@ -32,7 +42,7 @@
 - SET - sets a register to a value
 - LOD - loads a value from memory into a register
 - STR - Stores a value into a given memory address
-- PSH - loades a register into the stack pointer (SP) and decrements SP by 1
+- PSH - loades a register into SP and decrements SP by 1
 - POP - loads value from top of SP into register
 
 #####  Bit Instructions
@@ -41,8 +51,8 @@
 - BTF - flips a specific bit in a register
 
 #####  Control Instructions
-- CAL - sets the program counter (PC) to an address
-- RET - returns out of a CAL instruction
+- CAL - sets the PC to an address and decrements SP  
+- RET - returns out of a CAL instruction and increments SP
 - CMP - compares two values to eachother and sets flags (C,E,L,G)
 - JMP - jumps to given address
 - JE - jumps to given address if Equals flag true
