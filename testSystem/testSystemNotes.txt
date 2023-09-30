@@ -1,0 +1,10 @@
+Goals
+-look at instructions, opcodes and encoding structure
+-create really simple assembler for temporary ease of use only
+-create a simple testing system
+-create a test suite that covers all opcodes
+-use test suite to confirm the functionality of the opcodes
+
+Creating the simple assembler
+-parse asm file and create tasm file tokenized assembly file
+-parse tasm file and create bin or binary file
