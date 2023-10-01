@@ -179,6 +179,11 @@ struct teenyat {
 	 * or reset.
 	 */
 	uint64_t cycle_cnt;
+	/**
+	 * An extra pointer for system developers so data can follow a TeenyAT
+	 * instance through read/write callback functions, for example.
+	 */
+	void *ex_data;
 };
 
 #define TNY_OPCODE_SET 0
