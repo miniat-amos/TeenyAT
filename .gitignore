@@ -7,3 +7,5 @@ Thumbs.db
 # Applications
 *.out
 *.exe
+
+.vscode
