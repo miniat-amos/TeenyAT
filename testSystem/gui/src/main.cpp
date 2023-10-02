@@ -32,8 +32,8 @@
 const int size = 64;
 bool drawStroke = 1;
 bool drawFill  = 1;
-int WIDTH = 400;
-int HEIGHT = 400;
+int WIDTH = 640;
+int HEIGHT = 640;
 uint16_t currStrokeColor = 0;
 uint16_t currFillColor = 0;
 
@@ -158,7 +158,7 @@ void update(SDL_Renderer* renderer, int size,uint16_t dest[],uint16_t src[]){
             int index = y * size + x;
             dest[index] = src[index];
             fill(renderer,dest[index]);
-            pixel(renderer,x*res,y*res,res+1,res+1);
+            pixel(renderer,x*res,y*res,res,res);
         }
     }
     SDL_RenderPresent(renderer);
@@ -173,8 +173,7 @@ int main( int argc, char* argv[]){
                                 SDL_WINDOWPOS_UNDEFINED, 
                                 SDL_WINDOWPOS_UNDEFINED, 
                                 WIDTH, 
-                                HEIGHT, 
-                                SDL_WINDOW_RESIZABLE);
+                                HEIGHT,SDL_WINDOW_ALLOW_HIGHDPI);
     if(NULL == window){
         std::cout << "Could not create window" << SDL_GetError() << std::endl;
         return EXIT_FAILURE;
