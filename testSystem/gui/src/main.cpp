@@ -10,7 +10,23 @@
 #include "color.h"
 
 
-// Some globals (so scary)
+#define LIVESCREEN 0x8000
+#define UPDATESCREEN 0x9000
+#define X1 0xD000
+#define Y1 0xD001
+#define X2 0xD002
+#define Y2 0xD003
+#define STROKE 0xD010
+#define FILL 0xD011
+#define DRAWFILL 0xD012
+#define DRAWSTROKE 0xD013
+#define UPDATE 0xE000
+#define RECT 0xE010
+#define LINE 0xE011
+#define MOUSEX 0xFFFC
+#define MOUSEY 0xFFFD
+#define TERM 0xFFFF
+#define KEY 0xFFFE
 
 // How many pixels to draw size*size
 const int size = 64;
@@ -136,6 +152,7 @@ void rect(uint16_t src[],int x1, int y1,int w){
 
 // update game and draw all pixels 
 void update(SDL_Renderer* renderer, int size,uint16_t dest[],uint16_t src[]){
+    // Render Pixels and turn live_screen into update_screen
     for(int y = 0; y < size; y++){
         for(int x = 0; x < size; x++){
             int index = y * size + x;
