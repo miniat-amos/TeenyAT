@@ -32,9 +32,9 @@ int main( int argc, char* argv[]){
    
     Screen s;
 
-    //Initial the Scene
-    s.setVal(25,&s.x1);
-    s.setVal(25,&s.y1);
+    //Sample Initial Scene
+    s.setVal(26,&s.x1);
+    s.setVal(26,&s.y1);
 
     s.stroke(0);
     s.fill(190);

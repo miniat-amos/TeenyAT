@@ -5,6 +5,7 @@
 #include <ctime>
 #include <sstream>
 #include <SDL2/SDL.h>
+#include <vector>
 #include "Color.h"
 
 class Screen{
@@ -131,6 +132,8 @@ class Screen{
             verticalLine(x1, y1, y2);
             return;
         }
+
+        // Positive Slopes
         int m_new = 2 * (y2 - y1);
         int slope_error_new = m_new - (x2 - x1);
         for (int x = x1, y = y1; x <= x2; x++) {
@@ -152,19 +155,36 @@ class Screen{
     void line()
     {   
        if(drawStroke){
+
         // prevent bad values
         int temp1 = x1;
         int temp2 = x2;
+        int temp3 = y1;
+        int temp4 = y2;
         if(x1 > x2){
                 x1 = x2;
                 x2 = temp1;
+                y1 = y2;
+                y2 = temp3;
         }
-        uint16_t temp = currFillColor;
-        currFillColor = currStrokeColor;
-        bresenham(x1,y1,x2,y2);
-        currFillColor = temp;
+        
+        int m = (y2 - y1) / (x2 - x1);
+        int x = x1;
+        int y = y1;
+        update_screen[y * size + x] = currStrokeColor;
+        update_screen[y2 * size + x2] = currStrokeColor;
+        while(x <= x2){
+            y = (int)(m * x) + y1;
+            //  std::cout << x << ' ' << y << std::endl;
+            update_screen[y * size + x] = currStrokeColor;
+            x++;
+        }
+
         x1 = temp1;
         x2 = temp2;
+        y1 = temp3;
+        y2 = temp4;
+
        }
     }
 
