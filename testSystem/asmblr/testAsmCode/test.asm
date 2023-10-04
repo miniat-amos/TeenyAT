@@ -4,16 +4,16 @@ main:
     SET $4 $3 ;set register 3 to the value of the zero register always zero
     SET $7 $3 ;set register 7 to the value of the zero register which is always zero
 loopforlast:
-    LOD $5 [Array $7] ;load first value of the Array
+    LOD $5 [$7 + Array] ;load first value of the Array
     CMP $5 #FFFF
     JE lastfound ;address of last element is in $7
     ADD $7 1
     JMP loopforlast
 lastfound:
-    LOD $5 [Array $4]
-    LOD $6 [Array $7]
-    STR [Array $4] $6
-    STR [Array $7] $5
+    LOD $5 [$4 + Array]
+    LOD $6 [$7 +  Array]
+    STR [$4 + Array] $6
+    STR [$7 + Array] $5
     ADD $4 1
     SUB $7 1
     CMP $4 $7
