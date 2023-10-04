@@ -7,11 +7,23 @@
         ; whitespace and non-"!" characters.
 
 ;--- Registers ---
-; the eight registers supported by tnasm are:
+; The eight registers supported by tnasm are:
 ; rA, rB, rC, rD, rE: five general purpose registers
 ; PC: the Program Counter register
 ; SP: the Stack Pointer register
 ; rZ: the Zero Register (always contains the value zero)
+; r0--r7: Numeric reference to registers is also supported
+
+;--- Variables and Constants ---
+; Declare variables using the .var or .variable directives.  If no initial value
+; is provided at the time of declaration, the value is undefined.
+; Define constants using the .const or .constant directives.  These require an
+; initial value.
+
+.const TERM 0xFFFE
+.constant FOUR 4
+.var age 27
+.variable count
 
 ;--- Common Instruction formats
 ; The great majority of instructions have three main forms supported by tnasm.
@@ -22,7 +34,7 @@
 ; instruction.
 
 ;--- ALU Instructions ---
-add rA, rB        ; same as... rA += rB
+add rA, PC        ; same as... rA += rB
 add rA, 72        ; same as... rA += 72
 add rA, rC + 13   ; same as... rA += rC + 13
 
@@ -44,7 +56,7 @@ mod rA, rC + 13   ; same as... rA %= rC + 13
 
 and rA, rB        ; same as... rA &= rB
 and rA, 72        ; same as... rA &= 72
-and rA, rC + 13   ; same as... rA &= rC + 13
+and rA, rZ + 13   ; same as... rA &= rC + 13
 
 or rA, rB        ; same as... rA |= rB
 or rA, 72        ; same as... rA |= 72

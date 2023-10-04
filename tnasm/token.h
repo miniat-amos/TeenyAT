@@ -1,34 +1,111 @@
 #ifndef __TOKEN_H__
 #define __TOKEN_H__
 
-#include "../teenyat.h"
+#include <regex>
+#include <vector>
 
 using namespace std;
 
-typedef struct Token Token;
-typedef struct TokenLine TokenLine;
-typedef struct Symbol Symbol;
+enum Token_Type {
+    T_IGNORE = 0,
+    T_EOL,
+    T_LABEL,
+    T_CONSTANT,
+    T_VARIABLE,
+    T_REGISTER,
+    T_SET,
+    T_LOD,
+    T_STR,
+    T_PSH,
+    T_POP,
+    T_BTS,
+    T_BTC,
+    T_BTF,
+    T_CAL,
+    T_ADD,
+    T_SUB,
+    T_MPY,
+    T_DIV,
+    T_MOD,
+    T_AND,
+    T_OR,
+    T_XOR,
+    T_SHF,
+    T_ROT,
+    T_NEG,
+    T_CMP,
+    T_JMP,
+    T_DJZ,
+    T_INC,
+    T_DEC,
+    T_RET,
+    T_IDENTIFIER,
+    T_NUMBER,
+    T_PLUS,
+    T_MINUS,
+    T_COMMA,
+    T_LBRACKET,
+    T_RBRACKET,
+    T_BAD
+};
+
+string tstr[] = {
+    "T_IGNORE",
+    "T_EOL",
+    "T_LABEL",
+    "T_CONSTANT",
+    "T_VARIABLE",
+    "T_REGISTER",
+    "T_SET",
+    "T_LOD",
+    "T_STR",
+    "T_PSH",
+    "T_POP",
+    "T_BTS",
+    "T_BTC",
+    "T_BTF",
+    "T_CAL",
+    "T_ADD",
+    "T_SUB",
+    "T_MPY",
+    "T_DIV",
+    "T_MOD",
+    "T_AND",
+    "T_OR",
+    "T_XOR",
+    "T_SHF",
+    "T_ROT",
+    "T_NEG",
+    "T_CMP",
+    "T_JMP",
+    "T_DJZ",
+    "T_INC",
+    "T_DEC",
+    "T_RET",
+    "T_IDENTIFIER",
+    "T_NUMBER",
+    "T_PLUS",
+    "T_MINUS",
+    "T_COMMA",
+    "T_LBRACKET",
+    "T_RBRACKET",
+    "T_BAD"
+};
 
 struct Token {
-	int line_no;
-	string token_str;
-	int type;
-	/*
-	 * These two words could be used for the data of a single lexical token or
-	 * as the first and second words of an encoded instruction.
-	 */
-	tny_word data;
-	tny_word immed;
+    Token_Type id;
+    string token_str;
+    int line_no;
+    int ram_addr;
 };
 
-struct TokenLine {
-	int line_no;
-	vector <Token> toks;
-};
+typedef vector <Token> Token_Line;
+typedef vector <Token_Line> Token_Lines;
 
 struct Symbol {
 	int line_no;
 	string str;
 	tny_word data;
 };
+
 #endif /* __TOKEN_H__ */
