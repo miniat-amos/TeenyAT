@@ -13,16 +13,18 @@ class Screen{
     static const int size = 64;
     bool drawStroke = 1;
     bool drawFill  = 1;
-    int WIDTH = 640;
-    int HEIGHT = 640;
+    int Window_WIDTH = 640;
+    int Window_HEIGHT = 640;
     uint16_t currStrokeColor = 0;
     uint16_t currFillColor = 0;
     // 354 - lightLavender 
-    int hue = 354;
+    int hue = 268;
     int sat = 1150;
     int val = 200;
+
     // Resoulution of each pixel
-    double res = (double) WIDTH / size;
+    double res = (double) Window_WIDTH / size;
+
     SDL_Window *window;
     SDL_Renderer *renderer;
 
@@ -49,8 +51,8 @@ class Screen{
         window = SDL_CreateWindow("Test System GUI", 
                                 SDL_WINDOWPOS_UNDEFINED, 
                                 SDL_WINDOWPOS_UNDEFINED, 
-                                WIDTH, 
-                                HEIGHT,SDL_WINDOW_ALLOW_HIGHDPI);
+                                Window_WIDTH, 
+                                Window_HEIGHT,SDL_WINDOW_ALLOW_HIGHDPI);
         if(NULL == window){
             std::cout << "Could not create window" << SDL_GetError() << std::endl;
         }
