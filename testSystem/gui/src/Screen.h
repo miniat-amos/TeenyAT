@@ -11,14 +11,17 @@
 class Screen{
     public: 
     static const int size = 64;
-    bool drawStroke = 1;
-    bool drawFill  = 1;
+    int drawStroke = 1;
+    int drawFill  = 1;
     int Window_WIDTH = 640;
     int Window_HEIGHT = 640;
     uint16_t currStrokeColor = 0;
     uint16_t currFillColor = 0;
+
     // 354 - lightLavender 
     int hue = 268;
+
+    // 1150 - orig
     int sat = 1150;
     int val = 200;
 
@@ -52,13 +55,14 @@ class Screen{
                                 SDL_WINDOWPOS_UNDEFINED, 
                                 SDL_WINDOWPOS_UNDEFINED, 
                                 Window_WIDTH, 
-                                Window_HEIGHT,SDL_WINDOW_ALLOW_HIGHDPI);
+                                Window_HEIGHT, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
         if(NULL == window){
             std::cout << "Could not create window" << SDL_GetError() << std::endl;
         }
 
         // Create renderer and initialize update_screen to lavender
         renderer =  SDL_CreateRenderer( window, -1, SDL_RENDERER_ACCELERATED);
+        SDL_RenderSetLogicalSize(renderer, size, size);
         for(int i = 0; i < size*size; i++){
             update_screen[i] = hue;
         }
@@ -218,7 +222,6 @@ class Screen{
 
     }
 
-
     // update game and draw all pixels 
     void update(){
         // Render Pixels and turn live_screen into update_screen
@@ -227,7 +230,7 @@ class Screen{
                 int index = y * size + x;
                 live_screen[index] = update_screen[index];
                 fill(live_screen[index]);
-                pixel(x*res,y*res,res,res);
+                SDL_RenderDrawPoint(renderer, x, y);
             }
         }
         SDL_RenderPresent(renderer);

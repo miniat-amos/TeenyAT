@@ -1,8 +1,6 @@
 /*
     Some things to remember:    
-        When reading in a pixels value from memory return the update_screen 16b value
-
-
+        When reading in a pixels value from memory return the update_screen 0b16 value
 */
 
 #include <iostream>
@@ -36,7 +34,7 @@ int main( int argc, char* argv[]){
     // Screen to write too
     Screen s;
 
-#if 0    
+#if 0   
     for(int i = 0; i < s.size*s.size; i++){
         s.update_screen[i] = i % 360;
     }
@@ -72,13 +70,13 @@ int main( int argc, char* argv[]){
     s.update();
 #endif
     
-
+    // Initialize the teenyAT
     // if(argc != 2){
     //     std::cout << "Please provide an asm file" << std::endl;
     //     return 1;
     // }
     // char * fileName = argv[1];
-    // teenyat t;
+    //teenyat t;
     // bool success = false;
 	// FILE *bin_file = fopen(fileName, "rb");
 	// if (bin_file != NULL) {
@@ -90,8 +88,10 @@ int main( int argc, char* argv[]){
     
 
     while(SDL_PollEvent(&s.windowEvent) == 0 || s.windowEvent.type != SDL_QUIT){
+        SDL_SetRenderDrawColor(s.renderer, 0xDD, 0xBB, 0xFF, 0xFF);
+        SDL_RenderClear(s.renderer);
         SDL_GetMouseState(&s.mouseX, &s.mouseY);
-        
+        s.update();
         //tny_clock(&t);
     }
 
@@ -107,7 +107,8 @@ int map(int num, int in_min, int in_max, int out_min, int out_max){
 }
 
 void bus_read(teenyat *t, tny_uword addr, tny_word *data, uint16_t *delay) {
-	Screen *s = (Screen *)t->ex_data;
+	
+    Screen *s = (Screen *)t->ex_data;
 	*delay = 0;  
     if (s == NULL)
 		return;
@@ -189,6 +190,7 @@ void bus_read(teenyat *t, tny_uword addr, tny_word *data, uint16_t *delay) {
 }
 
 void bus_write(teenyat *t, tny_uword addr, tny_word data, uint16_t *delay) {
+    
     Screen *s = (Screen *)t->ex_data;
     *delay = 0;
     if (s == NULL)
@@ -239,11 +241,11 @@ void bus_write(teenyat *t, tny_uword addr, tny_word data, uint16_t *delay) {
              std::cout << " fill";
              break;
         case DRAWFILL:
-             s->drawFill = data.u;
+             s->setVal(data.u,&s->drawFill);
              std::cout << " drawFill";
              break;
         case DRAWSTROKE:
-             s->drawStroke = data.u;
+             s->setVal(data.u,&s->drawStroke);
              std::cout << " drawStroke";
              break;
         case UPDATE:
