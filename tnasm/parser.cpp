@@ -32,3 +32,7 @@ bool p_variable_line() {
 bool p_constant_line() {
     return term(T_CONSTANT) && term(T_IDENTIFIER) && p_immed() && term(T_EOL);
 }
+
+bool p_label_line() {
+    return term(T_LABEL) && term(T_EOL);
+}
