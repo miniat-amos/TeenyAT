@@ -22,13 +22,14 @@
 #define UPDATE 0xE000
 #define RECT 0xE010
 #define LINE 0xE011
+#define POINT 0xE012 // use x1 & y1 and stroke color
 #define MOUSEX 0xFFFC
 #define MOUSEY 0xFFFD
 #define TERM 0xFFFF
 #define KEY 0xFFFE
 
 void bus_read(teenyat *t, tny_uword addr, tny_word *data, uint16_t *delay);
-void bus_write(teenyat *t, tny_uword addr, tny_word *data, uint16_t *delay);
+void bus_write(teenyat *t, tny_uword addr, tny_word data, uint16_t *delay);
 
 int main( int argc, char* argv[]){
     // Screen to write too
@@ -70,29 +71,28 @@ int main( int argc, char* argv[]){
     s.update();
 #endif
     
-    // Initialize the teenyAT
-    // if(argc != 2){
-    //     std::cout << "Please provide an asm file" << std::endl;
-    //     return 1;
-    // }
-    // char * fileName = argv[1];
-    //teenyat t;
-    // bool success = false;
-	// FILE *bin_file = fopen(fileName, "rb");
-	// if (bin_file != NULL) {
-	// 	success = true;
-	// 	tny_init_from_file(&t, bin_file, bus_read, bus_write);
-	// 	fclose(bin_file);
-	// }
-	// t.ex_data = &s;
+    //Initialize the teenyAT
+    if(argc != 2){
+        std::cout << "Please provide an asm file" << std::endl;
+        return 1;
+    }
+    char * fileName = argv[1];
+    teenyat t;
+    bool success = false;
+	FILE *bin_file = fopen(fileName, "rb");
+	if (bin_file != NULL) {
+		success = true;
+		tny_init_from_file(&t, bin_file, bus_read, bus_write);
+		fclose(bin_file);
+	}
+	t.ex_data = &s;
     
 
     while(SDL_PollEvent(&s.windowEvent) == 0 || s.windowEvent.type != SDL_QUIT){
         SDL_SetRenderDrawColor(s.renderer, 0xDD, 0xBB, 0xFF, 0xFF);
         SDL_RenderClear(s.renderer);
         SDL_GetMouseState(&s.mouseX, &s.mouseY);
-        s.update();
-        //tny_clock(&t);
+        tny_clock(&t);
     }
 
     SDL_DestroyWindow(s.window);
