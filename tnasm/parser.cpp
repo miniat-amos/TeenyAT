@@ -12,6 +12,7 @@ bool p_raw_line();
 bool p_label_line();
 
 bool p_immed();
+bool p_number(tny_word &v);
 
 bool term(Token_Type id) {
     return next < parse_line.size() && parse_line[next++].id == id;
@@ -35,4 +36,23 @@ bool p_constant_line() {
 
 bool p_label_line() {
     return term(T_LABEL) && term(T_EOL);
+}
+
+/* number ::= (PLUS | MINUS)? NUMBER. */
+bool p_number(tny_word &v) {
+    bool result = false;
+    int save = next;
+    if(next = save, term(T_PLUS) && term(T_NUMBER)) {
+        v = parse_line[save + 1].value;
+        result = true;
+    }
+    else if(next = save, term(T_MINUS)) && term(T_NUMBER)) {
+        v.s = -(parse_line[save + 1].value.s);
+        result = true;
+    }
+    else if(next = save, term(T_NUMBER)) {
+        v = parse_line[save + 1].value;
+        result = true;
+    }
+    return result;
 }

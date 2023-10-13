@@ -97,6 +97,7 @@ struct Token {
     string token_str;
     int line_no;
     int ram_addr;
+    tny_word value;
 };
 
 typedef vector <Token> Token_Line;
