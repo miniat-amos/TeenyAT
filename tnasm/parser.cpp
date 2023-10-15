@@ -3,6 +3,12 @@
 
 using namespace std;
 
+struct instruction {
+    tny_word low;
+    tny_word high;
+    int line_no;
+}
+
 Token_Line parse_line;  // The current line of tokens being parsed
 int i next;  // index of the next token in the line to consider
 
