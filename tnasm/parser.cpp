@@ -1,6 +1,7 @@
 #include <memory>
 
-#include "../token.h"
+#include "../teenyat.h"
+#include "token.h"
 #include "parser.h"
 
 using namespace std;
@@ -17,7 +18,7 @@ int tnext;  // index of the next token in the line to consider
 bool p_variable_line();
 bool p_constant_line();
 bool p_raw_line();
-bool p_label_line();
+unique_ptr<token> p_label_line();
 
 bool p_immed();
 bool p_number(tny_word &v);
@@ -39,7 +40,7 @@ bool p_number(tny_word &v);
  */
 unique_ptr<token> term(token_type id) {
     unique_ptr<token> val = nullptr;
-    if(next < parse_line.size() && parse_line[next].id == id) {
+    if(tnext < parse_line.size() && parse_line[tnext].id == id) {
         val = unique_ptr<token>(new token(parse_line[tnext]));
     }
     tnext++;
@@ -48,10 +49,10 @@ unique_ptr<token> term(token_type id) {
 
 bool p_loc() {
     int save = tnext;
-    return (next = save, p_variable_line()) ||
-           (next = save, p_constant_line()) ||
-           (next = save, p_raw_line()) ||
-           (next = save, p_label_line());
+    return (tnext = save, p_variable_line()) ||
+           (tnext = save, p_constant_line()) ||
+           (tnext = save, p_raw_line()) ||
+           (tnext = save, p_label_line());
 }
 
 bool p_variable_line() {
@@ -62,8 +63,13 @@ bool p_constant_line() {
     return term(T_CONSTANT) && term(T_IDENTIFIER) && p_immed() && term(T_EOL);
 }
 
-bool p_label_line() {
-    return term(T_LABEL) && term(T_EOL);
+unique_ptr<token> p_label_line() {
+    unique_ptr<token> val = nullptr;
+    int save = tnext;
+    if(term(T_LABEL) && term(T_EOL)) {
+        *val = parse_line[save];
+    }
+    return val;
 }
 
 /* number ::= (PLUS | MINUS)? NUMBER. */
@@ -74,7 +80,7 @@ bool p_number(tny_word &v) {
         v = parse_line[save + 1].value;
         result = true;
     }
-    else if(tnext = save, term(T_MINUS)) && term(T_NUMBER)) {
+    else if(tnext = save, term(T_MINUS) && term(T_NUMBER)) {
         v.s = -(parse_line[save + 1].value.s);
         result = true;
     }
