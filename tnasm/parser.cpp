@@ -1,3 +1,5 @@
+#include <memory>
+
 #include "../token.h"
 #include "parser.h"
 
@@ -7,10 +9,10 @@ struct instruction {
     tny_word low;
     tny_word high;
     int line_no;
-}
+};
 
 token_line parse_line;  // The current line of tokens being parsed
-int i next;  // index of the next token in the line to consider
+int tnext;  // index of the next token in the line to consider
 
 bool p_variable_line();
 bool p_constant_line();
@@ -20,12 +22,32 @@ bool p_label_line();
 bool p_immed();
 bool p_number(tny_word &v);
 
-bool term(token_type id) {
-    return next < parse_line.size() && parse_line[next++].id == id;
+/**
+ * @brief
+ *   Verifies the next token in the line is a particular type and moves to the
+ *   next
+ *
+ * @param id
+ *   The type of the token to check for
+ *
+ * @return
+ *   A smart pointer to the matching token or nullptr if the type doesn't match
+ *
+ * @note
+ *   It is important to realize the global tnext token index will always be
+ *   incremented, regardless of whether the token type matched.
+ */
+unique_ptr<token> term(token_type id) {
+    unique_ptr<token> val = nullptr;
+    if(next < parse_line.size() && parse_line[next].id == id) {
+        val = unique_ptr<token>(new token(parse_line[tnext]));
+    }
+    tnext++;
+    return val;
 }
 
 bool p_loc() {
-    int save = next;
+    int save = tnext;
     return (next = save, p_variable_line()) ||
            (next = save, p_constant_line()) ||
            (next = save, p_raw_line()) ||
@@ -47,16 +69,16 @@ bool p_label_line() {
 /* number ::= (PLUS | MINUS)? NUMBER. */
 bool p_number(tny_word &v) {
     bool result = false;
-    int save = next;
-    if(next = save, term(T_PLUS) && term(T_NUMBER)) {
+    int save = tnext;
+    if(tnext = save, term(T_PLUS) && term(T_NUMBER)) {
         v = parse_line[save + 1].value;
         result = true;
     }
-    else if(next = save, term(T_MINUS)) && term(T_NUMBER)) {
+    else if(tnext = save, term(T_MINUS)) && term(T_NUMBER)) {
         v.s = -(parse_line[save + 1].value.s);
         result = true;
     }
-    else if(next = save, term(T_NUMBER)) {
+    else if(tnext = save, term(T_NUMBER)) {
         v = parse_line[save + 1].value;
         result = true;
     }
