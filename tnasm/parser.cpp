@@ -9,7 +9,7 @@ struct instruction {
     int line_no;
 }
 
-Token_Line parse_line;  // The current line of tokens being parsed
+token_line parse_line;  // The current line of tokens being parsed
 int i next;  // index of the next token in the line to consider
 
 bool p_variable_line();
@@ -20,7 +20,7 @@ bool p_label_line();
 bool p_immed();
 bool p_number(tny_word &v);
 
-bool term(Token_Type id) {
+bool term(token_type id) {
     return next < parse_line.size() && parse_line[next++].id == id;
 }
 
