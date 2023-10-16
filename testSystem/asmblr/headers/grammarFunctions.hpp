@@ -33,6 +33,7 @@ extern void grammar11(const std::vector<std::string>& line, const std::string& f
 extern void grammar12(const std::vector<std::string>& line, const std::string& filename);
 extern void grammar13(const std::vector<std::string>& line, const std::string& filename);
 extern void grammar14(const std::vector<std::string>& line, const std::string& filename);
+extern void grammar15(const std::vector<std::string>& line, const std::string& filename);
 
 extern void grammar32(const std::vector<std::string>& line, const std::string& filename);
 extern void grammar33(const std::vector<std::string>& line, const std::string& filename);

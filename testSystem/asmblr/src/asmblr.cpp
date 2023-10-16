@@ -19,7 +19,7 @@ void whitespaceTrim(std::string &str)
 {
     std::string whiteSpace = " \t";
     int lastCharacter = str.length() - 1;
-    int firstCharacter = 0;
+    size_t firstCharacter = 0;
     while(whiteSpace.find(str[lastCharacter]) != std::string::npos && lastCharacter != 0)
         lastCharacter = lastCharacter - 1;
     while(whiteSpace.find(str[firstCharacter]) != std::string::npos && firstCharacter != str.length() - 1)
@@ -105,6 +105,7 @@ int main(int argc, char* argv[]){
 
     std::remove("output.txt");
     std::cout << "removed output.txt" << std::endl;
+    resetWordCnt();
 
     for(std::string line : file){
         std::vector<std::string> sline = splitOnWhitespace(line);

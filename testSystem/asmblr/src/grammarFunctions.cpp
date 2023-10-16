@@ -83,6 +83,11 @@ extern void resetWordCnt(){
 
 extern void grammar0(const std::vector<std::string>& line, const std::string& filename)
 {
+    std::cout << "empty grammar 0" << std::endl;
+}
+
+extern void grammar1(const std::vector<std::string>& line, const std::string& filename)
+{
     uint16_t encoding;
     uint8_t dreg;
     uint8_t sreg;
@@ -98,7 +103,7 @@ extern void grammar0(const std::vector<std::string>& line, const std::string& fi
     append16ToFile(filename,encoding);
 }
 
-extern void grammar1(const std::vector<std::string>& line, const std::string& filename){
+extern void grammar2(const std::vector<std::string>& line, const std::string& filename){
     uint32_t encoding;
     uint8_t dreg = registers[line[2]];
     uint8_t sreg = registers[line[3]];
@@ -122,7 +127,7 @@ extern void grammar1(const std::vector<std::string>& line, const std::string& fi
 
 }
 
-extern void grammar2(const std::vector<std::string>& line, const std::string& filename)
+extern void grammar3(const std::vector<std::string>& line, const std::string& filename)
 {
     uint32_t encoding;
     uint8_t dreg = registers[line[2]];
@@ -146,7 +151,7 @@ extern void grammar2(const std::vector<std::string>& line, const std::string& fi
     append32ToFile(filename, encoding);
 }
 
-extern void grammar3(const std::vector<std::string>& line, const std::string& filename){
+extern void grammar4(const std::vector<std::string>& line, const std::string& filename){
     uint16_t encoding;
     uint8_t dreg = registers[line[2]];
     uint8_t sreg = registers["z"];
@@ -160,7 +165,7 @@ extern void grammar3(const std::vector<std::string>& line, const std::string& fi
     append16ToFile(filename,encoding);
 }
 
-extern void grammar4(const std::vector<std::string>& line, const std::string& filename){
+extern void grammar5(const std::vector<std::string>& line, const std::string& filename){
     uint16_t encoding;
     uint8_t dreg;
     uint8_t sreg;
@@ -176,7 +181,7 @@ extern void grammar4(const std::vector<std::string>& line, const std::string& fi
     append16ToFile(filename,encoding);
 }
 
-extern void grammar5(const std::vector<std::string>& line, const std::string& filename){
+extern void grammar6(const std::vector<std::string>& line, const std::string& filename){
     uint32_t encoding;
     uint8_t dreg = registers[line[2]];
     uint8_t sreg = registers[line[4]];
@@ -200,7 +205,7 @@ extern void grammar5(const std::vector<std::string>& line, const std::string& fi
     append32ToFile(filename, encoding);
 }
 
-extern void grammar6(const std::vector<std::string>& line, const std::string& filename){
+extern void grammar7(const std::vector<std::string>& line, const std::string& filename){
     uint32_t encoding;
     uint8_t dreg = registers["z"];
     uint8_t sreg = registers[line[3]];
@@ -223,7 +228,7 @@ extern void grammar6(const std::vector<std::string>& line, const std::string& fi
     append32ToFile(filename, encoding);
 }
 
-extern void grammar7(const std::vector<std::string>& line, const std::string& filename){
+extern void grammar8(const std::vector<std::string>& line, const std::string& filename){
     uint16_t encoding;
     uint8_t dreg = registers["z"];
     uint8_t sreg = registers[line[2]];
@@ -237,7 +242,7 @@ extern void grammar7(const std::vector<std::string>& line, const std::string& fi
     append16ToFile(filename,encoding);
 }
 
-extern void grammar8(const std::vector<std::string>& line, const std::string& filename){
+extern void grammar9(const std::vector<std::string>& line, const std::string& filename){
     uint32_t encoding;
     uint8_t dreg = registers["z"];
     uint8_t sreg = registers[line[2]];
@@ -260,7 +265,7 @@ extern void grammar8(const std::vector<std::string>& line, const std::string& fi
     append32ToFile(filename, encoding);
 }
 
-extern void grammar9(const std::vector<std::string>& line, const std::string& filename){
+extern void grammar10(const std::vector<std::string>& line, const std::string& filename){
     uint32_t encoding;
     uint8_t dreg = registers["z"];
     uint8_t sreg = registers["z"];
@@ -283,7 +288,7 @@ extern void grammar9(const std::vector<std::string>& line, const std::string& fi
     append32ToFile(filename, encoding);
 }
 
-extern void grammar10(const std::vector<std::string>& line, const std::string& filename){
+extern void grammar11(const std::vector<std::string>& line, const std::string& filename){
     uint16_t encoding;
     uint8_t dreg = registers["pc"];
     uint8_t sreg = registers["z"];
@@ -297,7 +302,7 @@ extern void grammar10(const std::vector<std::string>& line, const std::string& f
     append16ToFile(filename,encoding);
 }
 
-extern void grammar11(const std::vector<std::string>& line, const std::string& filename){
+extern void grammar12(const std::vector<std::string>& line, const std::string& filename){
     uint16_t encoding;
     uint8_t dreg = registers[line[2]];
     uint8_t sreg = registers["z"];
@@ -312,7 +317,7 @@ extern void grammar11(const std::vector<std::string>& line, const std::string& f
     append16ToFile(filename,encoding);
 }
 
-extern void grammar12(const std::vector<std::string>& line, const std::string& filename){
+extern void grammar13(const std::vector<std::string>& line, const std::string& filename){
     uint32_t encoding;
     uint8_t dreg = registers[line[2]];
     uint8_t sreg = registers["z"];
@@ -336,7 +341,7 @@ extern void grammar12(const std::vector<std::string>& line, const std::string& f
     append32ToFile(filename, encoding);
 }
 
-extern void grammar13(const std::vector<std::string>& line, const std::string& filename){
+extern void grammar14(const std::vector<std::string>& line, const std::string& filename){
     uint32_t encoding;
     uint8_t dreg = registers["z"];
     uint8_t sreg = registers["z"];
@@ -363,17 +368,16 @@ extern void grammar13(const std::vector<std::string>& line, const std::string& f
     append32ToFile(filename, encoding);
 }
 
-extern void grammar14(const std::vector<std::string>& line, const std::string& filename){
-    //there is no grammar 14 unless I missed something
+extern void grammar15(const std::vector<std::string>& line, const std::string& filename){
+    std::cout << "empty grammer #15" << std::endl;
 }
 
 extern void grammar32(const std::vector<std::string>& line, const std::string& filename){
-    std::cout << "I am in grammar 32" << std::endl;
     labels[line[1]] = wordCnt;
 }
 
 extern void grammar33(const std::vector<std::string>& line, const std::string& filename){
-    for(int i = 1; i < line.size(); i++){
+    for(size_t i = 1; i < line.size(); i++){
         uint16_t value;
         try{
             value = std::stoi(line[i]);

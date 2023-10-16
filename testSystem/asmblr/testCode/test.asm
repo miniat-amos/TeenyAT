@@ -1,50 +1,50 @@
 ;crappy test program reverses array including array terminating value which is arbitrarily set to #FFFF
-13 JMP print
+14 JMP print
 34 Screen 32768
 
 32 Array
    33 2 45 12 3 67 34 10 65535
 
 32 print
-    0 SET 7 z
+    1 SET 7 z
 32 loop
-    1 LOD 5 7 Array
-    5 STR 7 Screen 5
-    4 INC 7
-    2 CMP 5 65535
-    13 JE main
-    13 JMP loop
+    2 LOD 5 7 Array
+    6 STR 7 Screen 5
+    5 INC 7
+    3 CMP 5 65535
+    14 JE main
+    14 JMP loop
 
 32 main
-    0 SET 4 z ;set register 3 to the value of the zero register always zero
-    0 SET 7 z ;set register 7 to the value of the zero register which is always zero
+    1 SET 4 z ;set register 3 to the value of the zero register always zero
+    1 SET 7 z ;set register 7 to the value of the zero register which is always zero
 32 loopforlast
-    1 LOD 5 7 Array ;load first value of the Array
-    2 CMP 5 65535
-    13 JE lastfound ;address of last element is in $7
-    4 INC 7
-    13 JMP loopforlast
+    2 LOD 5 7 Array ;load first value of the Array
+    3 CMP 5 65535
+    14 JE lastfound ;address of last element is in $7
+    5 INC 7
+    14 JMP loopforlast
 32 lastfound
-    1 LOD 5 4 Array
-    1 LOD 6 7 Array
-    5 STR 4 Array 6
-    5 STR 7 Array 5
-    4 INC 4
-    4 DEC 7
-    0 CMP 4 7
-    13 JGE endofprogram
-    13 JMP lastfound
+    2 LOD 5 4 Array
+    2 LOD 6 7 Array
+    6 STR 4 Array 6
+    6 STR 7 Array 5
+    5 INC 4
+    5 DEC 7
+    1 CMP 4 7
+    14 JGE endofprogram
+    14 JMP lastfound
 32 endofprogram
 
 32 printtwo
-    0 SET 7 Z
+    1 SET 7 Z
 32 looptwo
-    1 LOD 5 7 Array
-    5 STR 7 Screen 5
-    4 INC 7
-    2 CMP 5 65535
-    13 JE print
-    13 JMP looptwo
+    2 LOD 5 7 Array
+    6 STR 7 Screen 5
+    5 INC 7
+    3 CMP 5 65535
+    14 JE print
+    14 JMP looptwo
 
 
 ;first pass
