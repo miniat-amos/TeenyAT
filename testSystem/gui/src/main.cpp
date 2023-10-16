@@ -122,7 +122,7 @@ void bus_read(teenyat *t, tny_uword addr, tny_word *data, uint16_t *delay) {
         int index = map(addr,UPDATESCREEN,(UPDATESCREEN + 0xFFF),0,(s->size*s->size)-1);
         data->u = s->update_screen[index];
         *delay = 1;
-        std::cout << "update_screen";
+        std::cout << "update_screen" << std::endl;
         return;
     }
 
@@ -130,7 +130,7 @@ void bus_read(teenyat *t, tny_uword addr, tny_word *data, uint16_t *delay) {
         int index = map(addr,LIVESCREEN,(LIVESCREEN + 0xFFF),0,(s->size*s->size)-1);
         data->u = s->live_screen[index];
         *delay = 2;
-        std::cout << "live_screen";
+        std::cout << "live_screen" << std::endl;
         return;
     }
 
@@ -187,7 +187,7 @@ void bus_read(teenyat *t, tny_uword addr, tny_word *data, uint16_t *delay) {
 			break;
              
     }
-    std::cout << std::endl; 
+    std::cout << "" <<std::endl; 
 	return;
 }
 
@@ -205,7 +205,7 @@ void bus_write(teenyat *t, tny_uword addr, tny_word data, uint16_t *delay) {
         int index = map(addr,UPDATESCREEN,(UPDATESCREEN + 0xFFF),0,(s->size*s->size)-1);
         s->update_screen[index] = data.u;
         *delay = 1;
-        std::cout << "update_screen";
+        std::cout << "update_screen" << std::endl;
         return;
     }
 
@@ -214,7 +214,7 @@ void bus_write(teenyat *t, tny_uword addr, tny_word data, uint16_t *delay) {
         s->live_screen[index] = data.u;
         *delay = 2;
         s->render();
-        std::cout << "live_screen";
+        std::cout << "live_screen" << std::endl;
         return;
     }
     
