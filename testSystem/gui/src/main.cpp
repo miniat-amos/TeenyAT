@@ -1,13 +1,13 @@
 /*
     Some things to remember:    
-        When reading in a pixels value from memory return the update_screen 0b16 value
+        When reading in a pixel's value from memory return the update_screen 0b16 value
 */
 
 #include <iostream>
 #include <SDL2/SDL.h>
 #include "Screen.h"
 #include "color.h"
-#include "teenyat.h"
+#include "../../../teenyat.h"
 
 #define LIVESCREEN 0x8000
 #define UPDATESCREEN 0x9000
@@ -91,8 +91,8 @@ int main( int argc, char* argv[]){
     while(SDL_PollEvent(&s.windowEvent) == 0 || s.windowEvent.type != SDL_QUIT){
         SDL_SetRenderDrawColor(s.renderer, 0xDD, 0xBB, 0xFF, 0xFF);
         SDL_RenderClear(s.renderer);
-        s.updateNoSwap();
         SDL_GetMouseState(&s.mouseX, &s.mouseY);
+        s.render();
         tny_clock(&t);
     }
 
@@ -213,7 +213,7 @@ void bus_write(teenyat *t, tny_uword addr, tny_word data, uint16_t *delay) {
         int index = map(addr,LIVESCREEN,(LIVESCREEN + 0xFFF),0,(s->size*s->size)-1);
         s->live_screen[index] = data.u;
         *delay = 2;
-        s->updateNoSwap();
+        s->render();
         std::cout << "live_screen";
         return;
     }

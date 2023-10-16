@@ -3,4 +3,4 @@ CC=g++
 CFLAGS=-g -Wall
 
 buildASM:
-	$(CC) $(CFLAGS) src/*.cpp -o bin/asmblr.out -I../../ -I./headers
+	$(CC) $(CFLAGS) src/*.cpp -o bin/asmblr.exe -I../../ -I./headers

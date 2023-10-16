@@ -229,14 +229,11 @@ class Screen{
             for(int x = 0; x < size; x++){
                 int index = y * size + x;
                 live_screen[index] = update_screen[index];
-                fill(live_screen[index]);
-                SDL_RenderDrawPoint(renderer, x, y);
             }
         }
-        SDL_RenderPresent(renderer);
     }
 
-    void updateNoSwap(){
+    void render(){
         // Render Pixels and turn live_screen into update_screen
         for(int y = 0; y < size; y++){
             for(int x = 0; x < size; x++){

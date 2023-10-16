@@ -71,7 +71,7 @@ int main(int argc, char* argv[]){
         std::cout << "please provide an assembly file to assemble and output file name" << std::endl;
         exit(EXIT_FAILURE);
     } else if(argc < 3){
-        outFile = "output.b";
+        outFile = "output.trash";
     } else {
         outFile = argv[2];
     }
