@@ -69,6 +69,25 @@ std::map<std::string,uint16_t> instructionToFlag = {
     {"jl", 2}
 };
 
+uint16_t read16FromInstruction(std::string immField){
+    uint16_t imm16;
+    std::string imm = immField.substr(1);
+    try
+    {
+        imm16 = std::stoi(immField);
+    }
+    catch(const std::invalid_argument& e)
+    {
+        if(immField[0] != '#'){
+            imm16 = labels[immField];
+        } else{
+            imm16 = std::stoi(imm, 0, 16);
+        }
+    }
+
+    return imm16;
+}
+
 std::string toLowerCase(const std::string& str)
 {
     std::string result = str;
@@ -99,7 +118,6 @@ extern void grammar1(const std::vector<std::string>& line, const std::string& fi
     encoding = (encoding << 3) | dreg;
     encoding = (encoding << 3) | sreg;
     encoding = encoding << 4;
-    std::cout << "test:" << std::hex << encoding << std::endl;
     append16ToFile(filename,encoding);
 }
 
@@ -107,15 +125,7 @@ extern void grammar2(const std::vector<std::string>& line, const std::string& fi
     uint32_t encoding;
     uint8_t dreg = registers[line[2]];
     uint8_t sreg = registers[line[3]];
-    uint16_t imm16;
-    try
-    {
-        imm16 = std::stoi(line[4]);
-    }
-    catch(const std::invalid_argument& e)
-    {
-        imm16 = labels[line[4]];
-    }
+    uint16_t imm16 = read16FromInstruction(line[4]);
 
     encoding = instructions[toLowerCase(line[1])] << 1;
     encoding = (encoding << 3) | dreg;
@@ -132,15 +142,7 @@ extern void grammar3(const std::vector<std::string>& line, const std::string& fi
     uint32_t encoding;
     uint8_t dreg = registers[line[2]];
     uint8_t sreg = registers["z"];
-    uint16_t imm16;
-    try
-    {
-        imm16 = std::stoi(line[3]);
-    }
-    catch(const std::invalid_argument& e)
-    {
-        imm16 = labels[line[3]];
-    }
+    uint16_t imm16 = read16FromInstruction(line[3]);
 
     encoding = instructions[toLowerCase(line[1])] << 1;
     encoding = (encoding << 3) | dreg;
@@ -185,22 +187,13 @@ extern void grammar6(const std::vector<std::string>& line, const std::string& fi
     uint32_t encoding;
     uint8_t dreg = registers[line[2]];
     uint8_t sreg = registers[line[4]];
-    uint16_t imm16;
-    try
-    {
-        imm16 = std::stoi(line[3]);
-    }
-    catch(const std::invalid_argument& e)
-    {
-        imm16 = labels[line[3]];
-    }
-    std::cout << "here is the imm16 on a str instruction: " << std::hex << imm16 << std::endl;
+    uint16_t imm16 = read16FromInstruction(line[3]);
+    
     encoding = instructions[toLowerCase(line[1])] << 1;
     encoding = (encoding << 3) | dreg;
     encoding = (encoding << 3) | sreg;
     encoding = encoding << 4;
     encoding = (encoding << 16) | imm16;
-    std::cout << "and here is the encoding: " << std::hex << encoding << std::endl;
 
     append32ToFile(filename, encoding);
 }
@@ -209,15 +202,7 @@ extern void grammar7(const std::vector<std::string>& line, const std::string& fi
     uint32_t encoding;
     uint8_t dreg = registers["z"];
     uint8_t sreg = registers[line[3]];
-    uint16_t imm16;
-    try
-    {
-        imm16 = std::stoi(line[2]);
-    }
-    catch(const std::invalid_argument& e)
-    {
-        imm16 = labels[line[2]];
-    }
+    uint16_t imm16 = read16FromInstruction(line[2]);
 
     encoding = instructions[toLowerCase(line[1])] << 1;
     encoding = (encoding << 3) | dreg;
@@ -246,15 +231,7 @@ extern void grammar9(const std::vector<std::string>& line, const std::string& fi
     uint32_t encoding;
     uint8_t dreg = registers["z"];
     uint8_t sreg = registers[line[2]];
-    uint16_t imm16;
-    try
-    {
-        imm16 = std::stoi(line[3]);
-    }
-    catch(const std::invalid_argument& e)
-    {
-        imm16 = labels[line[3]];
-    }
+    uint16_t imm16 = read16FromInstruction(line[3]);
 
     encoding = instructions[toLowerCase(line[1])] << 1;
     encoding = (encoding << 3) | dreg;
@@ -269,15 +246,7 @@ extern void grammar10(const std::vector<std::string>& line, const std::string& f
     uint32_t encoding;
     uint8_t dreg = registers["z"];
     uint8_t sreg = registers["z"];
-    uint16_t imm16;
-    try
-    {
-        imm16 = std::stoi(line[2]);
-    }
-    catch(const std::invalid_argument& e)
-    {
-        imm16 = labels[line[2]];
-    }
+    uint16_t imm16 = read16FromInstruction(line[2]);
 
     encoding = instructions[toLowerCase(line[1])] << 1;
     encoding = (encoding << 3) | dreg;
@@ -321,16 +290,8 @@ extern void grammar13(const std::vector<std::string>& line, const std::string& f
     uint32_t encoding;
     uint8_t dreg = registers[line[2]];
     uint8_t sreg = registers["z"];
-    uint16_t imm16;
+    uint16_t imm16 = read16FromInstruction(line[3]);
     uint8_t flags = instructionToFlag[toLowerCase(line[1])];
-    try
-    {
-        imm16 = std::stoi(line[3]);
-    }
-    catch(const std::invalid_argument& e)
-    {
-        imm16 = labels[line[3]];
-    }
 
     encoding = instructions[toLowerCase(line[1])] << 1;
     encoding = (encoding << 3) | dreg;
@@ -347,7 +308,6 @@ extern void grammar14(const std::vector<std::string>& line, const std::string& f
     uint8_t sreg = registers["z"];
     uint16_t imm16;
     uint8_t flags = instructionToFlag[toLowerCase(line[1])];
-    std::cout << (char)(flags + '0') << std::endl;
     try
     {
         imm16 = std::stoi(line[2]);
@@ -362,8 +322,6 @@ extern void grammar14(const std::vector<std::string>& line, const std::string& f
     encoding = (encoding << 3) | sreg;
     encoding = (encoding << 4) | flags;
     encoding = (encoding << 16) | imm16;
-    std::cout << "jump encoding: " << std::hex << encoding << std::endl;
-    std::cout << "why is it jumping to far? " << std::dec << imm16 << std::endl;
 
     append32ToFile(filename, encoding);
 }
@@ -379,20 +337,15 @@ extern void grammar32(const std::vector<std::string>& line, const std::string& f
 extern void grammar33(const std::vector<std::string>& line, const std::string& filename){
     for(size_t i = 1; i < line.size(); i++){
         uint16_t value;
-        try{
-            value = std::stoi(line[i]);
-            append16ToFile(filename, value);
-        } catch(const std::invalid_argument& e){
-            std::cout << "non numeric data encountered at value " << wordCnt << std::endl;
-        }
+        value = read16FromInstruction(line[i]);
+        append16ToFile(filename, value);
     }
 
     return;
 }
 
 extern void grammar34(const std::vector<std::string>& line, const std::string& filename){
-    std::cout << "I am in grammar 32" << std::endl;
-    labels[line[1]] = std::stoi(line[2]);
+    labels[line[1]] = read16FromInstruction(line[2]);
 }
 
 void append32ToFile(const std::string& filename, uint32_t value){

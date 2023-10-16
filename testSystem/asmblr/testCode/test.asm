@@ -1,9 +1,9 @@
 ;crappy test program reverses array including array terminating value which is arbitrarily set to #FFFF
 14 JMP print
-34 Screen 32768
+34 Screen #8000
 
 32 Array
-   33 2 45 12 3 67 34 10 65535
+   33 2 45 12 3 67 34 10 #ffff
 
 32 print
     1 SET 7 z

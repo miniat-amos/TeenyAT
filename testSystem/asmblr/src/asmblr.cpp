@@ -65,11 +65,16 @@ std::vector<std::string> splitOnWhitespace(const std::string& line) {
 
 int main(int argc, char* argv[]){
 
-    if(argc < 3){
+    std::string outFile;
+
+    if(argc < 2){
         std::cout << "please provide an assembly file to assemble and output file name" << std::endl;
         exit(EXIT_FAILURE);
+    } else if(argc < 3){
+        outFile = "output.b";
+    } else {
+        outFile = argv[2];
     }
-
 
     grammars[0] = grammar0;
     grammars[1] = grammar1;
@@ -113,8 +118,7 @@ int main(int argc, char* argv[]){
             whitespaceTrim(word);
         }
         int grammarIndex = std::stoi(sline[0]);
-        std::cout << grammarIndex << std::endl;
-        grammars[grammarIndex](sline, argv[2]);
+        grammars[grammarIndex](sline, outFile);
     }
 
     return EXIT_SUCCESS;

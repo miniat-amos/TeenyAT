@@ -18,6 +18,8 @@ void append32ToFile(const std::string& filename, uint32_t value);
 
 void append16ToFile(const std::string& filename, uint16_t value);
 
+uint16_t read16FromInstruction(std::string immField);
+
 extern void grammar0(const std::vector<std::string>& line, const std::string& filename);
 extern void grammar1(const std::vector<std::string>& line, const std::string& filename);
 extern void grammar2(const std::vector<std::string>& line, const std::string& filename);
