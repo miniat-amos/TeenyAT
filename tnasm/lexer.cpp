@@ -16,27 +16,27 @@
 using namespace std;
 
 
-struct Token_Regex {
+struct token_regex {
 	regex expr;
-	Token_Type id;
+	token_type id;
 };
 
 
 void read_file(const char *path, vector <string> &asm_lines);
-void initialize_lexical_regex(vector <Token_Regex> &patterns);
-Token get_token(const vector <Token_Regex>& patterns, const string& s, int line_no);
+void initialize_lexical_regex(vector <token_regex> &patterns);
+token get_token(const vector <token_regex>& patterns, const string& s, int line_no);
 void tokenize_line(
 	string asm_line,
-	Token_Line &token_line,
-	vector <Token_Regex> &patterns,
+	token_line &token_line,
+	vector <token_regex> &patterns,
 	int line_no
 );
 void tokenize_all_lines(
-	Token_Lines &token_lines,
+	token_lines &token_lines,
 	vector <string> &asm_lines,
-	vector <Token_Regex> &patterns
+	vector <token_regex> &patterns
 );
-void debug_print_lexed_input(Token_Lines &token_lines, vector <string> &asm_lines);
+void debug_print_lexed_input(token_lines &token_lines, vector <string> &asm_lines);
 
 int main(int argc, char *argv[]) {
 	if(argc != 2) {
@@ -47,10 +47,10 @@ int main(int argc, char *argv[]) {
 	vector <string> asm_lines;
 	read_file(argv[1], asm_lines);
 
-	vector <Token_Regex> patterns;
+	vector <token_regex> patterns;
 	initialize_lexical_regex(patterns);
 
-	Token_Lines token_lines;
+	token_lines token_lines;
 	tokenize_all_lines(token_lines, asm_lines, patterns);
 	#ifdef DEBUG_TRACE
 	cerr << "\n\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n\n";
@@ -73,15 +73,15 @@ void read_file(const char *path, vector <string> &asm_lines) {
 }
 
 
-Token_Regex regex_token(string s, Token_Type id) {
-	Token_Regex tr;
+token_regex regex_token(string s, token_type id) {
+	token_regex tr;
 	tr.expr = regex(s, regex_constants::icase);
 	tr.id = id;
 
 	return tr;
 }
 
-void initialize_lexical_regex(vector <Token_Regex> &patterns) {
+void initialize_lexical_regex(vector <token_regex> &patterns) {
     patterns.push_back(regex_token("[ \\t\\b\\v\\f\\r]+", T_IGNORE));
 	patterns.push_back(regex_token(";.*", T_IGNORE));
 	patterns.push_back(regex_token("![^ \\t\\b\\v\\r\\n;]+", T_LABEL));
@@ -130,8 +130,8 @@ void initialize_lexical_regex(vector <Token_Regex> &patterns) {
 }
 
 
-Token get_token(const vector <Token_Regex>& patterns, const string& s, int line_no) {
-	Token token;
+token get_token(const vector <token_regex>& patterns, const string& s, int line_no) {
+	token token;
 	token.line_no = line_no;
 	int longest = 0;
 
@@ -171,13 +171,13 @@ Token get_token(const vector <Token_Regex>& patterns, const string& s, int line_
 
 void tokenize_line(
 	string asm_line,
-	Token_Line &token_line,
-	vector <Token_Regex> &patterns,
+	token_line &token_line,
+	vector <token_regex> &patterns,
 	int line_no
 ) {
 	string s(asm_line);
 	while(s.length() > 0) {
-        Token token = get_token(patterns, s, line_no);
+        token token = get_token(patterns, s, line_no);
 		if(token.id != T_IGNORE && token.id != T_BAD) {
 			token_line.push_back(token);
         }
@@ -196,15 +196,15 @@ void tokenize_line(
 
 
 void tokenize_all_lines(
-	Token_Lines &token_lines,
+	token_lines &token_lines,
 	vector <string> &asm_lines,
-	vector <Token_Regex> &patterns
+	vector <token_regex> &patterns
 ) {
 		for(int i = 0; i < asm_lines.size(); i++) {
-		Token_Line token_line;
+		token_line token_line;
 		tokenize_line(asm_lines[i], token_line, patterns, i + 1);
 		if(token_line.size() > 0) {
-			Token t;
+			token t;
 			t.id = T_EOL;
 			t.line_no = i + 1;
 			token_lines.push_back(token_line);
@@ -215,10 +215,10 @@ void tokenize_all_lines(
 }
 
 
-void debug_print_lexed_input(Token_Lines &token_lines, vector <string> &asm_lines) {
+void debug_print_lexed_input(token_lines &token_lines, vector <string> &asm_lines) {
 	int current_i = 1;
 	for(int i = 0; i < token_lines.size(); i++) {
-		Token_Line line = token_lines[i];
+		token_line line = token_lines[i];
 		/* catch up current line to wherever this token was */
 		while(current_i < line[0].line_no) {
 			cerr << current_i << ": " << asm_lines[current_i - 1] << endl;
