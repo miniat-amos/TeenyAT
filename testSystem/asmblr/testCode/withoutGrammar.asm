@@ -45,23 +45,3 @@ JMP !print
     CMP $5 65535
     JE !print
     JMP !looptwo
-
-
-;first pass
-;first thing on each line can be a instruction or a label or a variable
-;instructions start with a ascii letter and have no colon
-;labels start with ascii and do have a colon
-;variables start with a .
-;data section starts with @
-
-;if a label add to map with mapping the string to the current address remove the label line
-;if @data ignore it for now
-;if instruction figure out if it is teeny and increase the current address appropriately
-;if variable add to map mapping the string to the value remove the variable assignment line
-
-;second pass
-;replace all instances of variables and labels in asm code with the value they represent
-
-;third pass
-;go through each instruction make the encoding and place it in memory in the correct location
-;once we hit @data just place the whitespace seperated values in memory as half words or 16 bit values
