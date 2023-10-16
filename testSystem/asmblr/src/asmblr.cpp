@@ -104,6 +104,7 @@ int main(int argc, char* argv[]){
     }
 
     std::remove("output.txt");
+    std::cout << "removed output.txt" << std::endl;
 
     for(std::string line : file){
         std::vector<std::string> sline = splitOnWhitespace(line);

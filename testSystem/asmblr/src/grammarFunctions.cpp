@@ -77,6 +77,10 @@ std::string toLowerCase(const std::string& str)
     return result;
 }
 
+extern void resetWordCnt(){
+    wordCnt = 0;
+}
+
 extern void grammar0(const std::vector<std::string>& line, const std::string& filename)
 {
     uint16_t encoding;
@@ -90,7 +94,7 @@ extern void grammar0(const std::vector<std::string>& line, const std::string& fi
     encoding = (encoding << 3) | dreg;
     encoding = (encoding << 3) | sreg;
     encoding = encoding << 4;
-
+    std::cout << "test:" << std::hex << encoding << std::endl;
     append16ToFile(filename,encoding);
 }
 
@@ -185,12 +189,13 @@ extern void grammar5(const std::vector<std::string>& line, const std::string& fi
     {
         imm16 = labels[line[3]];
     }
-
+    std::cout << "here is the imm16 on a str instruction: " << std::hex << imm16 << std::endl;
     encoding = instructions[toLowerCase(line[1])] << 1;
     encoding = (encoding << 3) | dreg;
     encoding = (encoding << 3) | sreg;
     encoding = encoding << 4;
     encoding = (encoding << 16) | imm16;
+    std::cout << "and here is the encoding: " << std::hex << encoding << std::endl;
 
     append32ToFile(filename, encoding);
 }
@@ -352,8 +357,8 @@ extern void grammar13(const std::vector<std::string>& line, const std::string& f
     encoding = (encoding << 3) | sreg;
     encoding = (encoding << 4) | flags;
     encoding = (encoding << 16) | imm16;
-    std::cout << std::bitset<32>(encoding) << std::endl;
-    std::cout << labels[line[2]] << ":" << labels.size() << std::endl;
+    std::cout << "jump encoding: " << std::hex << encoding << std::endl;
+    std::cout << "why is it jumping to far? " << std::dec << imm16 << std::endl;
 
     append32ToFile(filename, encoding);
 }
@@ -393,9 +398,10 @@ void append32ToFile(const std::string& filename, uint32_t value){
         return;
     }
 
-    outfile.write(reinterpret_cast<char*>(&value), sizeof(value));
+    uint16_t upper = (value >> 16);
+    append16ToFile(filename, upper);
+    append16ToFile(filename, value);
     outfile.close();
-    wordCnt += 2;
 }
 
 void append16ToFile(const std::string& filename, uint16_t value){

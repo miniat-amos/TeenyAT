@@ -1,6 +1,6 @@
 CC=g++
 
-CFLAGS=-g -w
+CFLAGS=-g -Wall
 
 buildASM:
 	$(CC) $(CFLAGS) src/*.cpp -o bin/asmblr.out -I../../ -I./headers

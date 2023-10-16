@@ -12,6 +12,8 @@
 
 #include "teenyat.h"
 
+extern void resetWordCnt();
+
 void append32ToFile(const std::string& filename, uint32_t value);
 
 void append16ToFile(const std::string& filename, uint16_t value);

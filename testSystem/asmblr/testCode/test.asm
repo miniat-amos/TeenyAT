@@ -1,11 +1,12 @@
 ;crappy test program reverses array including array terminating value which is arbitrarily set to #FFFF
+13 JMP print
 34 Screen 32768
 
 32 Array
-   33 2 45 12 3 67 34 10 #FFFF
+   33 2 45 12 3 67 34 10 65535
 
 32 print
-    0 SET 7 Z
+    0 SET 7 z
 32 loop
     1 LOD 5 7 Array
     5 STR 7 Screen 5
@@ -42,8 +43,8 @@
     5 STR 7 Screen 5
     4 INC 7
     2 CMP 5 65535
-    13 JE main
-    13 JMP loop
+    13 JE print
+    13 JMP looptwo
 
 
 ;first pass

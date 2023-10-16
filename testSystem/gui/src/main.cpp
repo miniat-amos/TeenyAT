@@ -6,7 +6,8 @@
 #include <iostream>
 #include <SDL2/SDL.h>
 #include "Screen.h"
-#include "../../../teenyat.h"
+#include "color.h"
+#include "teenyat.h"
 
 #define LIVESCREEN 0x8000
 #define UPDATESCREEN 0x9000
@@ -83,7 +84,6 @@ int main( int argc, char* argv[]){
 	if (bin_file != NULL) {
 		success = true;
 		tny_init_from_file(&t, bin_file, bus_read, bus_write);
-		fclose(bin_file);
 	}
 	t.ex_data = &s;
     
@@ -91,6 +91,7 @@ int main( int argc, char* argv[]){
     while(SDL_PollEvent(&s.windowEvent) == 0 || s.windowEvent.type != SDL_QUIT){
         SDL_SetRenderDrawColor(s.renderer, 0xDD, 0xBB, 0xFF, 0xFF);
         SDL_RenderClear(s.renderer);
+        s.updateNoSwap();
         SDL_GetMouseState(&s.mouseX, &s.mouseY);
         tny_clock(&t);
     }
@@ -98,6 +99,7 @@ int main( int argc, char* argv[]){
     SDL_DestroyWindow(s.window);
     SDL_Quit();
 
+	fclose(bin_file);
     return EXIT_SUCCESS;
 }
 
@@ -211,6 +213,7 @@ void bus_write(teenyat *t, tny_uword addr, tny_word data, uint16_t *delay) {
         int index = map(addr,LIVESCREEN,(LIVESCREEN + 0xFFF),0,(s->size*s->size)-1);
         s->live_screen[index] = data.u;
         *delay = 2;
+        s->updateNoSwap();
         std::cout << "live_screen";
         return;
     }
@@ -270,3 +273,4 @@ void bus_write(teenyat *t, tny_uword addr, tny_word data, uint16_t *delay) {
     std::cout << std::endl;
 	return;
 }
+
