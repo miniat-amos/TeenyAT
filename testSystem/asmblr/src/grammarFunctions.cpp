@@ -4,7 +4,7 @@ std::map<std::string,uint16_t> labels;
 
 int wordCnt = 0;
 
-std::map<std::string,int>instructions = {
+extern std::map<std::string,int>instructions = {
     {"and", TNY_OPCODE_AND},
     {"or", TNY_OPCODE_OR},
     {"xor", TNY_OPCODE_XOR},
@@ -88,7 +88,7 @@ uint16_t read16FromInstruction(std::string immField){
     return imm16;
 }
 
-std::string toLowerCase(const std::string& str)
+extern std::string toLowerCase(const std::string& str)
 {
     std::string result = str;
     std::transform(result.begin(), result.end(), result.begin(),
