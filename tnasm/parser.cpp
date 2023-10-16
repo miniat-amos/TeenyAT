@@ -15,7 +15,7 @@ struct instruction {
 token_line parse_line;  // The current line of tokens being parsed
 int tnext;  // index of the next token in the line to consider
 
-bool p_variable_line();
+unique_ptr<token> p_variable_line();
 unique_ptr<token> p_constant_line();
 bool p_raw_line();
 unique_ptr<token> p_label_line();
@@ -55,8 +55,15 @@ bool p_loc() {
            (tnext = save, p_label_line());
 }
 
-bool p_variable_line() {
-    return term(T_VARIABLE) && term(T_IDENTIFIER) && p_immed() && term(T_EOL);
+unique_ptr<token> p_variable_line() {
+    unique_ptr<token> val = nullptr;
+    int save = tnext;
+    if(term(T_VARIABLE) && term(T_IDENTIFIER) && p_immed() && term(T_EOL)) {
+        val = unique_ptr<token>(new token(parse_line[save + 1]));
+
+        /* TODO: create the variable and map the immediate */
+    }
+    return val;
 }
 
 unique_ptr<token> p_constant_line() {
