@@ -67,16 +67,12 @@ class Screen{
             update_screen[i] = hue;
         }
         update();
+        render();
     }
 
-    void pixel(int x, int y,int w, int h){
-        SDL_Rect r;
-        r.x = x;
-        r.y = y;
-        r.w = w;
-        r.h = h;
-        // Render rect
-        SDL_RenderFillRect(renderer, &r );
+    void point(){
+        int index = y1 * size + x1;
+        update_screen[index] = currStrokeColor;
     }
 
     uint16_t rand16(){
@@ -120,7 +116,7 @@ class Screen{
 
     // Set the x1,x2,y1,y2 values
     void setVal(int val,int * ret){
-        *ret = (val%64); 
+        *ret = (val%(size)); 
     }
 
     // Fast bressenham and vertical line drawer 
@@ -231,6 +227,7 @@ class Screen{
                 live_screen[index] = update_screen[index];
             }
         }
+        render();
     }
 
     void render(){

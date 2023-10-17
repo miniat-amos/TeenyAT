@@ -87,13 +87,22 @@ int main( int argc, char* argv[]){
 	}
 	t.ex_data = &s;
     
-
+    bool resized = false;
     while(SDL_PollEvent(&s.windowEvent) == 0 || s.windowEvent.type != SDL_QUIT){
+        switch(s.windowEvent.type){
+            case SDL_WINDOWEVENT:
+            case SDL_WINDOWEVENT_RESIZED:
+            case SDL_WINDOWEVENT_SIZE_CHANGED:
+                 resized = true;
+            break;
+        }
         SDL_SetRenderDrawColor(s.renderer, 0xDD, 0xBB, 0xFF, 0xFF);
         SDL_RenderClear(s.renderer);
         SDL_GetMouseState(&s.mouseX, &s.mouseY);
-        s.render();
         tny_clock(&t);
+        if(resized){
+            s.render();
+        }
     }
 
     SDL_DestroyWindow(s.window);
@@ -263,6 +272,10 @@ void bus_write(teenyat *t, tny_uword addr, tny_word data, uint16_t *delay) {
             s->line();
             std::cout << " line";
             break;
+        case POINT:
+             s->point();
+             std::cout << " point";
+             break;
         default:
 			//apply a lag spike for a write to an unused address
 			*delay = 20;

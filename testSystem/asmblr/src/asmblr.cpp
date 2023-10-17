@@ -160,6 +160,12 @@ int main(int argc, char* argv[]){
         std::cout << "please provide an assembly file to assemble and output file name" << std::endl;
         exit(EXIT_FAILURE);
     } else if(argc < 3){
+        // Removes old output.trash & makes new one
+        if( remove( "output.trash" ) != 0 )
+            perror( "Error deleting file" );
+        else
+            std::cout<< "File successfully deleted" << std::endl;
+
         outFile = "output.trash";
     } else {
         outFile = argv[2];
