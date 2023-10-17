@@ -204,7 +204,7 @@ void bus_write(teenyat *t, tny_uword addr, tny_word data, uint16_t *delay) {
     if(addr >= UPDATESCREEN && addr <= (UPDATESCREEN + 0xFFF)){
         int index = map(addr,UPDATESCREEN,(UPDATESCREEN + 0xFFF),0,(s->size*s->size)-1);
         s->update_screen[index] = data.u;
-        *delay = 1;
+        *delay = 0;
         std::cout << "update_screen" << std::endl;
         return;
     }

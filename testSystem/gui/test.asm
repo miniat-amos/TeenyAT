@@ -1,7 +1,18 @@
-34 Screen #8000
+JMP !main
 
-1 SET a z
-1 SET b 80
-6 STR a Screen a
+!Screen #8000
 
-;32768
+!main
+    SET $a $z
+    SET $b $z
+    SET $c $z
+!loop
+    STR $c !Screen $a
+    INC $c
+    CMP $c #1000
+    JE !end
+    INC $a
+    MOD $a 360
+
+    JMP !loop
+!end
