@@ -13,6 +13,5 @@ JMP !main
     JE !end
     INC $a
     MOD $a 360
-
     JMP !loop
 !end
