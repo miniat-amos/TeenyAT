@@ -22,6 +22,7 @@ unique_ptr<token> p_label_line();
 
 bool p_immed();
 bool p_number(tny_word &v);
+unique_ptr<token> p_plus_or_minus();
 
 /**
  * @brief
@@ -86,21 +87,35 @@ unique_ptr<token> p_label_line() {
     return val;
 }
 
-/* number ::= (PLUS | MINUS)? NUMBER. */
-bool p_number(tny_word &v) {
-    bool result = false;
+/*
+ * number ::= NUMBER.
+ * number ::= plus_or_minus NUMBER.
+ */
+unique_ptr<tny_word> p_number() {
+    unique_ptr<tny_word> val = nullptr;
     int save = tnext;
-    if(tnext = save, term(T_PLUS) && term(T_NUMBER)) {
-        v = parse_line[save + 1].value;
-        result = true;
+    unique_ptr<token> A, B;
+    if(tnext = save, term(T_NUMBER)) {
+        val = unique_ptr<tny_word>(new tny_word);
+        *val = parse_line[save].value;
     }
-    else if(tnext = save, term(T_MINUS) && term(T_NUMBER)) {
-        v.s = -(parse_line[save + 1].value.s);
-        result = true;
+    else if(tnext = save, A = p_plus_or_minus() && B = term(T_NUMBER)) {
+        val = unique_ptr<tny_word>(new tny_word);
+        val->s = A->value.s * (B->id == T_PLUS ? 1 : -1);
     }
-    else if(tnext = save, term(T_NUMBER)) {
-        v = parse_line[save + 1].value;
-        result = true;
-    }
-    return result;
+    return val;
+}
+
+/*
+ * plus_or_minus ::= PLUS.
+ * plus_or_minus ::= MINUS.
+ */
+unique_ptr<token> p_plus_or_minus() {
+    unique_ptr<token> val = nullptr;
+    int save = tnext;
+
+    (tnext = save, val = term(T_PLUS)) ||
+    (tnext = save, val = term(T_MINUS));
+
+    return val;
 }

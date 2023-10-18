@@ -31,27 +31,26 @@ label_line ::= LABEL.
 immediate ::= number.
 immediate ::= LABEL.
 
-number ::= PLUS NUMBER.
-number ::= MINUS NUMBER.
 number ::= NUMBER.
+number ::= plus_or_minus NUMBER.
+
+plus_or_minus ::= PLUS.
+plus_or_minus ::= MINUS.
 
 code_1_line ::= code_1_inst REGISTER COMMA REGISTER.
-code_2_line ::= code_2_inst REGISTER COMMA REGISTER add_or_subtract immediate.
+code_2_line ::= code_2_inst REGISTER COMMA REGISTER plus_or_minus immediate.
 code_3_line ::= code_3_inst REGISTER COMMA immediate.
 code_4_line ::= code_4_inst REGISTER.
 code_5_line ::= code_5_inst REGISTER.
-code_6_line ::= code_6_inst REGISTER add_or_subtract immediate COMMA REGISTER.
+code_6_line ::= code_6_inst REGISTER plus_or_minus immediate COMMA REGISTER.
 code_7_line ::= code_7_inst immediate COMMA REGISTER.
 code_8_line ::= code_8_inst REGISTER.
-code_9_line ::= code_9_inst REGISTER add_or_subtract immediate.
+code_9_line ::= code_9_inst REGISTER plus_or_minus immediate.
 code_10_line ::= code_10_inst immediate.
 code_11_line ::= code_11_inst.
 code_12_line ::= code_12_inst REGISTER.
-code_13_line ::= code_13_inst REGISTER add_or_subtract immediate.
+code_13_line ::= code_13_inst REGISTER plus_or_minus immediate.
 code_14_line ::= code_14_inst immediate.
-
-add_or_subtract ::= PLUS.
-add_or_subtract ::= MINUS.
 
 code_1_inst ::= ADD.
 code_1_inst ::= SUB.
