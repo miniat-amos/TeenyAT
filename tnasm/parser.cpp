@@ -20,8 +20,8 @@ unique_ptr<token> p_constant_line();
 bool p_raw_line();
 unique_ptr<token> p_label_line();
 
-bool p_immed();
-bool p_number(tny_word &v);
+unique_ptr<tny_word> p_immediate();
+unique_ptr<tny_word> p_number();
 unique_ptr<token> p_plus_or_minus();
 
 /**
@@ -56,34 +56,64 @@ bool p_loc() {
            (tnext = save, p_label_line());
 }
 
+/*
+ * variable_line ::= VARIABLE IDENTIFIER immediate.
+ */
 unique_ptr<token> p_variable_line() {
-    unique_ptr<token> val = nullptr;
+    unique_ptr<token> val = nullptr, A;
+    unique_ptr<tny_word> B;
     int save = tnext;
-    if(term(T_VARIABLE) && term(T_IDENTIFIER) && p_immed() && term(T_EOL)) {
-        val = unique_ptr<token>(new token(parse_line[save + 1]));
+    if(term(T_VARIABLE) && (A = term(T_IDENTIFIER)) && (B = p_immediate()) && term(T_EOL)) {
+        val = move(A);
 
         /* TODO: create the variable and map the immediate */
     }
     return val;
 }
 
+/*
+ * constant_line ::= CONSTANT IDENTIFIER immediate.
+ */
 unique_ptr<token> p_constant_line() {
-    unique_ptr<token> val = nullptr;
+    unique_ptr<token> val = nullptr, A;
+    unique_ptr<tny_word> B;
     int save = tnext;
-    if(term(T_CONSTANT) && term(T_IDENTIFIER) && p_immed() && term(T_EOL)) {
-        val = unique_ptr<token>(new token(parse_line[save + 1]));
+    if(term(T_CONSTANT) && (A = term(T_IDENTIFIER)) && (B = p_immediate()) && term(T_EOL)) {
+        val = move(A);
 
         /* TODO: create the constanst and map the immediate */
     }
     return val;
 }
 
+/*
+ * label_line ::= LABEL.
+ */
 unique_ptr<token> p_label_line() {
-    unique_ptr<token> val = nullptr;
+    unique_ptr<token> val = nullptr, A;
     int save = tnext;
-    if(term(T_LABEL) && term(T_EOL)) {
-        *val = parse_line[save];
+    if((A = term(T_LABEL)) && term(T_EOL)) {
+        val = move(A);
     }
+    return val;
+}
+
+/*
+ * immediate ::= number.
+ * immediate ::= LABEL.
+ */
+unique_ptr<tny_word> p_immediate() {
+    unique_ptr<tny_word> val = nullptr;
+    unique_ptr<token> A;
+    int save = tnext;
+
+    if(tnext = save, val = p_number()) {
+        /* nothing to do */
+    }
+    else if(tnext = save, A = term(T_LABEL)) {
+        /* TODO: look up label's address */
+    }
+
     return val;
 }
 
@@ -93,15 +123,16 @@ unique_ptr<token> p_label_line() {
  */
 unique_ptr<tny_word> p_number() {
     unique_ptr<tny_word> val = nullptr;
-    int save = tnext;
     unique_ptr<token> A, B;
-    if(tnext = save, term(T_NUMBER)) {
-        val = unique_ptr<tny_word>(new tny_word);
-        *val = parse_line[save].value;
+    int save = tnext;
+    if(tnext = save, A = term(T_NUMBER)) {
+        val = unique_ptr<tny_word>(new tny_word(A->value));
     }
-    else if(tnext = save, A = p_plus_or_minus() && B = term(T_NUMBER)) {
-        val = unique_ptr<tny_word>(new tny_word);
-        val->s = A->value.s * (B->id == T_PLUS ? 1 : -1);
+    else if(tnext = save, (A = p_plus_or_minus()) && (B = term(T_NUMBER))) {
+        val = unique_ptr<tny_word>(new tny_word(B->value));
+        if(B->id == T_MINUS) {
+            val->s *= -1;
+        }
     }
     return val;
 }
