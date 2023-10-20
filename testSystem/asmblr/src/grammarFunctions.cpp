@@ -4,7 +4,7 @@ std::map<std::string,uint16_t> labels;
 
 int wordCnt = 0;
 
-extern std::map<std::string,int>instructions = {
+std::map<std::string,int>instructions = {
     {"and", TNY_OPCODE_AND},
     {"or", TNY_OPCODE_OR},
     {"xor", TNY_OPCODE_XOR},

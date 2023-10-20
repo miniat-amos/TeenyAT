@@ -17,7 +17,7 @@ GrammarFunctionPtr grammars[64];
 
 std::string toLowerCaseString(std::string &string){
     std::string result = "";
-    for(int i = 0; i < string.length(); i++){
+    for(size_t i = 0; i < string.length(); i++){
         result += tolower(string[i]);
     }
     return result;
@@ -66,7 +66,7 @@ std::vector<std::string> linesStartingWithNumber(const std::string& filepath) {
 int countRegisters(std::vector<std::string> &line){
     int result = 0;
     std::string specialCharacters = "$!";
-    for(int i = 0; i < line.size(); i++){
+    for(size_t i = 0; i < line.size(); i++){
         result += (line[i][0] == '$');
         if(specialCharacters.find(line[i][0]) != std::string::npos)
             line[i] = line[i].substr(1);
