@@ -245,11 +245,11 @@ void bus_write(teenyat *t, tny_uword addr, tny_word data, uint16_t *delay) {
             std::cout << "  y2";
             break;
         case STROKE:
-             s->stroke(data.u);
+             s->setStroke(data.u);
              std::cout << " stroke";
              break;
         case FILL:
-             s->fill(data.u);
+             s->setFill(data.u);
              std::cout << " fill";
              break;
         case DRAWFILL:
@@ -265,7 +265,7 @@ void bus_write(teenyat *t, tny_uword addr, tny_word data, uint16_t *delay) {
             std::cout << " update";
             break;
         case RECT:
-            s->rect(data.u);
+            s->rect();
             std::cout << " rect";
             break;
         case LINE:

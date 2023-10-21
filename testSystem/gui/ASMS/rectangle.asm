@@ -20,11 +20,15 @@ JMP !main
 !KEY #FFFE 
 
 !main
-    SET $a 30
-    SET $b 30
-    SET $c 180
+    SET $a $z
+    SET $b $z
+    SET $c 20
+    SET $d 34
     STR $z !X1 $a
     STR $z !Y1 $b
-    STR $z !STROKE $c
-    STR $z !POINT $z
+    STR $z !X2 $c
+    STR $z !Y2 $d
+    STR $z !FILL $z
+    STR $z !STROKE $z
+    STR $z !RECT $c
     STR $z !UPDATE $z

@@ -87,12 +87,20 @@ class Screen{
         drawStroke = 0;
     }
 
+    void setFill(uint16_t col){
+        drawFill = 1;
+        currFillColor = col;
+    }
+
+    void setStroke(uint16_t col){
+        drawStroke = 1;
+        currStrokeColor = col;
+    }
+
     // Colors in HSV (im not getting the right colors!!!)
     // Calling both fill and stroke sets their cooresponding booleans true
     void fill(uint16_t col){
         // default saturation & value are 50%
-        drawFill = 1;
-        currFillColor = col;
         unsigned char r,g,b;
         unsigned char a = 255;
         col = col % 360;
@@ -104,8 +112,6 @@ class Screen{
 
     void stroke(uint16_t col){
         // default saturation & value are 50%
-        drawStroke = 1;
-        currStrokeColor = col;
         unsigned char r,g,b;
         unsigned char a = 255;
         col = col % 360;
@@ -192,27 +198,22 @@ class Screen{
 
 
     // Draw rectangle centered at corner (x1,y1) {technically takes in a 16bit width value}
-    void rect(int w){
-            int _x2 = x1 + w;
-            if((_x2 >= size)) _x2 = (size-1);
-
-            int _y2 = y1 + w;
-            if((_y2 >= size)) _y2 = (size-1);
-            
+    void rect(){
             // Draw Stroke Lines
             if(drawStroke){
                 uint16_t temp = currFillColor;
                 currFillColor = currStrokeColor;
-                bresenham(x1, y1, _x2, y1);
-                bresenham(_x2, y1, _x2, _y2);
-                bresenham(x1, _y2,_x2, _y2);
-                bresenham(x1, y1, x1, _y2);
+                bresenham(x1, y1, x2, y1);
+                bresenham(x2, y1, x2, y2);
+                bresenham(x1, y2, x2, y2);
+                bresenham(x1, y1, x1, y2);
                 currFillColor = temp;
             }
+            int h = abs(y2-y1);
             // Draw Fill lines
             if(drawFill){
-                for(int i = 0; i < w-1; i++){
-                    bresenham((x1+1), (y1+1)+i, (_x2-1), (y1+1)+i);
+                for(int i = 0; i < h-1; i++){
+                    bresenham((x1+1), (y1+1)+i, (x2-1), (y1+1)+i);
                 }
             }
 
