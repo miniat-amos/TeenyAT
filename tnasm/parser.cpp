@@ -1,4 +1,6 @@
+#include <iostream>
 #include <memory>
+#include <map>
 
 #include "../teenyat.h"
 #include "token.h"
@@ -14,6 +16,9 @@ struct instruction {
 
 token_line parse_line;  // The current line of tokens being parsed
 int tnext;  // index of the next token in the line to consider
+int pass = 0;
+
+map<string, tny_word> constants;
 
 unique_ptr<token> p_variable_line();
 unique_ptr<token> p_constant_line();
@@ -49,7 +54,7 @@ unique_ptr<token> term(token_type id) {
 }
 
 bool p_loc() {
-    int save = tnext;
+    int save = tnext = 0;
     return (tnext = save, p_variable_line()) ||
            (tnext = save, p_constant_line()) ||
            (tnext = save, p_raw_line()) ||
@@ -82,6 +87,16 @@ unique_ptr<token> p_constant_line() {
         val = move(A);
 
         /* TODO: create the constanst and map the immediate */
+        if(pass == 0) {
+            if(constants.count(A->token_str) == 0) {
+                /* New constant found */
+                constants[A->token_str] = *B;
+            }
+            else {
+                cerr << "ERROR, Line " << A->line_no << ": ";
+                cerr << "Constant \"" << A->token_str << "\" already defined" << endl;
+            }
+        }
     }
     return val;
 }
