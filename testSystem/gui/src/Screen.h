@@ -60,6 +60,7 @@ class Screen{
             std::cout << "Could not create window" << SDL_GetError() << std::endl;
         }
 
+
         // Create renderer and initialize update_screen to lavender
         renderer =  SDL_CreateRenderer( window, -1, SDL_RENDERER_ACCELERATED);
         SDL_RenderSetLogicalSize(renderer, size, size);

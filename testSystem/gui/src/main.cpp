@@ -31,47 +31,13 @@
 
 void bus_read(teenyat *t, tny_uword addr, tny_word *data, uint16_t *delay);
 void bus_write(teenyat *t, tny_uword addr, tny_word data, uint16_t *delay);
-
+static int resizingEventWatcher(void* data, SDL_Event* event);
+bool resized = false;
+Screen s;
 int main( int argc, char* argv[]){
     // Screen to write too
-    Screen s;
+    SDL_AddEventWatch(resizingEventWatcher, s.window);
 
-#if 0   
-    for(int i = 0; i < s.size*s.size; i++){
-        s.update_screen[i] = i % 360;
-    }
-    s.update();
-#endif
-
-#if 0 
-    // Sample Initial Scene
-    s.setVal(26,&s.x1);
-    s.setVal(26,&s.y1);
-
-    s.stroke(0);
-    s.fill(190);
-    s.rect(10);
-
-
-    s.setVal(0,&s.x1);
-    s.setVal(0,&s.y1);
-    s.setVal(63,&s.x2);
-    s.setVal(63,&s.y2);
-
-    s.stroke(100);
-    s.line();
-
-    s.setVal(63,&s.x1);
-    s.setVal(0,&s.y1);
-    s.setVal(0,&s.x2);
-    s.setVal(63,&s.y2);
-
-    s.stroke(100);
-    s.line();
-
-    s.update();
-#endif
-    
     //Initialize the teenyAT
     if(argc != 2){
         std::cout << "Please provide an asm file" << std::endl;
@@ -86,23 +52,16 @@ int main( int argc, char* argv[]){
 		tny_init_from_file(&t, bin_file, bus_read, bus_write);
 	}
 	t.ex_data = &s;
-    
-    bool resized = false;
     while(SDL_PollEvent(&s.windowEvent) == 0 || s.windowEvent.type != SDL_QUIT){
         switch(s.windowEvent.type){
             case SDL_WINDOWEVENT:
             case SDL_WINDOWEVENT_RESIZED:
-            case SDL_WINDOWEVENT_SIZE_CHANGED:
-                 resized = true;
             break;
         }
         SDL_SetRenderDrawColor(s.renderer, 0xDD, 0xBB, 0xFF, 0xFF);
         SDL_RenderClear(s.renderer);
         SDL_GetMouseState(&s.mouseX, &s.mouseY);
         tny_clock(&t);
-        if(resized){
-            s.render();
-        }
     }
 
     SDL_DestroyWindow(s.window);
@@ -287,3 +246,13 @@ void bus_write(teenyat *t, tny_uword addr, tny_word data, uint16_t *delay) {
 	return;
 }
 
+static int resizingEventWatcher(void* data, SDL_Event* event) {
+  if (event->type == SDL_WINDOWEVENT &&
+      event->window.event == SDL_WINDOWEVENT_RESIZED) {
+    SDL_Window* win = SDL_GetWindowFromID(event->window.windowID);
+    if (win == (SDL_Window*)data) {
+        resized = true;
+    }
+  }
+  return 0;
+}
