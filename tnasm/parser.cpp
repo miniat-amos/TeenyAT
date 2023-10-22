@@ -16,7 +16,7 @@ struct instruction {
 
 token_line parse_line;  // The current line of tokens being parsed
 int tnext;  // index of the next token in the line to consider
-int pass = 0;
+int pass = 1;
 
 map<string, tny_word> constants;
 
@@ -87,7 +87,7 @@ unique_ptr<token> p_constant_line() {
         val = move(A);
 
         /* TODO: create the constanst and map the immediate */
-        if(pass == 0) {
+        if(pass == 1) {
             if(constants.count(A->token_str) == 0) {
                 /* New constant found */
                 constants[A->token_str] = *B;
@@ -116,6 +116,7 @@ unique_ptr<token> p_label_line() {
 /*
  * immediate ::= number.
  * immediate ::= LABEL.
+ * immediate ::= IDENTIFIER.
  */
 unique_ptr<tny_word> p_immediate() {
     unique_ptr<tny_word> val = nullptr;
@@ -127,6 +128,17 @@ unique_ptr<tny_word> p_immediate() {
     }
     else if(tnext = save, A = term(T_LABEL)) {
         /* TODO: look up label's address */
+    }
+    else if(tnext = save, A = term(T_IDENTIFIER)) {
+        /* As an immediate, ensure the identifier is a constant. */
+        if(pass == 2) {
+            if(constants.count(A->token_str) > 0) {
+                val = unique_ptr<tny_word>(new tny_word(constants[A->token_str]));
+            }
+            else {
+                val = nullptr;
+            }
+        }
     }
 
     return val;

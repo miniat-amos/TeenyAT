@@ -30,6 +30,7 @@ label_line ::= LABEL.
 
 immediate ::= number.
 immediate ::= LABEL.
+immediate ::= IDENTIFIER.
 
 number ::= NUMBER.
 number ::= plus_or_minus NUMBER.
