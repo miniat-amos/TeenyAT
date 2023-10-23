@@ -2,5 +2,8 @@ CC=g++
 
 CFLAGS=-g -Wall
 
-buildASM:
-	$(CC) $(CFLAGS) src/*.cpp -o ../bin/asmblr.exe -I../../ -I./headers
+buildWin:
+	$(CC) $(CFLAGS) src/*.cpp -o ../bin/trash.exe -I../../ -I./headers
+
+buildLinux:
+	$(CC) $(CFLAGS) src/*.cpp -o ../bin/trash -I../../ -I./headers
