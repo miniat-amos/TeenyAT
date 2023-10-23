@@ -20,6 +20,8 @@ int pass = 1;
 
 map<string, tny_word> constants;
 
+unique_ptr<token> term(token_type id);
+bool p_loc();
 unique_ptr<token> p_variable_line();
 unique_ptr<token> p_constant_line();
 bool p_raw_line();
