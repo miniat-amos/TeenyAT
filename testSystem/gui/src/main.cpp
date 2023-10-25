@@ -44,7 +44,7 @@ int main( int argc, char* argv[]){
         std::cout << "Please provide an asm file" << std::endl;
         return 1;
     }
-    std::string cmd = "asmblr.exe " + (std::string)argv[1];
+    std::string cmd = "trash.exe " + (std::string)argv[1];
     std::system(cmd.c_str());
 
     std::string fileName = "output.trash";
@@ -56,6 +56,7 @@ int main( int argc, char* argv[]){
 		tny_init_from_file(&t, bin_file, bus_read, bus_write);
 	}
 	t.ex_data = &s;
+
     while(SDL_PollEvent(&s.windowEvent) == 0 || s.windowEvent.type != SDL_QUIT){
         switch(s.windowEvent.type){
             case SDL_WINDOWEVENT:
