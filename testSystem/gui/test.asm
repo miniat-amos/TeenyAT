@@ -1,6 +1,6 @@
 JMP !main
 
-!Screen #8000
+!Screen #9000
 
 !main
     SET $a $z
@@ -15,3 +15,4 @@ JMP !main
     MOD $a 360
     JMP !loop
 !end
+STR $z #E000 $z
