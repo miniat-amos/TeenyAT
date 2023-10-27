@@ -420,6 +420,12 @@ void tny_clock(teenyat *t) {
 			set_pc(t, t->reg[reg2].s + immed);
 		}
 		break;
+	case TNY_OPCODE_DEL:
+		tny_sword delay_cnt = t->reg[reg2].s + immed;
+		if(delay_cnt >= 1) {
+			t->delay_cycles = delay_cnt - 1; // current instruction already 1 cycle
+		}
+		break;
 	default:
 		fprintf(stderr, "Unknown opcode (%d) encountered at 0x%04X on cycle %" PRIu64 "\n",
 		        opcode, orig_PC, t->cycle_cnt);
