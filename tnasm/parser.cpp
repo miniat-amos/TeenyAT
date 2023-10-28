@@ -16,7 +16,8 @@ struct instruction {
 
 token_line parse_line;  // The current line of tokens being parsed
 int tnext;  // index of the next token in the line to consider
-int pass = 1;
+int pass;
+tny_uword address;
 
 map<string, tny_word> constants;
 
@@ -30,6 +31,66 @@ unique_ptr<token> p_label_line();
 unique_ptr<tny_word> p_immediate();
 unique_ptr<tny_word> p_number();
 unique_ptr<token> p_plus_or_minus();
+
+/**
+ * @brief
+ *   Parses the token, line by line, to generate the encoded version of the
+ *   program.
+ *
+ * @return
+ *   True if entire program is correct.  False otherwise.
+ */
+bool parse(token_lines &parse_lines, vector <string> asm_lines) {
+    bool result = true;  // assume the assembly input is syntactically correct
+
+    /*
+     * In pass 1:
+     *   - create the variables table and determine the address of each
+     *   - create the constants symbol table w/ associated values
+     *   - create the labels symbol table and determine the address of each
+     *   - report errors for any line of code that doesn't match the p_loc()
+     *     grammar
+     */
+    pass = 1;
+    address = 0x0000;
+
+    for(auto &line: parse_lines) {
+        int line_no = line[0].line_no;
+        parse_line = line;
+        if(p_loc() == false) {
+            result = false;
+            cerr << "Error, line(" << line_no << "): " << asm_lines[line_no] << endl;
+        }
+    }
+
+    /* If anything went wrong, there's no point in going on to pass 2 */
+    if(result == false) {
+        return false;
+    }
+
+    /*
+     * In pass 2:
+     *   - generate a vector of encoded instructions, one per line of operable
+     *     code, variable memory, and raw data
+     */
+    pass = 2;
+    address = 0x0000;
+
+    for(auto &line: parse_lines) {
+        parse_line = line;
+        if(p_loc() == false) {
+            result = false;
+            /*
+             * TODO: is there anything that needs to happen here?
+             * The first pass would stop us from even getting here if p_loc()
+             * ever fails, right?
+             */
+             cerr << "Err... Your CPU has bad sectors" << endl;
+        }
+    }
+
+    return result;
+}
 
 /**
  * @brief
