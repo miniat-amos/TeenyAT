@@ -167,6 +167,33 @@ unique_ptr<token> p_constant_line() {
 }
 
 /*
+ * raw_line ::= NUMBER+.
+ * We'll implement the "one-or-more" NUMBER check manually rather than via the
+ * recursive descent approach.
+ */
+bool p_raw_line() {
+    bool all_good = true;
+    vector <unique_ptr <tny_word> > data;
+
+    while(all_good) {
+        int save = tnext;
+        unique_ptr <tny_word> A;
+
+        if(A = p_number()) {
+            data.push_back(move(A));
+        }
+        else if(tnext = save, (term(T_EOL) != nullptr)) {
+            break;
+        }
+        else {
+            all_good = false;
+        }
+    }
+
+    return all_good;
+}
+
+/*
  * label_line ::= LABEL.
  */
 unique_ptr<token> p_label_line() {
