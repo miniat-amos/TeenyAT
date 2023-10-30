@@ -15,3 +15,4 @@ JMP !main
     MOD $a 360
     JMP !loop
 !end
+STR $z #E000 $z
