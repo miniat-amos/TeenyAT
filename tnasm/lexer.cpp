@@ -106,8 +106,8 @@ void initialize_lexical_regex(vector <token_regex> &patterns) {
 	patterns.push_back(regex_token("![^ \\t\\b\\v\\r\\n;]+", T_LABEL, nullptr));
 	patterns.push_back(regex_token("\\.const(ant)?", T_CONSTANT, nullptr));
 	patterns.push_back(regex_token("\\.var(iable)?", T_VARIABLE, nullptr));
-	patterns.push_back(regex_token("(pc)|(sp)|(rz)", T_REGISTER, nullptr));
-	patterns.push_back(regex_token("r[a-e0-7]", T_REGISTER, nullptr));
+	patterns.push_back(regex_token("(pc)|(sp)|(rz)", T_REGISTER, handle_register));
+	patterns.push_back(regex_token("r[a-e0-7]", T_REGISTER, handle_register));
 	patterns.push_back(regex_token("set", T_SET, nullptr));
 	patterns.push_back(regex_token("lod", T_LOD, nullptr));
 	patterns.push_back(regex_token("str", T_STR, nullptr));
