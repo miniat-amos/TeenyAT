@@ -34,6 +34,8 @@ unique_ptr<tny_word> p_immediate();
 unique_ptr<tny_word> p_number();
 unique_ptr<token> p_plus_or_minus();
 
+tny_uword token_to_opcode(int id);
+
 unique_ptr<tny_uword> p_code_1_inst();
 unique_ptr<tny_uword> p_code_2_inst();
 unique_ptr<tny_uword> p_code_3_inst();
@@ -303,6 +305,45 @@ bool p_code_2_line() {
     }
 
     return result;
+}
+
+tny_uword token_to_opcode(int id) {
+    tny_uword result;
+    switch(id) {
+    case T_SET:   result = TNY_OPCODE_T_SET;   break;
+    case T_LOD:   result = TNY_OPCODE_T_LOD;   break;
+    case T_STR:   result = TNY_OPCODE_T_STR;   break;
+    case T_PSH:   result = TNY_OPCODE_T_PSH;   break;
+    case T_POP:   result = TNY_OPCODE_T_POP;   break;
+    case T_BTS:   result = TNY_OPCODE_T_BTS;   break;
+    case T_BTC:   result = TNY_OPCODE_T_BTC;   break;
+    case T_BTF:   result = TNY_OPCODE_T_BTF;   break;
+    case T_CAL:   result = TNY_OPCODE_T_CAL;   break;
+    case T_ADD:   result = TNY_OPCODE_T_ADD;   break;
+    case T_SUB:   result = TNY_OPCODE_T_SUB;   break;
+    case T_MPY:   result = TNY_OPCODE_T_MPY;   break;
+    case T_DIV:   result = TNY_OPCODE_T_DIV;   break;
+    case T_MOD:   result = TNY_OPCODE_T_MOD;   break;
+    case T_AND:   result = TNY_OPCODE_T_AND;   break;
+    case T_OR:    result = TNY_OPCODE_T_OR;    break;
+    case T_XOR:   result = TNY_OPCODE_T_XOR;   break;
+    case T_SHF:   result = TNY_OPCODE_T_SHF;   break;
+    case T_ROT:   result = TNY_OPCODE_T_ROT;   break;
+    case T_NEG:   result = TNY_OPCODE_T_NEG;   break;
+    case T_CMP:   result = TNY_OPCODE_T_CMP;   break;
+    case T_JMP:   result = TNY_OPCODE_T_JMP;   break;
+    case T_DJZ:   result = TNY_OPCODE_T_DJZ;   break;
+    case T_INC:   result = TNY_OPCODE_T_INC;   break;
+    case T_DEC:   result = TNY_OPCODE_T_DEC;   break;
+    case T_RET:   result = TNY_OPCODE_T_RET;   break;
+    default:
+        cerr << "Error, line(" << line[0].line_no << "): ";
+        cerr << "token_to_opcode() has unknown id, " << id << endl;
+        /*
+         * TODO: We should cleanly terminiate the assembler here
+         */
+        result = 1234;
+    }
 }
 
 /*
