@@ -36,10 +36,11 @@ unique_ptr<token> p_plus_or_minus();
 
 tny_uword token_to_opcode(int id);
 
-unique_ptr<tny_uword> p_code_1_inst();
-unique_ptr<tny_uword> p_code_2_inst();
-unique_ptr<tny_uword> p_code_3_inst();
-unique_ptr<tny_uword> p_code_4_inst();
+unique_ptr<token> p_code_1_inst();
+unique_ptr<token> p_code_2_inst();
+unique_ptr<token> p_code_3_inst();
+unique_ptr<token> p_code_4_inst();
+unique_ptr<token> p_code_5_inst();
 
 /**
  * @brief
@@ -282,8 +283,7 @@ unique_ptr<token> p_plus_or_minus() {
  */
 bool p_code_2_line() {
     bool result = false;
-    unique_ptr<token> dreg, sreg, sign;
-    unique_ptr<tny_uword> oper;
+    unique_ptr<token> dreg, oper, sreg, sign;
     unique_ptr<tny_word> immed;
     int save = tnext;
     if((oper = p_code_2_inst()) && (dreg = term(T_REGISTER)) && term(T_COMMA) &&
@@ -293,7 +293,7 @@ bool p_code_2_line() {
         inst.line_no = dreg->line_no;
 
         tny_word &f = inst.first;
-        f.instruction.opcode = *oper;
+        f.instruction.opcode = token_to_opcode(oper->id);
         f.instruction.teeny = 0;
         f.instruction.reg1 = dreg->value.u;
         f.instruction.reg2 = sreg->value.u;
@@ -310,40 +310,45 @@ bool p_code_2_line() {
 tny_uword token_to_opcode(int id) {
     tny_uword result;
     switch(id) {
-    case T_SET:   result = TNY_OPCODE_T_SET;   break;
-    case T_LOD:   result = TNY_OPCODE_T_LOD;   break;
-    case T_STR:   result = TNY_OPCODE_T_STR;   break;
-    case T_PSH:   result = TNY_OPCODE_T_PSH;   break;
-    case T_POP:   result = TNY_OPCODE_T_POP;   break;
-    case T_BTS:   result = TNY_OPCODE_T_BTS;   break;
-    case T_BTC:   result = TNY_OPCODE_T_BTC;   break;
-    case T_BTF:   result = TNY_OPCODE_T_BTF;   break;
-    case T_CAL:   result = TNY_OPCODE_T_CAL;   break;
-    case T_ADD:   result = TNY_OPCODE_T_ADD;   break;
-    case T_SUB:   result = TNY_OPCODE_T_SUB;   break;
-    case T_MPY:   result = TNY_OPCODE_T_MPY;   break;
-    case T_DIV:   result = TNY_OPCODE_T_DIV;   break;
-    case T_MOD:   result = TNY_OPCODE_T_MOD;   break;
-    case T_AND:   result = TNY_OPCODE_T_AND;   break;
-    case T_OR:    result = TNY_OPCODE_T_OR;    break;
-    case T_XOR:   result = TNY_OPCODE_T_XOR;   break;
-    case T_SHF:   result = TNY_OPCODE_T_SHF;   break;
-    case T_ROT:   result = TNY_OPCODE_T_ROT;   break;
-    case T_NEG:   result = TNY_OPCODE_T_NEG;   break;
-    case T_CMP:   result = TNY_OPCODE_T_CMP;   break;
-    case T_JMP:   result = TNY_OPCODE_T_JMP;   break;
-    case T_DJZ:   result = TNY_OPCODE_T_DJZ;   break;
-    case T_INC:   result = TNY_OPCODE_T_INC;   break;
-    case T_DEC:   result = TNY_OPCODE_T_DEC;   break;
-    case T_RET:   result = TNY_OPCODE_T_RET;   break;
+    case T_SET:   result = TNY_OPCODE_SET;   break;
+    case T_LOD:   result = TNY_OPCODE_LOD;   break;
+    case T_STR:   result = TNY_OPCODE_STR;   break;
+    case T_PSH:   result = TNY_OPCODE_PSH;   break;
+    case T_POP:   result = TNY_OPCODE_POP;   break;
+    case T_BTS:   result = TNY_OPCODE_BTS;   break;
+    case T_BTC:   result = TNY_OPCODE_BTC;   break;
+    case T_BTF:   result = TNY_OPCODE_BTF;   break;
+    case T_CAL:   result = TNY_OPCODE_CAL;   break;
+    case T_ADD:   result = TNY_OPCODE_ADD;   break;
+    case T_SUB:   result = TNY_OPCODE_SUB;   break;
+    case T_MPY:   result = TNY_OPCODE_MPY;   break;
+    case T_DIV:   result = TNY_OPCODE_DIV;   break;
+    case T_MOD:   result = TNY_OPCODE_MOD;   break;
+    case T_AND:   result = TNY_OPCODE_AND;   break;
+    case T_OR:    result = TNY_OPCODE_OR;    break;
+    case T_XOR:   result = TNY_OPCODE_XOR;   break;
+    case T_SHF:   result = TNY_OPCODE_SHF;   break;
+    case T_ROT:   result = TNY_OPCODE_ROT;   break;
+    case T_NEG:   result = TNY_OPCODE_NEG;   break;
+    case T_CMP:   result = TNY_OPCODE_CMP;   break;
+    case T_JMP:   result = TNY_OPCODE_JMP;   break;
+    case T_DJZ:   result = TNY_OPCODE_DJZ;   break;
+    /*
+     * The following are pseudo-instructions
+     */
+    case T_INC:   result = TNY_OPCODE_ADD;   break;
+    case T_DEC:   result = TNY_OPCODE_SUB;   break;
+    case T_RET:   result = TNY_OPCODE_POP;   break;
     default:
-        cerr << "Error, line(" << line[0].line_no << "): ";
+        cerr << "Error, line(" << parse_line[0].line_no << "): ";
         cerr << "token_to_opcode() has unknown id, " << id << endl;
         /*
          * TODO: We should cleanly terminiate the assembler here
          */
         result = 1234;
     }
+
+    return result;
 }
 
 /*
@@ -364,27 +369,26 @@ tny_uword token_to_opcode(int id) {
  * code_1_inst ::= CMP.
  * code_1_inst ::= DJZ.
  */
-unique_ptr<tny_uword> p_code_1_inst() {
-    unique_ptr<tny_uword> result = unique_ptr<tny_uword>(new tny_uword);
+unique_ptr<token> p_code_1_inst() {
+    unique_ptr<token> result;
     int save = tnext;
 
-    if     (tnext = save, term(T_ADD)) *result = TNY_OPCODE_ADD;
-    else if(tnext = save, term(T_SUB)) *result = TNY_OPCODE_SUB;
-    else if(tnext = save, term(T_MPY)) *result = TNY_OPCODE_MPY;
-    else if(tnext = save, term(T_DIV)) *result = TNY_OPCODE_DIV;
-    else if(tnext = save, term(T_MOD)) *result = TNY_OPCODE_MOD;
-    else if(tnext = save, term(T_AND)) *result = TNY_OPCODE_AND;
-    else if(tnext = save, term(T_OR))  *result = TNY_OPCODE_OR;
-    else if(tnext = save, term(T_XOR)) *result = TNY_OPCODE_XOR;
-    else if(tnext = save, term(T_SHF)) *result = TNY_OPCODE_SHF;
-    else if(tnext = save, term(T_ROT)) *result = TNY_OPCODE_ROT;
-    else if(tnext = save, term(T_SET)) *result = TNY_OPCODE_SET;
-    else if(tnext = save, term(T_LOD)) *result = TNY_OPCODE_LOD;
-    else if(tnext = save, term(T_STR)) *result = TNY_OPCODE_STR;
-    else if(tnext = save, term(T_BTF)) *result = TNY_OPCODE_BTF;
-    else if(tnext = save, term(T_CMP)) *result = TNY_OPCODE_CMP;
-    else if(tnext = save, term(T_DJZ)) *result = TNY_OPCODE_DJZ;
-    else result = nullptr;
+    (tnext = save, result = term(T_ADD)) ||
+    (tnext = save, result = term(T_SUB)) ||
+    (tnext = save, result = term(T_MPY)) ||
+    (tnext = save, result = term(T_DIV)) ||
+    (tnext = save, result = term(T_MOD)) ||
+    (tnext = save, result = term(T_AND)) ||
+    (tnext = save, result = term(T_OR))  ||
+    (tnext = save, result = term(T_XOR)) ||
+    (tnext = save, result = term(T_SHF)) ||
+    (tnext = save, result = term(T_ROT)) ||
+    (tnext = save, result = term(T_SET)) ||
+    (tnext = save, result = term(T_LOD)) ||
+    (tnext = save, result = term(T_STR)) ||
+    (tnext = save, result = term(T_BTF)) ||
+    (tnext = save, result = term(T_CMP)) ||
+    (tnext = save, result = term(T_DJZ));
 
     return result;
 }
@@ -406,26 +410,25 @@ unique_ptr<tny_uword> p_code_1_inst() {
  * code_2_inst ::= CMP.
  * code_2_inst ::= DJZ.
  */
-unique_ptr<tny_uword> p_code_2_inst() {
-    unique_ptr<tny_uword> result = unique_ptr<tny_uword>(new tny_uword);
+unique_ptr<token> p_code_2_inst() {
+    unique_ptr<token> result;
     int save = tnext;
 
-    if     (tnext = save, term(T_ADD)) *result = TNY_OPCODE_ADD;
-    else if(tnext = save, term(T_SUB)) *result = TNY_OPCODE_SUB;
-    else if(tnext = save, term(T_MPY)) *result = TNY_OPCODE_MPY;
-    else if(tnext = save, term(T_DIV)) *result = TNY_OPCODE_DIV;
-    else if(tnext = save, term(T_MOD)) *result = TNY_OPCODE_MOD;
-    else if(tnext = save, term(T_AND)) *result = TNY_OPCODE_AND;
-    else if(tnext = save, term(T_OR))  *result = TNY_OPCODE_OR;
-    else if(tnext = save, term(T_XOR)) *result = TNY_OPCODE_XOR;
-    else if(tnext = save, term(T_SHF)) *result = TNY_OPCODE_SHF;
-    else if(tnext = save, term(T_ROT)) *result = TNY_OPCODE_ROT;
-    else if(tnext = save, term(T_SET)) *result = TNY_OPCODE_SET;
-    else if(tnext = save, term(T_LOD)) *result = TNY_OPCODE_LOD;
-    else if(tnext = save, term(T_BTF)) *result = TNY_OPCODE_BTF;
-    else if(tnext = save, term(T_CMP)) *result = TNY_OPCODE_CMP;
-    else if(tnext = save, term(T_DJZ)) *result = TNY_OPCODE_DJZ;
-    else result = nullptr;
+    (tnext = save, result = term(T_ADD)) ||
+    (tnext = save, result = term(T_SUB)) ||
+    (tnext = save, result = term(T_MPY)) ||
+    (tnext = save, result = term(T_DIV)) ||
+    (tnext = save, result = term(T_MOD)) ||
+    (tnext = save, result = term(T_AND)) ||
+    (tnext = save, result = term(T_OR))  ||
+    (tnext = save, result = term(T_XOR)) ||
+    (tnext = save, result = term(T_SHF)) ||
+    (tnext = save, result = term(T_ROT)) ||
+    (tnext = save, result = term(T_SET)) ||
+    (tnext = save, result = term(T_LOD)) ||
+    (tnext = save, result = term(T_BTF)) ||
+    (tnext = save, result = term(T_CMP)) ||
+    (tnext = save, result = term(T_DJZ));
 
     return result;
 }
@@ -447,26 +450,25 @@ unique_ptr<tny_uword> p_code_2_inst() {
  * code_3_inst ::= CMP.
  * code_3_inst ::= DJZ.
  */
-unique_ptr<tny_uword> p_code_3_inst() {
-    unique_ptr<tny_uword> result = unique_ptr<tny_uword>(new tny_uword);
+unique_ptr<token> p_code_3_inst() {
+    unique_ptr<token> result;
     int save = tnext;
 
-    if     (tnext = save, term(T_ADD)) *result = TNY_OPCODE_ADD;
-    else if(tnext = save, term(T_SUB)) *result = TNY_OPCODE_SUB;
-    else if(tnext = save, term(T_MPY)) *result = TNY_OPCODE_MPY;
-    else if(tnext = save, term(T_DIV)) *result = TNY_OPCODE_DIV;
-    else if(tnext = save, term(T_MOD)) *result = TNY_OPCODE_MOD;
-    else if(tnext = save, term(T_AND)) *result = TNY_OPCODE_AND;
-    else if(tnext = save, term(T_OR))  *result = TNY_OPCODE_OR;
-    else if(tnext = save, term(T_XOR)) *result = TNY_OPCODE_XOR;
-    else if(tnext = save, term(T_SHF)) *result = TNY_OPCODE_SHF;
-    else if(tnext = save, term(T_ROT)) *result = TNY_OPCODE_ROT;
-    else if(tnext = save, term(T_SET)) *result = TNY_OPCODE_SET;
-    else if(tnext = save, term(T_LOD)) *result = TNY_OPCODE_LOD;
-    else if(tnext = save, term(T_BTF)) *result = TNY_OPCODE_BTF;
-    else if(tnext = save, term(T_CMP)) *result = TNY_OPCODE_CMP;
-    else if(tnext = save, term(T_DJZ)) *result = TNY_OPCODE_DJZ;
-    else result = nullptr;
+    (tnext = save, result = term(T_ADD)) ||
+    (tnext = save, result = term(T_SUB)) ||
+    (tnext = save, result = term(T_MPY)) ||
+    (tnext = save, result = term(T_DIV)) ||
+    (tnext = save, result = term(T_MOD)) ||
+    (tnext = save, result = term(T_AND)) ||
+    (tnext = save, result = term(T_OR))  ||
+    (tnext = save, result = term(T_XOR)) ||
+    (tnext = save, result = term(T_SHF)) ||
+    (tnext = save, result = term(T_ROT)) ||
+    (tnext = save, result = term(T_SET)) ||
+    (tnext = save, result = term(T_LOD)) ||
+    (tnext = save, result = term(T_BTF)) ||
+    (tnext = save, result = term(T_CMP)) ||
+    (tnext = save, result = term(T_DJZ));
 
     return result;
 }
@@ -475,13 +477,26 @@ unique_ptr<tny_uword> p_code_3_inst() {
  * code_4_inst ::= NEG.
  * code_4_inst ::= POP.
  */
-unique_ptr<tny_uword> p_code_4_inst() {
-    unique_ptr<tny_uword> result = unique_ptr<tny_uword>(new tny_uword);
+unique_ptr<token> p_code_4_inst() {
+    unique_ptr<token> result;
     int save = tnext;
 
-    if     (tnext = save, term(T_NEG)) *result = TNY_OPCODE_NEG;
-    else if(tnext = save, term(T_POP)) *result = TNY_OPCODE_POP;
-    else result = nullptr;
+    (tnext = save, result = term(T_NEG)) ||
+    (tnext = save, result = term(T_POP));
+
+    return result;
+}
+
+/*
+ * code_5_inst ::= INC.
+ * code_5_inst ::= DEC.
+ */
+unique_ptr<token> p_code_5_inst() {
+    unique_ptr<token> result;
+    int save = tnext;
+
+    (tnext = save, result = term(T_INC)) ||
+    (tnext = save, result = term(T_DEC));
 
     return result;
 }
