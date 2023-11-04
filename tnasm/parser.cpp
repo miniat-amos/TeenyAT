@@ -37,6 +37,7 @@ unique_ptr<token> p_plus_or_minus();
 unique_ptr<tny_uword> p_code_1_inst();
 unique_ptr<tny_uword> p_code_2_inst();
 unique_ptr<tny_uword> p_code_3_inst();
+unique_ptr<tny_uword> p_code_4_inst();
 
 /**
  * @brief
@@ -424,6 +425,21 @@ unique_ptr<tny_uword> p_code_3_inst() {
     else if(tnext = save, term(T_BTF)) *result = TNY_OPCODE_BTF;
     else if(tnext = save, term(T_CMP)) *result = TNY_OPCODE_CMP;
     else if(tnext = save, term(T_DJZ)) *result = TNY_OPCODE_DJZ;
+    else result = nullptr;
+
+    return result;
+}
+
+/*
+ * code_4_inst ::= NEG.
+ * code_4_inst ::= POP.
+ */
+unique_ptr<tny_uword> p_code_4_inst() {
+    unique_ptr<tny_uword> result = unique_ptr<tny_uword>(new tny_uword);
+    int save = tnext;
+
+    if     (tnext = save, term(T_NEG)) *result = TNY_OPCODE_NEG;
+    else if(tnext = save, term(T_POP)) *result = TNY_OPCODE_POP;
     else result = nullptr;
 
     return result;
