@@ -5,6 +5,7 @@
 
 #include <cstdlib>
 #include <ctype.h>
+#include <cstring>
 
 #include "../teenyat.h"
 #include "token.h"

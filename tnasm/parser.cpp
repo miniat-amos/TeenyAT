@@ -9,8 +9,8 @@
 using namespace std;
 
 struct instruction {
-    tny_word low;
-    tny_word high;
+    tny_word first;
+    tny_word second;
     int line_no;
 };
 
@@ -33,6 +33,8 @@ unique_ptr<token> p_label_line();
 unique_ptr<tny_word> p_immediate();
 unique_ptr<tny_word> p_number();
 unique_ptr<token> p_plus_or_minus();
+
+unique_ptr<tny_uword> p_code_2_inst();
 
 /**
  * @brief
@@ -268,4 +270,75 @@ unique_ptr<token> p_plus_or_minus() {
     (tnext = save, val = term(T_MINUS));
 
     return val;
+}
+
+/*
+ * code_2_line ::= code_2_inst REGISTER COMMA REGISTER plus_or_minus immediate.
+ */
+bool p_code_2_line() {
+    bool result = false;
+    unique_ptr<token> dreg, sreg, sign;
+    unique_ptr<tny_uword> oper;
+    unique_ptr<tny_word> immed;
+    int save = tnext;
+    if((oper = p_code_2_inst()) && (dreg = term(T_REGISTER)) && term(T_COMMA) &&
+       (sreg = term(T_REGISTER)) && (sign = p_plus_or_minus()) && (immed = p_immediate())) {
+
+        instruction inst;
+        inst.line_no = dreg->line_no;
+
+        tny_word &f = inst.first;
+        f.instruction.opcode = *oper;
+        f.instruction.teeny = 0;
+        f.instruction.reg1 = dreg->value.u;
+        f.instruction.reg2 = sreg->value.u;
+        f.instruction.immed4 = 0;
+
+        inst.second.s = immed->s * (sign->id == T_PLUS ? +1 : -1);
+
+        result = true;
+    }
+
+    return result;
+}
+
+/*
+ * code_2_inst ::= ADD.
+ * code_2_inst ::= SUB.
+ * code_2_inst ::= MPY.
+ * code_2_inst ::= DIV.
+ * code_2_inst ::= MOD.
+ * code_2_inst ::= AND.
+ * code_2_inst ::= OR.
+ * code_2_inst ::= XOR.
+ * code_2_inst ::= SHF.
+ * code_2_inst ::= ROT.
+ * code_2_inst ::= SET.
+ * code_2_inst ::= LOD.
+ * code_2_inst ::= BTF.
+ * code_2_inst ::= CMP.
+ * code_2_inst ::= DJZ.
+ */
+unique_ptr<tny_uword> p_code_2_inst() {
+    unique_ptr<tny_uword> result = unique_ptr<tny_uword>(new tny_uword);
+    int save = tnext;
+
+    if     (tnext = save, term(T_ADD)) *result = TNY_OPCODE_ADD;
+    else if(tnext = save, term(T_SUB)) *result = TNY_OPCODE_SUB;
+    else if(tnext = save, term(T_MPY)) *result = TNY_OPCODE_MPY;
+    else if(tnext = save, term(T_DIV)) *result = TNY_OPCODE_DIV;
+    else if(tnext = save, term(T_MOD)) *result = TNY_OPCODE_MOD;
+    else if(tnext = save, term(T_AND)) *result = TNY_OPCODE_AND;
+    else if(tnext = save, term(T_OR))  *result = TNY_OPCODE_OR;
+    else if(tnext = save, term(T_XOR)) *result = TNY_OPCODE_XOR;
+    else if(tnext = save, term(T_SHF)) *result = TNY_OPCODE_SHF;
+    else if(tnext = save, term(T_ROT)) *result = TNY_OPCODE_ROT;
+    else if(tnext = save, term(T_SET)) *result = TNY_OPCODE_SET;
+    else if(tnext = save, term(T_LOD)) *result = TNY_OPCODE_LOD;
+    else if(tnext = save, term(T_BTF)) *result = TNY_OPCODE_BTF;
+    else if(tnext = save, term(T_CMP)) *result = TNY_OPCODE_CMP;
+    else if(tnext = save, term(T_DJZ)) *result = TNY_OPCODE_DJZ;
+    else result = nullptr;
+
+    return result;
 }
