@@ -1,5 +1,14 @@
-buildWin:
-	g++ -o ../bin/system.exe src/main.cpp src/../../../teenyat.c  -Ic:\dev\include\SDL2 -Ic:\dev\include -Lc:\dev\lib -lmingw32 -lSDL2main -lSDL2
+CFLAGS += -I../..
+ifeq ($(OS),Windows_NT)
+	LDFLAGS += -s -lopengl32 -lgdi32
+else
+	UNAME_S := $(shell uname -s)
+	ifeq ($(UNAME_S),Darwin)
+		LDFLAGS += -framework OpenGL -framework Cocoa
+	else ifeq ($(UNAME_S),Linux)
+		LDFLAGS += -s -lGLU -lGL -lX11
+	endif
+endif
 
-buildLinux:
-	g++ -o ../bin/system src/main.cpp src/../../../teenyat.c  -Ic:\dev\include\SDL2 -Ic:\dev\include -Lc:\dev\lib -lSDL2main -lSDL2
+test : src/main.cpp tigr.c ../../teenyat.c
+	g++ $^ -Os -osystem $(CFLAGS) $(LDFLAGS) 

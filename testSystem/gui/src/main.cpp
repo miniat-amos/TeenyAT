@@ -4,10 +4,9 @@
 */
 
 #include <iostream>
-#include <SDL2/SDL.h>
 #include <cstdlib>
+#include "../tigr.h"
 #include "Screen.h"
-#include "color.h"
 #include "../../../teenyat.h"
 
 #define LIVESCREEN 0x8000
@@ -32,13 +31,11 @@
 
 void bus_read(teenyat *t, tny_uword addr, tny_word *data, uint16_t *delay);
 void bus_write(teenyat *t, tny_uword addr, tny_word data, uint16_t *delay);
-static int resizingEventWatcher(void* data, SDL_Event* event);
 bool resized = false;
+
+// Screen to write too
 Screen s;
 int main( int argc, char* argv[]){
-    // Screen to write too
-    SDL_AddEventWatch(resizingEventWatcher, s.window);
-
     //Initialize the teenyAT
     if(argc != 2){
         std::cout << "Please provide an asm file" << std::endl;
@@ -57,21 +54,11 @@ int main( int argc, char* argv[]){
 	}
 	t.ex_data = &s;
 
-    while(SDL_PollEvent(&s.windowEvent) == 0 || s.windowEvent.type != SDL_QUIT){
-        switch(s.windowEvent.type){
-            case SDL_WINDOWEVENT:
-            case SDL_WINDOWEVENT_RESIZED:
-            break;
-        }
-        SDL_SetRenderDrawColor(s.renderer, 0xDD, 0xBB, 0xFF, 0xFF);
-        SDL_RenderClear(s.renderer);
-        SDL_GetMouseState(&s.mouseX, &s.mouseY);
+    while (!tigrClosed(s.window) && !tigrKeyDown(s.window, TK_ESCAPE)){
         tny_clock(&t);
     }
 
-    SDL_DestroyWindow(s.window);
-    SDL_Quit();
-
+    tigrFree(s.window);
 	fclose(bin_file);
     return EXIT_SUCCESS;
 }
@@ -249,15 +236,4 @@ void bus_write(teenyat *t, tny_uword addr, tny_word data, uint16_t *delay) {
     }
     std::cout << std::endl;
 	return;
-}
-
-static int resizingEventWatcher(void* data, SDL_Event* event) {
-  if (event->type == SDL_WINDOWEVENT &&
-      event->window.event == SDL_WINDOWEVENT_RESIZED) {
-    SDL_Window* win = SDL_GetWindowFromID(event->window.windowID);
-    if (win == (SDL_Window*)data) {
-        resized = true;
-    }
-  }
-  return 0;
 }

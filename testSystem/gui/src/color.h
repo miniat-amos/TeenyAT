@@ -1,84 +1,35 @@
-/*
- * Simple-color-conversions
- *
- * Copyright 2016 Jake Besworth
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
-
-/*  
- * color.h
- *
- * Portable, simple, compact, color conversion library between color spaces, most notibly RGB -> CYM(K) and HSV
- * Formulas derived from "Color Space Conversions" by Adrian Ford and Alan Roberts.
- *
- * Note: RGB values are 0-255 (unsigned char)
- *       CMY(K) values are 0.00-1.00 (0 to 100%) (float)
- *       HSV values are Hue: 0-360 (0 to 360 degrees) (float), Saturation: 0.00-1.00 (0 to 100%) (float), and Value: 0.00-1.00 (0 to 100%) (float)
- *
- */
-
-#ifndef COLOR_ 
-#define COLOR_
-
-#ifdef __cplusplus
-extern "C"
-{
-#endif
-
-void convertHSVtoRGB(const int h, const int s, const int v, unsigned char * r, unsigned char * g, unsigned char * b)
-{
-    unsigned char region, remainder, p, q, t;
-    
-    if (s == 0)
-    {
-        *r = v;
-        *g = v;
-        *b = v;
+#include <cmath>
+void HSVtoRGB(float H, float S,float V,unsigned char *R, unsigned char *G, unsigned char *B){
+    if(H>360 || H<0 || S>100 || S<0 || V>100 || V<0){
+        return;
     }
-    
-    region = h / 43;
-    remainder = (h - (region * 43)) * 6; 
-    
-    p = (v * (255 - s)) >> 8;
-    q = (v * (255 - ((s * remainder) >> 8))) >> 8;
-    t = (unsigned char)(v * (255 - ((s * (255 - remainder)) >> 8))) >> 8;
-    
-    switch (region)
-    {
-        case 0:
-            *r = v; *g = t; *b = p;
-            break;
-        case 1:
-            *r = q; *g = v; *b = p;
-            break;
-        case 2:
-            *r = p; *g = v; *b = t;
-            break;
-        case 3:
-            *r = p; *g = q; *b = v;
-            break;
-        case 4:
-            *r = t; *g = p; *b = v;
-            break;
-        default:
-            *r = v; *g = p; *b = q;
-            break;
+    float s = S/100;
+    float v = V/100;
+    float C = s*v;
+    float X = C*(1-abs(fmod(H/60.0, 2)-1));
+    float m = v-C;
+    float r,g,b;
+    if(H >= 0 && H < 60){
+        r = C,g = X,b = 0;
     }
-}
-#ifdef __cplusplus
-}
-#endif
+    else if(H >= 60 && H < 120){
+        r = X,g = C,b = 0;
+    }
+    else if(H >= 120 && H < 180){
+        r = 0,g = C,b = X;
+    }
+    else if(H >= 180 && H < 240){
+        r = 0,g = X,b = C;
+    }
+    else if(H >= 240 && H < 300){
+        r = X,g = 0,b = C;
+    }
+    else{
+        r = C,g = 0,b = X;
+    }
 
-#endif
+    *R = (r+m)*255;
+    *G = (g+m)*255;
+    *B = (b+m)*255;
+
+}
