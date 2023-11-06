@@ -9,6 +9,7 @@
 
 #include "../teenyat.h"
 #include "token.h"
+#include "parser.h"
 
 /*
  * Uncomment the definition below to trace the lexer
@@ -69,6 +70,8 @@ int main(int argc, char *argv[]) {
 	cerr << "\n\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n\n";
 	debug_print_lexed_input(token_lines, asm_lines);
 	#endif /* DEBUG_TRACE */
+
+	parse(token_lines, asm_lines);
 
 	return EXIT_SUCCESS;
 }
