@@ -189,7 +189,7 @@ bool p_raw_line() {
         int save = tnext;
         unique_ptr <tny_word> A;
 
-        if(A = p_number()) {
+        if((A = p_number())) {
             data.push_back(move(A));
         }
         else if(tnext = save, (term(T_EOL) != nullptr)) {
