@@ -49,7 +49,7 @@ enum token_type {
     T_BAD
 };
 
-string tstr[] = {
+inline string tstr[] = {
     "T_IGNORE",
     "T_EOL",
     "T_LABEL",
