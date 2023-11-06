@@ -34,6 +34,8 @@ unique_ptr<tny_word> p_immediate();
 unique_ptr<tny_word> p_number();
 unique_ptr<token> p_plus_or_minus();
 
+bool p_code_2_line();
+
 tny_uword token_to_opcode(int id);
 
 unique_ptr<token> p_code_1_inst();
