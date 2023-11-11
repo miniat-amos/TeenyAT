@@ -247,6 +247,7 @@ unique_ptr<tny_word> p_immediate() {
 }
 
 /*
+ * number ::= IDENTIFIER.
  * number ::= NUMBER.
  * number ::= plus_or_minus NUMBER.
  */
@@ -254,7 +255,12 @@ unique_ptr<tny_word> p_number() {
     unique_ptr<tny_word> val = nullptr;
     unique_ptr<token> A, B;
     int save = tnext;
-    if(tnext = save, A = term(T_NUMBER)) {
+    if(tnext = save, A = term(T_IDENTIFIER)) {
+        // TODO: verify this is a constant and replace with its value
+        //       otherwise, report error
+        val = unique_ptr<tny_word>(new tny_word(A->value)); // get rid of this
+    }
+    else if(tnext = save, A = term(T_NUMBER)) {
         val = unique_ptr<tny_word>(new tny_word(A->value));
     }
     else if(tnext = save, (A = p_plus_or_minus()) && (B = term(T_NUMBER))) {

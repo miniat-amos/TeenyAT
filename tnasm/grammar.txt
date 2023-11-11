@@ -32,6 +32,7 @@ immediate ::= number.
 immediate ::= LABEL.
 immediate ::= IDENTIFIER.
 
+number ::= IDENTIFIER.
 number ::= NUMBER.
 number ::= plus_or_minus NUMBER.
 

@@ -8,6 +8,8 @@
     div rE, 15
     MpY rC, pc
 
+    123 -15 thiry_one 0x12F_F 0b_110_00000_1011_00_10
+
 !more
     BTF r1, r3 + thirty_one
 
