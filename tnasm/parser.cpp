@@ -155,23 +155,23 @@ unique_ptr<token> p_variable_line() {
  * constant_line ::= CONSTANT IDENTIFIER immediate.
  */
 unique_ptr<token> p_constant_line() {
-    unique_ptr<token> val = nullptr, A;
-    unique_ptr<tny_word> B;
+    unique_ptr<token> val = nullptr, ident;
+    unique_ptr<tny_word> immed;
     int save = tnext;
-    if(term(T_CONSTANT) && (A = term(T_IDENTIFIER)) && (B = p_immediate()) && term(T_EOL)) {
+    if(term(T_CONSTANT) && (ident = term(T_IDENTIFIER)) && (immed = p_immediate()) && term(T_EOL)) {
 
         /* TODO: create the constanst and map the immediate */
         if(pass == 1) {
-            if(constants.count(A->token_str) == 0) {
+            if(constants.count(ident->token_str) == 0) {
                 /* New constant found */
-                constants[A->token_str] = *B;
+                constants[ident->token_str] = *immed;
             }
             else {
-                cerr << "ERROR, Line " << A->line_no << ": ";
-                cerr << "Constant \"" << A->token_str << "\" already defined" << endl;
+                cerr << "ERROR, Line " << ident->line_no << ": ";
+                cerr << "Constant \"" << ident->token_str << "\" already defined" << endl;
             }
         }
-        val = move(A);
+        val = move(ident);
     }
     return val;
 }
