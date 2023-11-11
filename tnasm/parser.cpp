@@ -144,9 +144,9 @@ unique_ptr<token> p_variable_line() {
     unique_ptr<tny_word> B;
     int save = tnext;
     if(term(T_VARIABLE) && (A = term(T_IDENTIFIER)) && (B = p_immediate()) && term(T_EOL)) {
-        val = move(A);
-
         /* TODO: create the variable and map the immediate */
+
+        val = move(A);
     }
     return val;
 }
