@@ -159,7 +159,6 @@ unique_ptr<token> p_constant_line() {
     unique_ptr<tny_word> B;
     int save = tnext;
     if(term(T_CONSTANT) && (A = term(T_IDENTIFIER)) && (B = p_immediate()) && term(T_EOL)) {
-        val = move(A);
 
         /* TODO: create the constanst and map the immediate */
         if(pass == 1) {
@@ -172,6 +171,7 @@ unique_ptr<token> p_constant_line() {
                 cerr << "Constant \"" << A->token_str << "\" already defined" << endl;
             }
         }
+        val = move(A);
     }
     return val;
 }
