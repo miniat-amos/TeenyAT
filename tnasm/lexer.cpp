@@ -238,6 +238,7 @@ void tokenize_all_lines(
 			token t;
 			t.id = T_EOL;
 			t.line_no = i + 1;
+			token_line.push_back(t);
 			token_lines.push_back(token_line);
 		}
 	}
