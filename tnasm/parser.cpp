@@ -236,22 +236,27 @@ shared_ptr<token> p_label_line() {
  */
 shared_ptr<tny_word> p_immediate() {
     shared_ptr<tny_word> val = nullptr;
-    shared_ptr<token> A;
+    shared_ptr<token> ident;
     int save = tnext;
 
     if(tnext = save, val = p_number()) {
         /* nothing to do */
     }
-    else if(tnext = save, A = term(T_LABEL)) {
+    else if(tnext = save, ident = term(T_LABEL)) {
         /* TODO: look up label's address */
     }
-    else if(tnext = save, A = term(T_IDENTIFIER)) {
+    else if(tnext = save, ident = term(T_IDENTIFIER)) {
         /* As an immediate, ensure the identifier is a constant. */
         if(pass == 2) {
-            if(constants.count(A->token_str) > 0) {
-                val = shared_ptr<tny_word>(new tny_word(constants[A->token_str]));
+            if(constants.count(ident->token_str) > 0) {
+                val = shared_ptr<tny_word>(new tny_word(constants[ident->token_str]));
+            }
+            else if(variables.count(ident->token_str) > 0) {
+                val = shared_ptr<tny_word>(new tny_word(variables[ident->token_str]));
             }
             else {
+                cerr << "Error, Line(" << ident->line_no << "): ";
+                cerr << "\"" << ident->token_str << "\" is not a constant or identifier" << endl;
                 val = nullptr;
             }
         }
