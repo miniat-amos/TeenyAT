@@ -46,6 +46,8 @@ shared_ptr<token> p_code_3_inst();
 shared_ptr<token> p_code_4_inst();
 shared_ptr<token> p_code_5_inst();
 
+vector <tny_word> bin_words;
+
 /**
  * @brief
  *   Parses the token, line by line, to generate the encoded version of the
@@ -103,6 +105,10 @@ bool parse(token_lines &parse_lines, vector <string> asm_lines) {
         }
     }
 
+    for(auto w : bin_words) {
+        cout << hex << w.u << endl;
+    }
+
     return result;
 }
 
@@ -153,7 +159,7 @@ shared_ptr<token> p_variable_line() {
             bool variable_exists = (variables.count(ident->token_str) > 0);
             if(!constant_exists && !variable_exists) {
                 /* New variable found */
-                variables[ident->token_str] = tny_word{address};
+                variables[ident->token_str] = tny_word{.u = address};
                 address++;
             }
             else {
@@ -161,7 +167,9 @@ shared_ptr<token> p_variable_line() {
                 cerr << (constant_exists ? "Constant" : "Variable") << " \""  << ident->token_str << "\" already defined" << endl;
             }
         }
-        else if(pass == 2); // TODO: put the immediate in the binary at this address
+        else if(pass == 2) {
+            bin_words.push_back(*immed);
+        } // TODO: put the immediate in the binary at this address
         val = ident;
     }
     return val;
@@ -207,13 +215,22 @@ bool p_raw_line() {
 
         if((A = p_number())) {
             data.push_back(A);
-            address++;
         }
         else if(tnext = save, (term(T_EOL) != nullptr)) {
             break;
         }
         else {
             all_good = false;
+        }
+    }
+
+    if(all_good) {
+        address += data.size();
+        if(pass == 2) {
+            /* Add raw data to bin_words */
+            for(auto d: data) {
+                bin_words.push_back(*d);
+            }
         }
     }
 
@@ -287,7 +304,7 @@ shared_ptr<tny_word> p_number() {
     }
     else if(tnext = save, (A = p_plus_or_minus()) && (B = term(T_NUMBER))) {
         val = shared_ptr<tny_word>(new tny_word(B->value));
-        if(B->id == T_MINUS) {
+        if(A->id == T_MINUS) {
             val->s *= -1;
         }
     }
@@ -331,6 +348,11 @@ bool p_code_2_line() {
 
         inst.second.s = immed->s * (sign->id == T_PLUS ? +1 : -1);
 
+        if(pass == 2) {
+            bin_words.push_back(f);
+            bin_words.push_back(inst.second);
+        }
+
         address += 2;
         result = true;
     }
@@ -359,6 +381,11 @@ bool p_code_3_line() {
         f.instruction.immed4 = 0;
 
         inst.second.s = immed->s;
+
+        if(pass == 2) {
+            bin_words.push_back(f);
+            bin_words.push_back(inst.second);
+        }
 
         address += 2;
         result = true;
