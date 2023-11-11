@@ -134,7 +134,8 @@ bool p_loc() {
     return (tnext = save, p_variable_line()) ||
            (tnext = save, p_constant_line()) ||
            (tnext = save, p_raw_line()) ||
-           (tnext = save, p_label_line());
+           (tnext = save, p_label_line()) ||
+           (tnext = save, p_code_2_line());
 }
 
 /*
