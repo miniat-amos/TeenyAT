@@ -71,7 +71,7 @@ bool parse(token_lines &parse_lines, vector <string> asm_lines) {
         parse_line = line;
         if(p_loc() == false) {
             result = false;
-            cerr << "Error, line(" << line_no << "): " << asm_lines[line_no + 1] << endl;
+            cerr << "Error, line(" << line_no << "): " << asm_lines[line_no - 1] << endl;
         }
     }
 
