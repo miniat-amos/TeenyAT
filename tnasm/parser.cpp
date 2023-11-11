@@ -15,7 +15,7 @@ struct instruction {
 };
 
 token_line parse_line;  // The current line of tokens being parsed
-int tnext;  // index of the next token in the line to consider
+unsigned int tnext;  // index of the next token in the line to consider
 int pass;
 tny_uword address;
 

@@ -231,7 +231,7 @@ void tokenize_all_lines(
 	vector <string> &asm_lines,
 	vector <token_regex> &patterns
 ) {
-		for(int i = 0; i < asm_lines.size(); i++) {
+		for(unsigned int i = 0; i < asm_lines.size(); i++) {
 		token_line token_line;
 		tokenize_line(asm_lines[i], token_line, patterns, i + 1);
 		if(token_line.size() > 0) {
@@ -249,7 +249,7 @@ void tokenize_all_lines(
 
 void debug_print_lexed_input(token_lines &token_lines, vector <string> &asm_lines) {
 	int current_i = 1;
-	for(int i = 0; i < token_lines.size(); i++) {
+	for(unsigned int i = 0; i < token_lines.size(); i++) {
 		token_line line = token_lines[i];
 		/* catch up current line to wherever this token was */
 		while(current_i < line[0].line_no) {
