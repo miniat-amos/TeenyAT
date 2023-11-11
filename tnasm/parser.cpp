@@ -36,6 +36,7 @@ shared_ptr<tny_word> p_number();
 shared_ptr<token> p_plus_or_minus();
 
 bool p_code_2_line();
+bool p_code_3_line();
 
 tny_uword token_to_opcode(int id);
 
@@ -133,9 +134,10 @@ bool p_loc() {
     int save = tnext = 0;
     return (tnext = save, p_variable_line()) ||
            (tnext = save, p_constant_line()) ||
-           (tnext = save, p_raw_line()) ||
-           (tnext = save, p_label_line()) ||
-           (tnext = save, p_code_2_line());
+           (tnext = save, p_raw_line())      ||
+           (tnext = save, p_label_line())    ||
+           (tnext = save, p_code_2_line())   ||
+           (tnext = save, p_code_3_line());
 }
 
 /*
@@ -328,6 +330,35 @@ bool p_code_2_line() {
         f.instruction.immed4 = 0;
 
         inst.second.s = immed->s * (sign->id == T_PLUS ? +1 : -1);
+
+        address += 2;
+        result = true;
+    }
+
+    return result;
+}
+
+/*
+ * code_3_line ::= code_3_inst REGISTER COMMA immediate.
+ */
+bool p_code_3_line() {
+    bool result = false;
+    shared_ptr<token> dreg, oper;
+    shared_ptr<tny_word> immed;
+    int save = tnext;
+    if((oper = p_code_3_inst()) && (dreg = term(T_REGISTER)) && term(T_COMMA) && (immed = p_immediate())) {
+
+        instruction inst;
+        inst.line_no = dreg->line_no;
+
+        tny_word &f = inst.first;
+        f.instruction.opcode = token_to_opcode(oper->id);
+        f.instruction.teeny = 0;
+        f.instruction.reg1 = dreg->value.u;
+        f.instruction.reg2 = TNY_REG_ZERO;
+        f.instruction.immed4 = 0;
+
+        inst.second.s = immed->s;
 
         address += 2;
         result = true;

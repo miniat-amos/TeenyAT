@@ -8,6 +8,7 @@
     add r3, r4 + 7
     OR  SP, rA - 5
     div rE, 15
+    xor rA, -17
     MpY rC, pc
 
     123 -15 thiry_one 0x12F_F 0b_110_00000_1011_00_10
