@@ -20,6 +20,7 @@ int pass;
 tny_uword address;
 
 map<string, tny_word> constants;
+map<string, tny_word> variables;
 
 bool parse(token_lines &parse_lines, vector <string> asm_lines);
 
@@ -140,13 +141,25 @@ bool p_loc() {
  * variable_line ::= VARIABLE IDENTIFIER immediate.
  */
 shared_ptr<token> p_variable_line() {
-    shared_ptr<token> val = nullptr, A;
-    shared_ptr<tny_word> B;
+    shared_ptr<token> val = nullptr, ident;
+    shared_ptr<tny_word> immed;
     int save = tnext;
-    if(term(T_VARIABLE) && (A = term(T_IDENTIFIER)) && (B = p_immediate()) && term(T_EOL)) {
-        /* TODO: create the variable and map the immediate */
-
-        val = A;
+    if(term(T_VARIABLE) && (ident = term(T_IDENTIFIER)) && (immed = p_immediate()) && term(T_EOL)) {
+        if(pass == 1) {
+            bool constant_exists = (constants.count(ident->token_str) > 0);
+            bool variable_exists = (variables.count(ident->token_str) > 0);
+            if(!constant_exists && !variable_exists) {
+                /* New variable found */
+                variables[ident->token_str] = tny_word{address};
+                address++;
+            }
+            else {
+                cerr << "ERROR, Line " << ident->line_no << ": ";
+                cerr << (constant_exists ? "Constant" : "Variable") << " \""  << ident->token_str << "\" already defined" << endl;
+            }
+        }
+        else if(pass == 2); // TODO: put the immediate in the binary at this address
+        val = ident;
     }
     return val;
 }
@@ -159,16 +172,16 @@ shared_ptr<token> p_constant_line() {
     shared_ptr<tny_word> immed;
     int save = tnext;
     if(term(T_CONSTANT) && (ident = term(T_IDENTIFIER)) && (immed = p_immediate()) && term(T_EOL)) {
-
-        /* TODO: create the constanst and map the immediate */
         if(pass == 1) {
-            if(constants.count(ident->token_str) == 0) {
+            bool constant_exists = (constants.count(ident->token_str) > 0);
+            bool variable_exists = (variables.count(ident->token_str) > 0);
+            if(!constant_exists && !variable_exists) {
                 /* New constant found */
                 constants[ident->token_str] = *immed;
             }
             else {
                 cerr << "ERROR, Line " << ident->line_no << ": ";
-                cerr << "Constant \"" << ident->token_str << "\" already defined" << endl;
+                cerr << (constant_exists ? "Constant" : "Variable") << " \""  << ident->token_str << "\" already defined" << endl;
             }
         }
         val = ident;
@@ -191,6 +204,7 @@ bool p_raw_line() {
 
         if((A = p_number())) {
             data.push_back(A);
+            address++;
         }
         else if(tnext = save, (term(T_EOL) != nullptr)) {
             break;
@@ -309,6 +323,7 @@ bool p_code_2_line() {
 
         inst.second.s = immed->s * (sign->id == T_PLUS ? +1 : -1);
 
+        address += 2;
         result = true;
     }
 
