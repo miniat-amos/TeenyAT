@@ -44,7 +44,17 @@ int main( int argc, char* argv[]){
         std::cout << "Please provide an asm file" << std::endl;
         return 1;
     }
-    std::string cmd = "trash.exe " + (std::string)argv[1];
+    
+    std::string cmd = "./trash " + (std::string)argv[1];
+
+    #if defined(__linux__) // Or #if __linux__
+        cmd = "./trash " + (std::string)argv[1];
+    #elif _WIN32
+        cmd = "trash.exe " + (std::string)argv[1];
+    #else
+        cmd = "./trash " + (std::string)argv[1];
+    #endif
+    
     std::system(cmd.c_str());
 
     std::string fileName = "output.trash";
