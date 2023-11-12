@@ -211,10 +211,10 @@ bool p_raw_line() {
 
     while(all_good) {
         int save = tnext;
-        shared_ptr <tny_word> A;
+        shared_ptr <tny_word> d;
 
-        if((A = p_number())) {
-            data.push_back(A);
+        if((d = p_number())) {
+            data.push_back(d);
         }
         else if(tnext = save, (term(T_EOL) != nullptr)) {
             break;
@@ -241,10 +241,10 @@ bool p_raw_line() {
  * label_line ::= LABEL.
  */
 shared_ptr<token> p_label_line() {
-    shared_ptr<token> val = nullptr, A;
+    shared_ptr<token> val = nullptr, label;
     int save = tnext;
-    if((A = term(T_LABEL)) && term(T_EOL)) {
-        val = A;
+    if((label = term(T_LABEL)) && term(T_EOL)) {
+        val = label;
     }
     return val;
 }
@@ -292,32 +292,32 @@ shared_ptr<tny_word> p_immediate() {
  */
 shared_ptr<tny_word> p_number() {
     shared_ptr<tny_word> val = nullptr;
-    shared_ptr<token> A, B;
+    shared_ptr<token> ident, num, sign;
     int save = tnext;
-    if(tnext = save, A = term(T_IDENTIFIER)) {
+    if(tnext = save, ident = term(T_IDENTIFIER)) {
         if(pass == 1) {
             /* just return a valid pointer to indicate success */
-            val = shared_ptr<tny_word>(new tny_word(A->value));
+            val = shared_ptr<tny_word>(new tny_word(ident->value));
         }
         else if(pass == 2) {
-            if(constants.count(A->token_str) > 0) {
-                val = shared_ptr<tny_word>(new tny_word(constants[A->token_str]));
+            if(constants.count(ident->token_str) > 0) {
+                val = shared_ptr<tny_word>(new tny_word(constants[ident->token_str]));
             }
-            else if(variables.count(A->token_str) > 0) {
-                val = shared_ptr<tny_word>(new tny_word(variables[A->token_str]));
+            else if(variables.count(ident->token_str) > 0) {
+                val = shared_ptr<tny_word>(new tny_word(variables[ident->token_str]));
             }
             else {
-                cerr << "ERROR, Line " << A->line_no << ": ";
-                cerr << "Identifier \""  << A->token_str << "\" is not defined" << endl;
+                cerr << "ERROR, Line " << ident->line_no << ": ";
+                cerr << "Identifier \""  << ident->token_str << "\" is not defined" << endl;
             }
         }
     }
-    else if(tnext = save, A = term(T_NUMBER)) {
-        val = shared_ptr<tny_word>(new tny_word(A->value));
+    else if(tnext = save, num = term(T_NUMBER)) {
+        val = shared_ptr<tny_word>(new tny_word(num->value));
     }
-    else if(tnext = save, (A = p_plus_or_minus()) && (B = term(T_NUMBER))) {
-        val = shared_ptr<tny_word>(new tny_word(B->value));
-        if(A->id == T_MINUS) {
+    else if(tnext = save, (sign = p_plus_or_minus()) && (num = term(T_NUMBER))) {
+        val = shared_ptr<tny_word>(new tny_word(num->value));
+        if(sign->id == T_MINUS) {
             val->s *= -1;
         }
     }
