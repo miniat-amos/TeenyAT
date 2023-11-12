@@ -22,6 +22,9 @@ tny_uword address;
 map <string, tny_word> constants;
 map <string, tny_word> variables;
 
+map <string, tny_word> labels;
+bool labels_updated_this_pass;  
+
 bool parse(token_lines &parse_lines, vector <string> asm_lines);
 
 shared_ptr <token> term(token_type id);
@@ -92,6 +95,11 @@ bool parse(token_lines &parse_lines, vector <string> asm_lines) {
     pass = 2;
     address = 0x0000;
 
+    /*
+     * TODO: Eventually, once the parser auto-detects it can use the teeny
+     * form of some instructions, the second pass will have to be replaced by
+     * multiple passes that continue until no label addresses are modified.
+     */
     for(auto &line: parse_lines) {
         parse_line = line;
         if(p_loc() == false) {
@@ -160,7 +168,6 @@ shared_ptr <token> p_variable_line() {
             if(!constant_exists && !variable_exists) {
                 /* New variable found */
                 variables[ident->token_str] = tny_word{.u = address};
-                address++;
             }
             else {
                 cerr << "ERROR, Line " << ident->line_no << ": ";
@@ -170,6 +177,7 @@ shared_ptr <token> p_variable_line() {
         else if(pass == 2) {
             bin_words.push_back(*immed);
         } // TODO: put the immediate in the binary at this address
+        address++;
         val = ident;
     }
     return val;
@@ -244,6 +252,28 @@ shared_ptr <token> p_label_line() {
     shared_ptr <token> val = nullptr, label;
     int save = tnext;
     if((label = term(T_LABEL)) && term(T_EOL)) {
+        if(pass == 1) {
+            bool label_exists = (labels.count(label->token_str) > 0);
+            if(!label_exists) {
+                /* New label found */
+                labels[label->token_str] = tny_word{.u = address};
+            }
+            else {
+                cerr << "ERROR, Line " << label->line_no << ": ";
+                cerr << "Constant " << label->token_str << " already defined" << endl;
+            }
+        }
+        else if(pass == 2) {
+            if(address != labels[label->token_str].u) {
+                cerr << label->token_str << " changed from ";
+                cerr << hex << labels[label->token_str].u << " to ";
+                cerr << hex << address << " in pass " << dec << pass << endl;
+
+                labels[label->token_str] = tny_word{.u = address};
+                labels_updated_this_pass = true;
+            }
+        }
+
         val = label;
     }
     return val;
@@ -256,14 +286,31 @@ shared_ptr <token> p_label_line() {
  */
 shared_ptr <tny_word> p_immediate() {
     shared_ptr <tny_word> val = nullptr;
-    shared_ptr <token> ident;
+    shared_ptr <token> ident, label;
     int save = tnext;
 
     if(tnext = save, val = p_number()) {
         /* nothing to do */
     }
-    else if(tnext = save, ident = term(T_LABEL)) {
+    else if(tnext = save, label = term(T_LABEL)) {
         /* TODO: look up label's address */
+        if(pass == 1) {
+            /*
+             * Label address is likely unknown and definitely unecessary in this
+             * pass, so just recognize the immediate grammar was satisfied
+             * with an arbitrary value.
+             */
+            val = shared_ptr <tny_word>(new tny_word(label->value));
+        }
+        else if(pass == 2) {
+            if(labels.count(label->token_str) > 0) {
+                val = shared_ptr <tny_word>(new tny_word(labels[label->token_str]));
+            }
+            else {
+                cerr << "Error, Line(" << label->line_no << "): ";
+                cerr << label->token_str << " is not defined" << endl;
+            }
+        }
     }
     else if(tnext = save, ident = term(T_IDENTIFIER)) {
         /* As an immediate, ensure the identifier is a constant. */
