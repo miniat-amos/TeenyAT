@@ -96,17 +96,17 @@ bool parse(token_lines &parse_lines, vector <string> asm_lines) {
         parse_line = line;
         if(p_loc() == false) {
             result = false;
-            /*
-             * TODO: is there anything that needs to happen here?
-             * The first pass would stop us from even getting here if p_loc()
-             * ever fails, right?
-             */
-             cerr << "Err... Your CPU has bad sectors" << endl;
+            /* TODO: assumption that failed p_X_line() reported error already */
         }
     }
 
-    for(auto w : bin_words) {
-        cout << hex << w.u << endl;
+    if(result) {
+        for(auto w : bin_words) {
+            cout << hex << w.u << endl;
+        }
+    }
+    else {
+        cerr << "There were errors.  No binary output." << endl;
     }
 
     return result;
@@ -295,9 +295,22 @@ shared_ptr<tny_word> p_number() {
     shared_ptr<token> A, B;
     int save = tnext;
     if(tnext = save, A = term(T_IDENTIFIER)) {
-        // TODO: verify this is a constant and replace with its value
-        //       otherwise, report error
-        val = shared_ptr<tny_word>(new tny_word(A->value)); // get rid of this
+        if(pass == 1) {
+            /* just return a valid pointer to indicate success */
+            val = shared_ptr<tny_word>(new tny_word(A->value));
+        }
+        else if(pass == 2) {
+            if(constants.count(A->token_str) > 0) {
+                val = shared_ptr<tny_word>(new tny_word(constants[A->token_str]));
+            }
+            else if(variables.count(A->token_str) > 0) {
+                val = shared_ptr<tny_word>(new tny_word(variables[A->token_str]));
+            }
+            else {
+                cerr << "ERROR, Line " << A->line_no << ": ";
+                cerr << "Identifier \""  << A->token_str << "\" is not defined" << endl;
+            }
+        }
     }
     else if(tnext = save, A = term(T_NUMBER)) {
         val = shared_ptr<tny_word>(new tny_word(A->value));
