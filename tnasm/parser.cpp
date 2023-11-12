@@ -19,32 +19,32 @@ unsigned int tnext;  // index of the next token in the line to consider
 int pass;
 tny_uword address;
 
-map<string, tny_word> constants;
-map<string, tny_word> variables;
+map <string, tny_word> constants;
+map <string, tny_word> variables;
 
 bool parse(token_lines &parse_lines, vector <string> asm_lines);
 
-shared_ptr<token> term(token_type id);
+shared_ptr <token> term(token_type id);
 bool p_loc();
-shared_ptr<token> p_variable_line();
-shared_ptr<token> p_constant_line();
+shared_ptr <token> p_variable_line();
+shared_ptr <token> p_constant_line();
 bool p_raw_line();
-shared_ptr<token> p_label_line();
+shared_ptr <token> p_label_line();
 
-shared_ptr<tny_word> p_immediate();
-shared_ptr<tny_word> p_number();
-shared_ptr<token> p_plus_or_minus();
+shared_ptr <tny_word> p_immediate();
+shared_ptr <tny_word> p_number();
+shared_ptr <token> p_plus_or_minus();
 
 bool p_code_2_line();
 bool p_code_3_line();
 
 tny_uword token_to_opcode(int id);
 
-shared_ptr<token> p_code_1_inst();
-shared_ptr<token> p_code_2_inst();
-shared_ptr<token> p_code_3_inst();
-shared_ptr<token> p_code_4_inst();
-shared_ptr<token> p_code_5_inst();
+shared_ptr <token> p_code_1_inst();
+shared_ptr <token> p_code_2_inst();
+shared_ptr <token> p_code_3_inst();
+shared_ptr <token> p_code_4_inst();
+shared_ptr <token> p_code_5_inst();
 
 vector <tny_word> bin_words;
 
@@ -127,10 +127,10 @@ bool parse(token_lines &parse_lines, vector <string> asm_lines) {
  *   It is important to realize the global tnext token index will always be
  *   incremented, regardless of whether the token type matched.
  */
-shared_ptr<token> term(token_type id) {
-    shared_ptr<token> val = nullptr;
+shared_ptr <token> term(token_type id) {
+    shared_ptr <token> val = nullptr;
     if(tnext < parse_line.size() && parse_line[tnext].id == id) {
-        val = shared_ptr<token>(new token(parse_line[tnext]));
+        val = shared_ptr <token>(new token(parse_line[tnext]));
     }
     tnext++;
     return val;
@@ -149,9 +149,9 @@ bool p_loc() {
 /*
  * variable_line ::= VARIABLE IDENTIFIER immediate.
  */
-shared_ptr<token> p_variable_line() {
-    shared_ptr<token> val = nullptr, ident;
-    shared_ptr<tny_word> immed;
+shared_ptr <token> p_variable_line() {
+    shared_ptr <token> val = nullptr, ident;
+    shared_ptr <tny_word> immed;
     int save = tnext;
     if(term(T_VARIABLE) && (ident = term(T_IDENTIFIER)) && (immed = p_immediate()) && term(T_EOL)) {
         if(pass == 1) {
@@ -178,9 +178,9 @@ shared_ptr<token> p_variable_line() {
 /*
  * constant_line ::= CONSTANT IDENTIFIER immediate.
  */
-shared_ptr<token> p_constant_line() {
-    shared_ptr<token> val = nullptr, ident;
-    shared_ptr<tny_word> immed;
+shared_ptr <token> p_constant_line() {
+    shared_ptr <token> val = nullptr, ident;
+    shared_ptr <tny_word> immed;
     int save = tnext;
     if(term(T_CONSTANT) && (ident = term(T_IDENTIFIER)) && (immed = p_immediate()) && term(T_EOL)) {
         if(pass == 1) {
@@ -240,8 +240,8 @@ bool p_raw_line() {
 /*
  * label_line ::= LABEL.
  */
-shared_ptr<token> p_label_line() {
-    shared_ptr<token> val = nullptr, label;
+shared_ptr <token> p_label_line() {
+    shared_ptr <token> val = nullptr, label;
     int save = tnext;
     if((label = term(T_LABEL)) && term(T_EOL)) {
         val = label;
@@ -254,9 +254,9 @@ shared_ptr<token> p_label_line() {
  * immediate ::= LABEL.
  * immediate ::= IDENTIFIER.
  */
-shared_ptr<tny_word> p_immediate() {
-    shared_ptr<tny_word> val = nullptr;
-    shared_ptr<token> ident;
+shared_ptr <tny_word> p_immediate() {
+    shared_ptr <tny_word> val = nullptr;
+    shared_ptr <token> ident;
     int save = tnext;
 
     if(tnext = save, val = p_number()) {
@@ -269,10 +269,10 @@ shared_ptr<tny_word> p_immediate() {
         /* As an immediate, ensure the identifier is a constant. */
         if(pass == 2) {
             if(constants.count(ident->token_str) > 0) {
-                val = shared_ptr<tny_word>(new tny_word(constants[ident->token_str]));
+                val = shared_ptr <tny_word>(new tny_word(constants[ident->token_str]));
             }
             else if(variables.count(ident->token_str) > 0) {
-                val = shared_ptr<tny_word>(new tny_word(variables[ident->token_str]));
+                val = shared_ptr <tny_word>(new tny_word(variables[ident->token_str]));
             }
             else {
                 cerr << "Error, Line(" << ident->line_no << "): ";
@@ -290,21 +290,21 @@ shared_ptr<tny_word> p_immediate() {
  * number ::= NUMBER.
  * number ::= plus_or_minus NUMBER.
  */
-shared_ptr<tny_word> p_number() {
-    shared_ptr<tny_word> val = nullptr;
-    shared_ptr<token> ident, num, sign;
+shared_ptr <tny_word> p_number() {
+    shared_ptr <tny_word> val = nullptr;
+    shared_ptr <token> ident, num, sign;
     int save = tnext;
     if(tnext = save, ident = term(T_IDENTIFIER)) {
         if(pass == 1) {
             /* just return a valid pointer to indicate success */
-            val = shared_ptr<tny_word>(new tny_word(ident->value));
+            val = shared_ptr <tny_word>(new tny_word(ident->value));
         }
         else if(pass == 2) {
             if(constants.count(ident->token_str) > 0) {
-                val = shared_ptr<tny_word>(new tny_word(constants[ident->token_str]));
+                val = shared_ptr <tny_word>(new tny_word(constants[ident->token_str]));
             }
             else if(variables.count(ident->token_str) > 0) {
-                val = shared_ptr<tny_word>(new tny_word(variables[ident->token_str]));
+                val = shared_ptr <tny_word>(new tny_word(variables[ident->token_str]));
             }
             else {
                 cerr << "ERROR, Line " << ident->line_no << ": ";
@@ -313,10 +313,10 @@ shared_ptr<tny_word> p_number() {
         }
     }
     else if(tnext = save, num = term(T_NUMBER)) {
-        val = shared_ptr<tny_word>(new tny_word(num->value));
+        val = shared_ptr <tny_word>(new tny_word(num->value));
     }
     else if(tnext = save, (sign = p_plus_or_minus()) && (num = term(T_NUMBER))) {
-        val = shared_ptr<tny_word>(new tny_word(num->value));
+        val = shared_ptr <tny_word>(new tny_word(num->value));
         if(sign->id == T_MINUS) {
             val->s *= -1;
         }
@@ -328,8 +328,8 @@ shared_ptr<tny_word> p_number() {
  * plus_or_minus ::= PLUS.
  * plus_or_minus ::= MINUS.
  */
-shared_ptr<token> p_plus_or_minus() {
-    shared_ptr<token> val = nullptr;
+shared_ptr <token> p_plus_or_minus() {
+    shared_ptr <token> val = nullptr;
     int save = tnext;
 
     (tnext = save, val = term(T_PLUS)) ||
@@ -343,8 +343,8 @@ shared_ptr<token> p_plus_or_minus() {
  */
 bool p_code_2_line() {
     bool result = false;
-    shared_ptr<token> dreg, oper, sreg, sign;
-    shared_ptr<tny_word> immed;
+    shared_ptr <token> dreg, oper, sreg, sign;
+    shared_ptr <tny_word> immed;
     int save = tnext;
     if((oper = p_code_2_inst()) && (dreg = term(T_REGISTER)) && term(T_COMMA) &&
        (sreg = term(T_REGISTER)) && (sign = p_plus_or_minus()) && (immed = p_immediate())) {
@@ -378,8 +378,8 @@ bool p_code_2_line() {
  */
 bool p_code_3_line() {
     bool result = false;
-    shared_ptr<token> dreg, oper;
-    shared_ptr<tny_word> immed;
+    shared_ptr <token> dreg, oper;
+    shared_ptr <tny_word> immed;
     int save = tnext;
     if((oper = p_code_3_inst()) && (dreg = term(T_REGISTER)) && term(T_COMMA) && (immed = p_immediate())) {
 
@@ -469,8 +469,8 @@ tny_uword token_to_opcode(int id) {
  * code_1_inst ::= CMP.
  * code_1_inst ::= DJZ.
  */
-shared_ptr<token> p_code_1_inst() {
-    shared_ptr<token> result;
+shared_ptr <token> p_code_1_inst() {
+    shared_ptr <token> result;
     int save = tnext;
 
     (tnext = save, result = term(T_ADD)) ||
@@ -510,8 +510,8 @@ shared_ptr<token> p_code_1_inst() {
  * code_2_inst ::= CMP.
  * code_2_inst ::= DJZ.
  */
-shared_ptr<token> p_code_2_inst() {
-    shared_ptr<token> result;
+shared_ptr <token> p_code_2_inst() {
+    shared_ptr <token> result;
     int save = tnext;
 
     (tnext = save, result = term(T_ADD)) ||
@@ -550,8 +550,8 @@ shared_ptr<token> p_code_2_inst() {
  * code_3_inst ::= CMP.
  * code_3_inst ::= DJZ.
  */
-shared_ptr<token> p_code_3_inst() {
-    shared_ptr<token> result;
+shared_ptr <token> p_code_3_inst() {
+    shared_ptr <token> result;
     int save = tnext;
 
     (tnext = save, result = term(T_ADD)) ||
@@ -577,8 +577,8 @@ shared_ptr<token> p_code_3_inst() {
  * code_4_inst ::= NEG.
  * code_4_inst ::= POP.
  */
-shared_ptr<token> p_code_4_inst() {
-    shared_ptr<token> result;
+shared_ptr <token> p_code_4_inst() {
+    shared_ptr <token> result;
     int save = tnext;
 
     (tnext = save, result = term(T_NEG)) ||
@@ -591,8 +591,8 @@ shared_ptr<token> p_code_4_inst() {
  * code_5_inst ::= INC.
  * code_5_inst ::= DEC.
  */
-shared_ptr<token> p_code_5_inst() {
-    shared_ptr<token> result;
+shared_ptr <token> p_code_5_inst() {
+    shared_ptr <token> result;
     int save = tnext;
 
     (tnext = save, result = term(T_INC)) ||
