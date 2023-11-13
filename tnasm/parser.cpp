@@ -428,7 +428,8 @@ bool p_code_2_line() {
     shared_ptr <tny_word> immed;
     int save = tnext;
     if((oper = p_code_2_inst()) && (dreg = term(T_REGISTER)) && term(T_COMMA) &&
-       (sreg = term(T_REGISTER)) && (sign = p_plus_or_minus()) && (immed = p_immediate())) {
+       (sreg = term(T_REGISTER)) && (sign = p_plus_or_minus()) && (immed = p_immediate()) &&
+       term(T_EOL)) {
 
         instruction inst;
         inst.line_no = dreg->line_no;
@@ -462,7 +463,8 @@ bool p_code_3_line() {
     shared_ptr <token> dreg, oper;
     shared_ptr <tny_word> immed;
     int save = tnext;
-    if((oper = p_code_3_inst()) && (dreg = term(T_REGISTER)) && term(T_COMMA) && (immed = p_immediate())) {
+    if((oper = p_code_3_inst()) && (dreg = term(T_REGISTER)) && term(T_COMMA) && (immed = p_immediate()) &&
+        term(T_EOL)) {
 
         instruction inst;
         inst.line_no = dreg->line_no;
