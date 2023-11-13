@@ -44,7 +44,19 @@ int main( int argc, char* argv[]){
         return 1;
     }
     
-    std::string fileName = argv[1];
+    std::string cmd = "./trash " + (std::string)argv[1];
+
+    #if defined(__linux__) // Or #if __linux__
+        cmd = "./trash " + (std::string)argv[1];
+    #elif _WIN32
+        cmd = "trash.exe " + (std::string)argv[1];
+    #else
+        cmd = "./trash " + (std::string)argv[1];
+    #endif
+    
+    std::system(cmd.c_str());
+
+    std::string fileName = "output.trash";
     teenyat t;
     bool success = false;
 	FILE *bin_file = fopen(fileName.c_str(), "rb");
@@ -238,4 +250,15 @@ void bus_write(teenyat *t, tny_uword addr, tny_word data, uint16_t *delay) {
     }
     std::cout << std::endl;
 	return;
+}
+
+static int resizingEventWatcher(void* data, SDL_Event* event) {
+  if (event->type == SDL_WINDOWEVENT &&
+      event->window.event == SDL_WINDOWEVENT_RESIZED) {
+    SDL_Window* win = SDL_GetWindowFromID(event->window.windowID);
+    if (win == (SDL_Window*)data) {
+        resized = true;
+    }
+  }
+  return 0;
 }
