@@ -392,8 +392,7 @@ shared_ptr <token> p_plus_or_minus() {
  */
 bool p_code_1_line() {
     bool result = false;
-    shared_ptr <token> dreg, oper, sreg, sign;
-    shared_ptr <tny_word> immed;
+    shared_ptr <token> dreg, oper, sreg;
     int save = tnext;
     if((oper = p_code_1_inst()) && (dreg = term(T_REGISTER)) && term(T_COMMA) &&
        (sreg = term(T_REGISTER)) && term(T_EOL)) {
