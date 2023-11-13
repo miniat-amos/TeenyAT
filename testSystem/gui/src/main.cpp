@@ -252,13 +252,3 @@ void bus_write(teenyat *t, tny_uword addr, tny_word data, uint16_t *delay) {
 	return;
 }
 
-static int resizingEventWatcher(void* data, SDL_Event* event) {
-  if (event->type == SDL_WINDOWEVENT &&
-      event->window.event == SDL_WINDOWEVENT_RESIZED) {
-    SDL_Window* win = SDL_GetWindowFromID(event->window.windowID);
-    if (win == (SDL_Window*)data) {
-        resized = true;
-    }
-  }
-  return 0;
-}
