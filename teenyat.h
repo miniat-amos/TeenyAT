@@ -209,6 +209,7 @@ struct teenyat {
 #define TNY_OPCODE_CMP 20
 #define TNY_OPCODE_JMP 21
 #define TNY_OPCODE_DJZ 22
+#define TNY_OPCODE_DEL 23
 
 #define TNY_REG_PC   0
 #define TNY_REG_SP   1
