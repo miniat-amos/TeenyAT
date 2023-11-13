@@ -1,6 +1,8 @@
 /*
     Some things to remember:    
         When reading in a pixel's value from memory return the update_screen 0b16 value
+
+        ./system ../ASMCODE/pallete.asm
 */
 
 #include <iostream>
@@ -41,10 +43,8 @@ int main( int argc, char* argv[]){
         std::cout << "Please provide an asm file" << std::endl;
         return 1;
     }
-    std::string cmd = "trash.exe " + (std::string)argv[1];
-    std::system(cmd.c_str());
-
-    std::string fileName = "output.trash";
+    
+    std::string fileName = argv[1];
     teenyat t;
     bool success = false;
 	FILE *bin_file = fopen(fileName.c_str(), "rb");
@@ -55,6 +55,8 @@ int main( int argc, char* argv[]){
 	t.ex_data = &s;
 
     while (!tigrClosed(s.window) && !tigrKeyDown(s.window, TK_ESCAPE)){
+        //tigrMouse(s.window,&s.mouseX, &s.mouseY, nullptr);
+        //std::cout << s.mouseX << " " << s.mouseY << std::endl;
         tny_clock(&t);
     }
 
@@ -75,7 +77,7 @@ void bus_read(teenyat *t, tny_uword addr, tny_word *data, uint16_t *delay) {
     if (s == NULL)
 		return;
     std::cout << " read";
-	std::cout << "(" << addr << ")";
+	std::cout << "(" << std::hex << addr << ")";
 
      // Handle pixel screen reads
     if(addr >= UPDATESCREEN && addr <= (UPDATESCREEN + 0xFFF)){
@@ -158,7 +160,7 @@ void bus_write(teenyat *t, tny_uword addr, tny_word data, uint16_t *delay) {
     if (s == NULL)
 		return;
     std::cout << " writ";
-	std::cout << "(" << addr << ")";
+	std::cout << "(" << std::hex << addr << ")";
 
     // Handle pixel screen writes
     if(addr >= UPDATESCREEN && addr <= (UPDATESCREEN + 0xFFF)){

@@ -10,5 +10,8 @@ else
 	endif
 endif
 
-test : src/main.cpp tigr.c ../../teenyat.c
-	g++ $^ -Os -osystem $(CFLAGS) $(LDFLAGS) 
+buildWin: src/main.cpp tigr.c ../../teenyat.c
+	g++ $^ -Os -o ../bin/system.exe $(CFLAGS) $(LDFLAGS) 
+
+buildLinux: src/main.cpp tigr.c ../../teenyat.c
+	g++ $^ -Os -o ../bin/system $(CFLAGS) $(LDFLAGS) 

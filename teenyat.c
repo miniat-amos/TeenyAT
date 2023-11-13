@@ -123,6 +123,7 @@ void tny_clock(teenyat *t) {
 	 */
 	trunc_pc(t);
 
+
 	tny_uword orig_PC = t->reg[TNY_REG_PC].u; /* backup for error reporting */
 
  	tny_word IR = t->ram[t->reg[TNY_REG_PC].u];
