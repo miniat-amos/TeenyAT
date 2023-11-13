@@ -7,6 +7,7 @@
 !main
     add r3, r4 + 7
     mod r3, r1
+    neg r1
     OR  SP, rA - 5
     div rE, 15
     xor rA, -17

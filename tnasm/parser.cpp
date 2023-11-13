@@ -41,6 +41,7 @@ shared_ptr <token> p_plus_or_minus();
 bool p_code_1_line();
 bool p_code_2_line();
 bool p_code_3_line();
+bool p_code_4_line();
 
 tny_uword token_to_opcode(int id);
 
@@ -153,7 +154,8 @@ bool p_loc() {
            (tnext = save, p_label_line())    ||
            (tnext = save, p_code_1_line())   ||
            (tnext = save, p_code_2_line())   ||
-           (tnext = save, p_code_3_line());
+           (tnext = save, p_code_3_line())   ||
+           (tnext = save, p_code_4_line());
 }
 
 /*
@@ -483,6 +485,34 @@ bool p_code_3_line() {
         }
 
         address += 2;
+        result = true;
+    }
+
+    return result;
+}
+
+/*
+ * code_4_line ::= code_4_inst REGISTER.
+ */
+bool p_code_4_line() {
+    bool result = false;
+    shared_ptr <token> dreg, oper;
+    int save = tnext;
+    if((oper = p_code_4_inst()) && (dreg = term(T_REGISTER)) && term(T_EOL)) {
+
+        instruction inst;
+        inst.line_no = dreg->line_no;
+
+        tny_word &f = inst.first;
+        f.instruction.opcode = token_to_opcode(oper->id);
+        f.instruction.teeny = 1;
+        f.instruction.reg1 = dreg->value.u;
+
+        if(pass == 2) {
+            bin_words.push_back(f);
+        }
+
+        address += 1;
         result = true;
     }
 
