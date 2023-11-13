@@ -510,6 +510,10 @@ bool p_code_4_line() {
         f.instruction.teeny = 1;
         f.instruction.reg1 = dreg->value.u;
 
+        //these are not used need a decision about how to set these to a predictable value
+        f.instruction.reg2 = 0;
+        f.instruction.immed4 = 0;
+
         if(pass == 2) {
             bin_words.push_back(f);
         }
