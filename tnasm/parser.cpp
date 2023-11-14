@@ -38,6 +38,8 @@ shared_ptr <tny_word> p_immediate();
 shared_ptr <tny_word> p_number();
 shared_ptr <token> p_plus_or_minus();
 
+bool is_teeny(tny_sword n);
+
 bool p_code_1_line();
 bool p_code_2_line();
 bool p_code_3_line();
@@ -386,6 +388,13 @@ shared_ptr <token> p_plus_or_minus() {
     (tnext = save, val = term(T_MINUS));
 
     return val;
+}
+
+bool is_teeny(tny_sword n) {
+    tny_word small;
+    small.instruction.immed4 = n;
+
+    return small.instruction.immed4 == n;
 }
 
 /*
