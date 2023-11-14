@@ -496,12 +496,22 @@ bool p_code_3_line() {
 
         inst.second.s = immed->s;
 
-        if(pass > 1) {
-            bin_words.push_back(f);
-            bin_words.push_back(inst.second);
+        bool make_teeny = is_teeny(inst.second.s);
+        if(make_teeny) {
+            f.instruction.immed4 = inst.second.s;
+            address++;
+        }
+        else {
+            address += 2;
         }
 
-        address += 2;
+        if(pass > 1) {
+            bin_words.push_back(f);
+            if(!make_teeny) {
+                bin_words.push_back(inst.second);
+            }
+        }
+
         result = true;
     }
 

@@ -12,6 +12,7 @@
     add r3, r4 + 7
     mod r3, r1
     OR  SP, rA - 5
+!early
     div rE, 15
     xor rA, -17
 !middle
@@ -27,5 +28,5 @@
 !more
     BTF r1, r3 + thirty_one
     ;str SP - aero, amos
-
+    rOt rB, !early
 ; and that's all
