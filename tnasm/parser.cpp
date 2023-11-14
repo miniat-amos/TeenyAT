@@ -452,12 +452,19 @@ bool p_code_2_line() {
 
         inst.second.s = immed->s * (sign->id == T_PLUS ? +1 : -1);
 
+        if(is_teeny(inst.second.s)) {
+            f.instruction.immed4 = inst.second.s;
+            address++;
+        }
+        else {
+            address += 2;
+        }
+
         if(pass > 1) {
             bin_words.push_back(f);
             bin_words.push_back(inst.second);
         }
 
-        address += 2;
         result = true;
     }
 
