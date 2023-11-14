@@ -89,24 +89,34 @@ bool parse(token_lines &parse_lines, vector <string> asm_lines) {
     }
 
     /*
-     * In pass 2:
-     *   - generate a vector of encoded instructions, one per line of operable
-     *     code, variable memory, and raw data
+     * In passes 2+:
+     *   - generate encoded instructions, and add them to bin_words
+     *   - TODO: generate a vector of encoded instructions, variable memory,
+     *     and raw data to be used for making listings.
      */
-    pass = 2;
-    address = 0x0000;
+    labels_updated_this_pass = true;
 
-    /*
-     * TODO: Eventually, once the parser auto-detects it can use the teeny
-     * form of some instructions, the second pass will have to be replaced by
-     * multiple passes that continue until no label addresses are modified.
-     */
-    for(auto &line: parse_lines) {
-        parse_line = line;
-        if(p_loc() == false) {
-            result = false;
-            /* TODO: assumption that failed p_X_line() reported error already */
+    while(labels_updated_this_pass && (result == true)) {
+        labels_updated_this_pass = false;
+        pass++;
+        address = 0x0000;
+        bin_words.clear();
+
+        /*
+         * TODO: the parser should auto-detect if it can use the teeny
+         * form of some instructions
+         */
+        for(auto &line: parse_lines) {
+            parse_line = line;
+            if(p_loc() == false) {
+                result = false;
+                /* TODO: assumption that failed p_X_line() reported error already */
+            }
         }
+    }
+
+    if(result) {
+        cerr << "All labels resolved after " << pass << " passes." << endl;
     }
 
     return result;
@@ -167,7 +177,7 @@ shared_ptr <token> p_variable_line() {
                 cerr << (constant_exists ? "Constant" : "Variable") << " \""  << ident->token_str << "\" already defined" << endl;
             }
         }
-        else if(pass == 2) {
+        else if(pass > 1) {
             bin_words.push_back(*immed);
         } // TODO: put the immediate in the binary at this address
         address++;
@@ -227,7 +237,7 @@ bool p_raw_line() {
 
     if(all_good) {
         address += data.size();
-        if(pass == 2) {
+        if(pass > 1) {
             /* Add raw data to bin_words */
             for(auto d: data) {
                 bin_words.push_back(*d);
@@ -256,7 +266,7 @@ shared_ptr <token> p_label_line() {
                 cerr << "Constant " << label->token_str << " already defined" << endl;
             }
         }
-        else if(pass == 2) {
+        else if(pass > 1) {
             if(address != labels[label->token_str].u) {
                 cerr << label->token_str << " changed from ";
                 cerr << hex << labels[label->token_str].u << " to ";
@@ -295,7 +305,7 @@ shared_ptr <tny_word> p_immediate() {
              */
             val = shared_ptr <tny_word>(new tny_word(label->value));
         }
-        else if(pass == 2) {
+        else if(pass > 1) {
             if(labels.count(label->token_str) > 0) {
                 val = shared_ptr <tny_word>(new tny_word(labels[label->token_str]));
             }
@@ -307,7 +317,7 @@ shared_ptr <tny_word> p_immediate() {
     }
     else if(tnext = save, ident = term(T_IDENTIFIER)) {
         /* As an immediate, ensure the identifier is a constant. */
-        if(pass == 2) {
+        if(pass > 1) {
             if(constants.count(ident->token_str) > 0) {
                 val = shared_ptr <tny_word>(new tny_word(constants[ident->token_str]));
             }
@@ -339,7 +349,7 @@ shared_ptr <tny_word> p_number() {
             /* just return a valid pointer to indicate success */
             val = shared_ptr <tny_word>(new tny_word(ident->value));
         }
-        else if(pass == 2) {
+        else if(pass > 1) {
             if(constants.count(ident->token_str) > 0) {
                 val = shared_ptr <tny_word>(new tny_word(constants[ident->token_str]));
             }
@@ -399,7 +409,7 @@ bool p_code_1_line() {
         f.instruction.reg2 = sreg->value.u;
         f.instruction.immed4 = 0;
 
-        if(pass == 2) {
+        if(pass > 1) {
             bin_words.push_back(f);
         }
 
@@ -433,7 +443,7 @@ bool p_code_2_line() {
 
         inst.second.s = immed->s * (sign->id == T_PLUS ? +1 : -1);
 
-        if(pass == 2) {
+        if(pass > 1) {
             bin_words.push_back(f);
             bin_words.push_back(inst.second);
         }
@@ -467,7 +477,7 @@ bool p_code_3_line() {
 
         inst.second.s = immed->s;
 
-        if(pass == 2) {
+        if(pass > 1) {
             bin_words.push_back(f);
             bin_words.push_back(inst.second);
         }
