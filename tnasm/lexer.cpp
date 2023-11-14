@@ -2,6 +2,7 @@
 #include <fstream>
 #include <vector>
 #include <regex>
+#include <filesystem>
 
 #include <cstdlib>
 #include <ctype.h>
@@ -27,7 +28,10 @@ struct token_regex {
 };
 
 
-void read_file(const char *path, vector <string> &asm_lines);
+vector <tny_word> bin_words;
+
+
+void read_file(const string path, vector <string> &asm_lines);
 void initialize_lexical_regex(vector <token_regex> &patterns);
 token get_token(const vector <token_regex>& patterns, const string& s, int line_no);
 void tokenize_line(
@@ -58,8 +62,18 @@ int main(int argc, char *argv[]) {
 		exit(EXIT_FAILURE);
 	}
 
+	filesystem::path asm_filename(argv[1]);
+
+	if(asm_filename.extension() != ".asm") {
+		cerr << "Expected a \".asm\" file..." << endl;
+		cerr << "Usage:   tnasm <file>" << endl;
+		exit(EXIT_FAILURE);
+	}
+
+	filesystem::path bin_filename = asm_filename.filename().replace_extension(".bin");
+
 	vector <string> asm_lines;
-	read_file(argv[1], asm_lines);
+	read_file(asm_filename, asm_lines);
 
 	vector <token_regex> patterns;
 	initialize_lexical_regex(patterns);
@@ -71,13 +85,23 @@ int main(int argc, char *argv[]) {
 	debug_print_lexed_input(token_lines, asm_lines);
 	#endif /* DEBUG_TRACE */
 
-	parse(token_lines, asm_lines);
+	if(parse(token_lines, asm_lines)) {
+		ofstream bin_file(bin_filename, ios::binary);
+		bin_file.write(reinterpret_cast<const char*>(bin_words.data()), bin_words.size() * sizeof(tny_word));
+        for(auto w : bin_words) {
+            cout << hex << w.u << endl;
+        }
+    }
+    else {
+        cerr << "There were errors.  No binary output." << endl;
+    }
+
 
 	return EXIT_SUCCESS;
 }
 
 
-void read_file(const char *path, vector <string> &asm_lines) {
+void read_file(const string path, vector <string> &asm_lines) {
 	ifstream f(path);
 	string s;
 	while(getline(f, s)) {

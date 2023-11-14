@@ -23,7 +23,7 @@ map <string, tny_word> constants;
 map <string, tny_word> variables;
 
 map <string, tny_word> labels;
-bool labels_updated_this_pass;  
+bool labels_updated_this_pass;
 
 bool parse(token_lines &parse_lines, vector <string> asm_lines);
 
@@ -50,7 +50,7 @@ shared_ptr <token> p_code_3_inst();
 shared_ptr <token> p_code_4_inst();
 shared_ptr <token> p_code_5_inst();
 
-vector <tny_word> bin_words;
+extern vector <tny_word> bin_words;
 
 /**
  * @brief
@@ -107,15 +107,6 @@ bool parse(token_lines &parse_lines, vector <string> asm_lines) {
             result = false;
             /* TODO: assumption that failed p_X_line() reported error already */
         }
-    }
-
-    if(result) {
-        for(auto w : bin_words) {
-            cout << hex << w.u << endl;
-        }
-    }
-    else {
-        cerr << "There were errors.  No binary output." << endl;
     }
 
     return result;
