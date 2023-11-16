@@ -5,6 +5,7 @@
 #include "../teenyat.h"
 #include "token.h"
 #include "parser.h"
+#include "listing.h"
 
 using namespace std;
 
@@ -93,16 +94,25 @@ bool parse(token_lines &parse_lines, vector <string> asm_lines) {
     /*
      * In passes 2+:
      *   - generate encoded instructions, and add them to bin_words
-     *   - TODO: generate a vector of encoded instructions, variable memory,
-     *     and raw data to be used for making listings.
+     *   - generate listing data
      */
     labels_updated_this_pass = true;
 
+/*
+    struct listing_block {
+        string asm_line;
+        bool uses_words = false;
+        int line_no;
+        tny_uword address;
+        vector <tny_uword> bin_uwords;
+    };
+*/
     while(labels_updated_this_pass && (result == true)) {
         labels_updated_this_pass = false;
         pass++;
         address = 0x0000;
         bin_words.clear();
+        listing_blocks.clear();
 
         /*
          * TODO: the parser should auto-detect if it can use the teeny
@@ -110,10 +120,24 @@ bool parse(token_lines &parse_lines, vector <string> asm_lines) {
          */
         for(auto &line: parse_lines) {
             parse_line = line;
+            listing_block lb;
+            lb.line_no = line[0].line_no;
+            lb.asm_line = asm_lines[lb.line_no - 1];
+            lb.address = address;
             if(p_loc() == false) {
                 result = false;
                 /* TODO: assumption that failed p_X_line() reported error already */
             }
+            int words_used = address - lb.address;
+            if(words_used > 0) {
+                lb.uses_words = true;
+                auto word = bin_words.end() - words_used;
+                while(word != bin_words.end()) {
+                    lb.bin_uwords.push_back((*word).u);
+                    word++;
+                }
+            }
+            listing_blocks.push_back(lb);
         }
     }
 
@@ -271,7 +295,7 @@ shared_ptr <token> p_label_line() {
         else if(pass > 1) {
             if(address != labels[label->token_str].u) {
                 cerr << label->token_str << " changed from ";
-                cerr << hex << labels[label->token_str].u << " to ";
+                cerr << hex << labels[label->token_str].u << dec << " to ";
                 cerr << hex << address << " in pass " << dec << pass << endl;
 
                 labels[label->token_str] = tny_word{.u = address};
