@@ -11,9 +11,6 @@
 !main
     add r3, r4 + 7  ;1
     mod r3, r1      ;1
-    neg r1          ;1
-    inc r2          ;1
-    dec r2          ;1
     OR  SP, rA - 5  ;1
 !early
     div rE, 15      ;2
@@ -22,6 +19,10 @@
 ;--------------------
 
     sub PC, PC - !main  ;1 this is an unconditional jmp :-)
+    
+    neg r1              ;1
+    inc r2              ;1
+    dec r2              ;1
     str r4 + 16, r3     ;2
     str r4 + 3, r3      ;1
 
