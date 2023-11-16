@@ -5,6 +5,7 @@
 #include "../teenyat.h"
 #include "token.h"
 #include "parser.h"
+#include "listing.h"
 
 using namespace std;
 
@@ -23,7 +24,7 @@ map <string, tny_word> constants;
 map <string, tny_word> variables;
 
 map <string, tny_word> labels;
-bool labels_updated_this_pass;  
+bool labels_updated_this_pass;
 
 bool parse(token_lines &parse_lines, vector <string> asm_lines);
 
@@ -37,6 +38,8 @@ shared_ptr <token> p_label_line();
 shared_ptr <tny_word> p_immediate();
 shared_ptr <tny_word> p_number();
 shared_ptr <token> p_plus_or_minus();
+
+bool is_teeny(tny_sword n);
 
 bool p_code_1_line();
 bool p_code_2_line();
@@ -52,7 +55,7 @@ shared_ptr <token> p_code_3_inst();
 shared_ptr <token> p_code_4_inst();
 shared_ptr <token> p_code_5_inst();
 
-vector <tny_word> bin_words;
+extern vector <tny_word> bin_words;
 
 /**
  * @brief
@@ -91,33 +94,57 @@ bool parse(token_lines &parse_lines, vector <string> asm_lines) {
     }
 
     /*
-     * In pass 2:
-     *   - generate a vector of encoded instructions, one per line of operable
-     *     code, variable memory, and raw data
+     * In passes 2+:
+     *   - generate encoded instructions, and add them to bin_words
+     *   - generate listing data
      */
-    pass = 2;
-    address = 0x0000;
+    labels_updated_this_pass = true;
 
-    /*
-     * TODO: Eventually, once the parser auto-detects it can use the teeny
-     * form of some instructions, the second pass will have to be replaced by
-     * multiple passes that continue until no label addresses are modified.
-     */
-    for(auto &line: parse_lines) {
-        parse_line = line;
-        if(p_loc() == false) {
-            result = false;
-            /* TODO: assumption that failed p_X_line() reported error already */
+/*
+    struct listing_block {
+        string asm_line;
+        bool uses_words = false;
+        int line_no;
+        tny_uword address;
+        vector <tny_uword> bin_uwords;
+    };
+*/
+    while(labels_updated_this_pass && (result == true)) {
+        labels_updated_this_pass = false;
+        pass++;
+        address = 0x0000;
+        bin_words.clear();
+        listing_blocks.clear();
+
+        /*
+         * TODO: the parser should auto-detect if it can use the teeny
+         * form of some instructions
+         */
+        for(auto &line: parse_lines) {
+            parse_line = line;
+            listing_block lb;
+            lb.line_no = line[0].line_no;
+            lb.asm_line = asm_lines[lb.line_no - 1];
+            lb.address = address;
+            if(p_loc() == false) {
+                result = false;
+                /* TODO: assumption that failed p_X_line() reported error already */
+            }
+            int words_used = address - lb.address;
+            if(words_used > 0) {
+                lb.uses_words = true;
+                auto word = bin_words.end() - words_used;
+                while(word != bin_words.end()) {
+                    lb.bin_uwords.push_back((*word).u);
+                    word++;
+                }
+            }
+            listing_blocks.push_back(lb);
         }
     }
 
     if(result) {
-        for(auto w : bin_words) {
-            cout << hex << w.u << endl;
-        }
-    }
-    else {
-        cerr << "There were errors.  No binary output." << endl;
+        cerr << "All labels resolved after " << pass << " passes." << endl << endl;
     }
 
     return result;
@@ -180,7 +207,7 @@ shared_ptr <token> p_variable_line() {
                 cerr << (constant_exists ? "Constant" : "Variable") << " \""  << ident->token_str << "\" already defined" << endl;
             }
         }
-        else if(pass == 2) {
+        else if(pass > 1) {
             bin_words.push_back(*immed);
         } // TODO: put the immediate in the binary at this address
         address++;
@@ -240,7 +267,7 @@ bool p_raw_line() {
 
     if(all_good) {
         address += data.size();
-        if(pass == 2) {
+        if(pass > 1) {
             /* Add raw data to bin_words */
             for(auto d: data) {
                 bin_words.push_back(*d);
@@ -269,10 +296,10 @@ shared_ptr <token> p_label_line() {
                 cerr << "Constant " << label->token_str << " already defined" << endl;
             }
         }
-        else if(pass == 2) {
+        else if(pass > 1) {
             if(address != labels[label->token_str].u) {
                 cerr << label->token_str << " changed from ";
-                cerr << hex << labels[label->token_str].u << " to ";
+                cerr << hex << labels[label->token_str].u << dec << " to ";
                 cerr << hex << address << " in pass " << dec << pass << endl;
 
                 labels[label->token_str] = tny_word{.u = address};
@@ -308,7 +335,7 @@ shared_ptr <tny_word> p_immediate() {
              */
             val = shared_ptr <tny_word>(new tny_word(label->value));
         }
-        else if(pass == 2) {
+        else if(pass > 1) {
             if(labels.count(label->token_str) > 0) {
                 val = shared_ptr <tny_word>(new tny_word(labels[label->token_str]));
             }
@@ -320,7 +347,7 @@ shared_ptr <tny_word> p_immediate() {
     }
     else if(tnext = save, ident = term(T_IDENTIFIER)) {
         /* As an immediate, ensure the identifier is a constant. */
-        if(pass == 2) {
+        if(pass > 1) {
             if(constants.count(ident->token_str) > 0) {
                 val = shared_ptr <tny_word>(new tny_word(constants[ident->token_str]));
             }
@@ -352,7 +379,7 @@ shared_ptr <tny_word> p_number() {
             /* just return a valid pointer to indicate success */
             val = shared_ptr <tny_word>(new tny_word(ident->value));
         }
-        else if(pass == 2) {
+        else if(pass > 1) {
             if(constants.count(ident->token_str) > 0) {
                 val = shared_ptr <tny_word>(new tny_word(constants[ident->token_str]));
             }
@@ -391,6 +418,13 @@ shared_ptr <token> p_plus_or_minus() {
     return val;
 }
 
+bool is_teeny(tny_sword n) {
+    tny_word small;
+    small.instruction.immed4 = n;
+
+    return small.instruction.immed4 == n;
+}
+
 /*
  * code_1_line ::= code_1_inst REGISTER COMMA REGISTER.
  */
@@ -411,7 +445,7 @@ bool p_code_1_line() {
         f.instruction.reg2 = sreg->value.u;
         f.instruction.immed4 = 0;
 
-        if(pass == 2) {
+        if(pass > 1) {
             bin_words.push_back(f);
         }
 
@@ -446,12 +480,22 @@ bool p_code_2_line() {
 
         inst.second.s = immed->s * (sign->id == T_PLUS ? +1 : -1);
 
-        if(pass == 2) {
-            bin_words.push_back(f);
-            bin_words.push_back(inst.second);
+        bool make_teeny = is_teeny(inst.second.s);
+        if(make_teeny) {
+            f.instruction.immed4 = inst.second.s;
+            address++;
+        }
+        else {
+            address += 2;
         }
 
-        address += 2;
+        if(pass > 1) {
+            bin_words.push_back(f);
+            if(!make_teeny) {
+                bin_words.push_back(inst.second);
+            }
+        }
+
         result = true;
     }
 
@@ -481,12 +525,22 @@ bool p_code_3_line() {
 
         inst.second.s = immed->s;
 
-        if(pass == 2) {
-            bin_words.push_back(f);
-            bin_words.push_back(inst.second);
+        bool make_teeny = is_teeny(inst.second.s);
+        if(make_teeny) {
+            f.instruction.immed4 = inst.second.s;
+            address++;
+        }
+        else {
+            address += 2;
         }
 
-        address += 2;
+        if(pass > 1) {
+            bin_words.push_back(f);
+            if(!make_teeny) {
+                bin_words.push_back(inst.second);
+            }
+        }
+
         result = true;
     }
 
