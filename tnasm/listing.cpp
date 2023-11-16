@@ -13,7 +13,6 @@ vector <listing_block> listing_blocks;
 void generate_listing() {
 
     int line_no_width = to_string(listing_blocks.size()).length();
-    cout << line_no_width << endl;
 
     for(const listing_block &lb : listing_blocks) {
         /* print line's address if meaningful */

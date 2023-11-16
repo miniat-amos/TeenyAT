@@ -142,7 +142,7 @@ bool parse(token_lines &parse_lines, vector <string> asm_lines) {
     }
 
     if(result) {
-        cerr << "All labels resolved after " << pass << " passes." << endl;
+        cerr << "All labels resolved after " << pass << " passes." << endl << endl;
     }
 
     return result;
