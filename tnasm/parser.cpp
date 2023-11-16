@@ -486,6 +486,7 @@ bool p_code_2_line() {
         bool make_teeny = is_teeny(inst.second.s);
         if(make_teeny) {
             f.instruction.immed4 = inst.second.s;
+            f.instruction.teeny = true;
             address++;
         }
         else {
@@ -531,6 +532,7 @@ bool p_code_3_line() {
         bool make_teeny = is_teeny(inst.second.s);
         if(make_teeny) {
             f.instruction.immed4 = inst.second.s;
+            f.instruction.teeny = true;
             address++;
         }
         else {
