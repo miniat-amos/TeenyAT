@@ -5,31 +5,33 @@
 ;-------------------
 ; Don't change any of the lines in this boxed section. They are crafted to
 ; demonstrate multipass label resolution is working
-.variable amos 0x74A3
-.variable aero 0xBeeF
+.variable amos 0x74A3 ;1
+.variable aero 0xBeeF ;1
 
 !main
-    add r3, r4 + 7
-    mod r3, r1
-    neg r1
-    inc r2
-    dec r2
-    OR  SP, rA - 5
+    add r3, r4 + 7  ;1
+    mod r3, r1      ;1
+    neg r1          ;1
+    inc r2          ;1
+    dec r2          ;1
+    OR  SP, rA - 5  ;1
 !early
-    div rE, 15
-    xor rA, -17
+    div rE, 15      ;2
+    xor rA, -17     ;2
 !middle
 ;--------------------
 
-    sub PC, PC - !main ;this is an unconditional jmp :-)
+    sub PC, PC - !main  ;1 this is an unconditional jmp :-)
+    str r4 + 16, r3     ;2
+    str r4 + 3, r3      ;1
 
-    123 -15 thirty_one 0x12F_F 0b_110_00000_1011_00_10
+    123 -15 thirty_one 0x12F_F 0b_110_00000_1011_00_10 ;5
 
-    mpy r2, !more
-    SHF rD, r2 - !middle
+    mpy r2, !more           ;2
+    SHF rD, r2 - !middle    ;2
 
 !more
-    BTF r1, r3 + thirty_one
+    BTF r1, r3 + thirty_one ;2
     ;str SP - aero, amos
-    rOt rB, !early
+    rOt rB, !early ;2
 ; and that's all
