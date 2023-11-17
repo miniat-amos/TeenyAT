@@ -207,7 +207,6 @@ bool p_loc() {
 shared_ptr <token> p_variable_line() {
     shared_ptr <token> val = nullptr, ident;
     shared_ptr <tny_word> immed;
-    int save = tnext;
     if(term(T_VARIABLE) && (ident = term(T_IDENTIFIER)) && (immed = p_immediate()) && term(T_EOL)) {
         if(pass == 1) {
             bool constant_exists = (constants.count(ident->token_str) > 0);
@@ -236,7 +235,6 @@ shared_ptr <token> p_variable_line() {
 shared_ptr <token> p_constant_line() {
     shared_ptr <token> val = nullptr, ident;
     shared_ptr <tny_word> immed;
-    int save = tnext;
     if(term(T_CONSTANT) && (ident = term(T_IDENTIFIER)) && (immed = p_immediate()) && term(T_EOL)) {
         if(pass == 1) {
             bool constant_exists = (constants.count(ident->token_str) > 0);
@@ -297,7 +295,6 @@ bool p_raw_line() {
  */
 shared_ptr <token> p_label_line() {
     shared_ptr <token> val = nullptr, label;
-    int save = tnext;
     if((label = term(T_LABEL)) && term(T_EOL)) {
         if(pass == 1) {
             bool label_exists = (labels.count(label->token_str) > 0);
@@ -445,7 +442,6 @@ bool is_teeny(tny_sword n) {
 bool p_code_1_line() {
     bool result = false;
     shared_ptr <token> dreg, oper, sreg;
-    int save = tnext;
     if((oper = p_code_1_inst()) && (dreg = term(T_REGISTER)) && term(T_COMMA) &&
        (sreg = term(T_REGISTER)) && term(T_EOL)) {
 
@@ -477,7 +473,6 @@ bool p_code_2_line() {
     bool result = false;
     shared_ptr <token> dreg, oper, sreg, sign;
     shared_ptr <tny_word> immed;
-    int save = tnext;
     if((oper = p_code_2_inst()) && (dreg = term(T_REGISTER)) && term(T_COMMA) &&
        (sreg = term(T_REGISTER)) && (sign = p_plus_or_minus()) && (immed = p_immediate()) &&
        term(T_EOL)) {
@@ -524,7 +519,6 @@ bool p_code_3_line() {
     bool result = false;
     shared_ptr <token> dreg, oper;
     shared_ptr <tny_word> immed;
-    int save = tnext;
     if((oper = p_code_3_inst()) && (dreg = term(T_REGISTER)) && term(T_COMMA) && (immed = p_immediate()) &&
         term(T_EOL)) {
 
@@ -569,7 +563,6 @@ bool p_code_3_line() {
 bool p_code_4_line() {
     bool result = false;
     shared_ptr <token> dreg, oper;
-    int save = tnext;
     if((oper = p_code_4_inst()) && (dreg = term(T_REGISTER)) && term(T_EOL)) {
 
         instruction inst;
@@ -601,7 +594,6 @@ bool p_code_4_line() {
 bool p_code_5_line() {
     bool result = false;
     shared_ptr <token> dreg, oper;
-    int save = tnext;
     if((oper = p_code_5_inst()) && (dreg = term(T_REGISTER)) && term(T_EOL)) {
 
         instruction inst;
@@ -632,7 +624,6 @@ bool p_code_6_line() {
     bool result = false;
     shared_ptr <token> dreg, oper, sreg, sign;
     shared_ptr <tny_word> immed;
-    int save = tnext;
     if((oper = p_code_6_inst()) && (dreg = term(T_REGISTER)) && (sign = p_plus_or_minus()) &&
     (immed = p_immediate()) && term(T_COMMA) && (sreg = term(T_REGISTER)) && term(T_EOL)) {
 
@@ -678,7 +669,6 @@ bool p_code_7_line() {
     bool result = false;
     shared_ptr <token> oper, sreg;
     shared_ptr <tny_word> immed;
-    int save = tnext;
     if((oper = p_code_7_inst()) && (immed = p_immediate()) && term(T_COMMA) &&
        (sreg = term(T_REGISTER)) && term(T_EOL)) {
 
@@ -724,7 +714,6 @@ bool p_code_8_line() {
     bool result = false;
     shared_ptr <token> oper, sreg;
     shared_ptr <tny_word> immed;
-    int save = tnext;
     if((oper = p_code_8_inst()) && (sreg = term(T_REGISTER)) && term(T_EOL)) {
 
         instruction inst;
@@ -756,7 +745,6 @@ bool p_code_9_line() {
     bool result = false;
     shared_ptr <token> oper, sreg, sign;
     shared_ptr <tny_word> immed;
-    int save = tnext;
     if((oper = p_code_9_inst()) && (sreg = term(T_REGISTER)) && (sign = p_plus_or_minus())
         && (immed = p_immediate()) && term(T_EOL)) {
 
@@ -802,7 +790,6 @@ bool p_code_10_line() {
     bool result = false;
     shared_ptr <token> oper;
     shared_ptr <tny_word> immed;
-    int save = tnext;
     if((oper = p_code_10_inst()) && (immed = p_immediate()) && term(T_EOL)) {
 
         instruction inst;
@@ -846,7 +833,6 @@ bool p_code_10_line() {
 bool p_code_11_line() {
     bool result = false;
     shared_ptr <token> oper;
-    int save = tnext;
     if((oper = p_code_11_inst()) && term(T_EOL)) {
 
         instruction inst;
@@ -877,7 +863,6 @@ bool p_code_11_line() {
 bool p_code_12_line() {
     bool result = false;
     shared_ptr <token> oper, sreg;
-    int save = tnext;
     if((oper = p_code_12_inst()) && (sreg = term(T_REGISTER)) && term(T_EOL)) {
 
         instruction inst;
