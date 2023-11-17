@@ -560,7 +560,7 @@ bool p_code_4_line() {
         f.instruction.teeny = 1;
         f.instruction.reg1 = dreg->value.u;
 
-        //these are not used need a decision about how to set these to a predictable value
+        // TODO: these are not used need a decision about how to set these to a predictable value
         f.instruction.reg2 = 0;
         f.instruction.immed4 = 0;
 
@@ -613,7 +613,7 @@ bool p_code_6_line() {
     shared_ptr <token> dreg, oper, sreg, sign;
     shared_ptr <tny_word> immed;
     int save = tnext;
-    if((oper = p_code_6_inst()) && (dreg = term(T_REGISTER)) && (sign = p_plus_or_minus()) && 
+    if((oper = p_code_6_inst()) && (dreg = term(T_REGISTER)) && (sign = p_plus_or_minus()) &&
     (immed = p_immediate()) && term(T_COMMA) && (sreg = term(T_REGISTER)) && term(T_EOL)) {
 
         instruction inst;
