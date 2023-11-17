@@ -40,7 +40,7 @@ void generate_listing() {
                     cout << "]  " << endl;
                     cout << "        " << string(line_no_width, ' ') << ": [ ";
                 }
-                cout << hex << setw(4) << setfill('0') << lb.bin_uwords[addr] << dec;
+                cout << hex << setw(4) << setfill('0') << lb.bin_uwords[i] << dec;
                 cout << " ";
                 i++;
                 addr++;

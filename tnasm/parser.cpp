@@ -136,8 +136,8 @@ bool parse(token_lines &parse_lines, vector <string> asm_lines) {
                     lb.bin_uwords.push_back((*word).u);
                     word++;
                 }
+                listing_blocks.push_back(lb);
             }
-            listing_blocks.push_back(lb);
         }
     }
 
