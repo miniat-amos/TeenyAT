@@ -56,7 +56,8 @@ int main( int argc, char* argv[]){
 	t.ex_data = &s;
 
     while (!tigrClosed(s.window) && !tigrKeyDown(s.window, TK_ESCAPE)){
-        //tigrMouse(s.window,&s.mouseX, &s.mouseY, nullptr);
+        
+        tigrMouse(s.window,&s.mouseX, &s.mouseY, nullptr);
         //std::cout << s.mouseX << " " << s.mouseY << std::endl;
         tny_clock(&t);
     }
@@ -135,11 +136,11 @@ void bus_read(teenyat *t, tny_uword addr, tny_word *data, uint16_t *delay) {
              std::cout << " rand";
              break;
         case MOUSEX:
-             data->u = (uint16_t)s->mouseX;
+             data->u = (uint16_t)(s->mouseX/s->res);
              std::cout << " mouseX";
              break;
         case MOUSEY:
-             data->u = (uint16_t)s->mouseY;
+             data->u = (uint16_t)(s->mouseY/s->res);
              std::cout << " mouseY";
              break;
         default:

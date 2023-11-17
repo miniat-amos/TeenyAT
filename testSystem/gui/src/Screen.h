@@ -162,12 +162,10 @@ class Screen{
                 y1 = y2;
                 y2 = temp3;
         }
-
         if(x1 == x2 && y1 != y2){
             verticalLine(x1,y1,y2);
             return;
         }
-        
         int m = (y2 - y1) / (x2 - x1);
         int x = x1;
         int y = y1;
