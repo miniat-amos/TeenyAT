@@ -52,6 +52,7 @@ bool p_code_8_line();
 bool p_code_9_line();
 bool p_code_10_line();
 bool p_code_11_line();
+bool p_code_12_line();
 
 tny_uword token_to_opcode(int id);
 
@@ -196,7 +197,8 @@ bool p_loc() {
            (tnext = save, p_code_8_line())   ||
            (tnext = save, p_code_9_line())   ||
            (tnext = save, p_code_10_line())  ||
-           (tnext = save, p_code_11_line());
+           (tnext = save, p_code_11_line())  ||
+           (tnext = save, p_code_12_line());
 }
 
 /*
@@ -847,6 +849,35 @@ bool p_code_11_line() {
         f.instruction.immed4 = 0;
 
         address++;
+
+        if(pass > 1) {
+            bin_words.push_back(f);
+        }
+
+        result = true;
+    }
+
+    return result;
+}
+
+/*
+ * code_12_line ::= code_12_inst REGISTER.
+ */
+bool p_code_12_line() {
+    bool result = false;
+    shared_ptr <token> oper, sreg;
+    int save = tnext;
+    if((oper = p_code_12_inst()) && (sreg = term(T_REGISTER)) && term(T_EOL)) {
+
+        instruction inst;
+        inst.line_no = sreg->line_no;
+
+        tny_word &f = inst.first;
+        f.instruction.opcode = token_to_opcode(oper->id);
+        f.instruction.teeny = 1;
+        f.instruction.reg1 = TNY_REG_PC;
+        f.instruction.reg2 = sreg->value.u;
+        f.instruction.immed4 = 0;//TODO: needs a conversion from oper token to set these flags
 
         if(pass > 1) {
             bin_words.push_back(f);
