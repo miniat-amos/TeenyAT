@@ -24,6 +24,8 @@
     inc r2              ;1
     dec r2              ;1
     str r4 + 16, r3     ;2
+    psh 5              ;1
+    psh -20              ;2
     psh r3 - 4          ;1
     psh r3              ;1
     psh r3 + 14         ;2
