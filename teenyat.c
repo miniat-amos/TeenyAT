@@ -421,9 +421,11 @@ void tny_clock(teenyat *t) {
 		}
 		break;
 	case TNY_OPCODE_DEL:
-		tny_sword delay_cnt = t->reg[reg2].s + immed;
-		if(delay_cnt >= 1) {
-			t->delay_cycles = delay_cnt - 1; // current instruction already 1 cycle
+		{
+			tny_sword delay_cnt = t->reg[reg2].s + immed;
+			if(delay_cnt >= 1) {
+				t->delay_cycles = delay_cnt - 1; // current instruction already 1 cycle
+			}
 		}
 		break;
 	default:
