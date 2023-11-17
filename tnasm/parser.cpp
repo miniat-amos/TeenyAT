@@ -336,10 +336,10 @@ shared_ptr <tny_word> p_immediate() {
     shared_ptr <token> ident, label;
     int save = tnext;
 
-    if(tnext = save, val = p_number()) {
+    if((tnext = save, val = p_number())) {
         /* nothing to do */
     }
-    else if(tnext = save, label = term(T_LABEL)) {
+    else if((tnext = save, label = term(T_LABEL))) {
         /* TODO: look up label's address */
         if(pass == 1) {
             /*
@@ -359,7 +359,7 @@ shared_ptr <tny_word> p_immediate() {
             }
         }
     }
-    else if(tnext = save, ident = term(T_IDENTIFIER)) {
+    else if((tnext = save, ident = term(T_IDENTIFIER))) {
         /* As an immediate, ensure the identifier is a constant. */
         if(pass > 1) {
             if(constants.count(ident->token_str) > 0) {
@@ -388,7 +388,7 @@ shared_ptr <tny_word> p_number() {
     shared_ptr <tny_word> val = nullptr;
     shared_ptr <token> ident, num, sign;
     int save = tnext;
-    if(tnext = save, ident = term(T_IDENTIFIER)) {
+    if((tnext = save, ident = term(T_IDENTIFIER))) {
         if(pass == 1) {
             /* just return a valid pointer to indicate success */
             val = shared_ptr <tny_word>(new tny_word(ident->value));
@@ -406,7 +406,7 @@ shared_ptr <tny_word> p_number() {
             }
         }
     }
-    else if(tnext = save, num = term(T_NUMBER)) {
+    else if((tnext = save, num = term(T_NUMBER))) {
         val = shared_ptr <tny_word>(new tny_word(num->value));
     }
     else if(tnext = save, (sign = p_plus_or_minus()) && (num = term(T_NUMBER))) {
