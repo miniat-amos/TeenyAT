@@ -24,7 +24,9 @@
     inc r2              ;1
     dec r2              ;1
     str r4 + 16, r3     ;2
+    psh r3 - 4          ;1
     psh r3              ;1
+    psh r3 + 14         ;2
     str r4 + 3, r3      ;1
 
     123 -15 thirty_one 0x12F_F 0b_110_00000_1011_00_10 ;5
