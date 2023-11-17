@@ -1,3 +1,5 @@
+;Every accessable address in the test system
+
 JMP !main
 !LIVESCREEN #8000 
 !UPDATESCREEN #9000 
@@ -20,16 +22,13 @@ JMP !main
 !KEY #FFFE 
 
 !main
-    SET $a $z
-    SET $b $z
-    SET $c 20
-    SET $d 34
-    SET $e 30000
+    SET $a 10
+    SET $b 0
+    SET $c 10
+    SET $d 10
     STR $z !X1 $a
     STR $z !Y1 $b
     STR $z !X2 $c
     STR $z !Y2 $d
-    STR $z !FILL $e
-    STR $z !STROKE $z
-    STR $z !RECT $c
+    STR $z !LINE $z
     STR $z !UPDATE $z

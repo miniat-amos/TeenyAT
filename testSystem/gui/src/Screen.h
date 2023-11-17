@@ -22,7 +22,7 @@ class Screen{
     uint16_t currFillColor = 0;
 
     // 354 - lightLavender 
-    double hue = 270;
+    double hue = 4000;
 
     // 1150 - orig
     double sat = 27;
@@ -47,11 +47,10 @@ class Screen{
     //Start 0x9000 - 0x9FFF
     uint16_t update_screen[size*size] = {0};
 
-    Screen(){
-
+    Screen(double v){
+        hue = v;
         srand(time(nullptr));
         window = tigrWindow(Window_WIDTH, Window_HEIGHT, "Test Program", 0);
-        
         // Create renderer and initialize update_screen to lavender
         for(int i = 0; i < size*size; i++){
             update_screen[i] = hue;
@@ -162,6 +161,11 @@ class Screen{
                 x2 = temp1;
                 y1 = y2;
                 y2 = temp3;
+        }
+
+        if(x1 == x2 && y1 != y2){
+            verticalLine(x1,y1,y2);
+            return;
         }
         
         int m = (y2 - y1) / (x2 - x1);

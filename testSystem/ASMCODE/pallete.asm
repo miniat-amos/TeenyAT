@@ -1,6 +1,6 @@
 JMP !main
 
-!Screen #9000
+!Screen #8000
 
 !main
     SET $a $z
@@ -9,10 +9,8 @@ JMP !main
 !loop
     STR $c !Screen $a
     INC $c
-    CMP $c #1000
     JE !end
-    INC $a
-    MOD $a 360
+    ADD $a 7
+    MOD $c #1000
     JMP !loop
 !end
-STR $z #E000 $z

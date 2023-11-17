@@ -36,27 +36,16 @@ void bus_write(teenyat *t, tny_uword addr, tny_word data, uint16_t *delay);
 bool resized = false;
 
 // Screen to write too
-Screen s;
 int main( int argc, char* argv[]){
     //Initialize the teenyAT
-    if(argc != 2){
+    if(argc < 2){
         std::cout << "Please provide an asm file" << std::endl;
         return 1;
     }
-    
-    std::string cmd = "./trash " + (std::string)argv[1];
 
-    #if defined(__linux__) // Or #if __linux__
-        cmd = "./trash " + (std::string)argv[1];
-    #elif _WIN32
-        cmd = "trash.exe " + (std::string)argv[1];
-    #else
-        cmd = "./trash " + (std::string)argv[1];
-    #endif
-    
-    std::system(cmd.c_str());
+    Screen s(40000); 
 
-    std::string fileName = "output.trash";
+    std::string fileName = argv[1];
     teenyat t;
     bool success = false;
 	FILE *bin_file = fopen(fileName.c_str(), "rb");
