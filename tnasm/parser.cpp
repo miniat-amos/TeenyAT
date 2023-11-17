@@ -56,6 +56,14 @@ shared_ptr <token> p_code_3_inst();
 shared_ptr <token> p_code_4_inst();
 shared_ptr <token> p_code_5_inst();
 shared_ptr <token> p_code_6_inst();
+shared_ptr <token> p_code_7_inst();
+shared_ptr <token> p_code_8_inst();
+shared_ptr <token> p_code_9_inst();
+shared_ptr <token> p_code_10_inst();
+shared_ptr <token> p_code_11_inst();
+shared_ptr <token> p_code_12_inst();
+shared_ptr <token> p_code_13_inst();
+shared_ptr <token> p_code_14_inst();
 
 extern vector <tny_word> bin_words;
 
@@ -853,6 +861,144 @@ shared_ptr <token> p_code_6_inst() {
     int save = tnext;
 
     (tnext = save, result = term(T_STR));
+
+    return result;
+}
+
+/*
+ * code_7_inst ::= STR.
+ */
+shared_ptr <token> p_code_7_inst() {
+    shared_ptr <token> result;
+    int save = tnext;
+
+    (tnext = save, result = term(T_STR));
+
+    return result;
+}
+
+/*
+ * code_8_inst ::= PSH.
+ * code_8_inst ::= CAL.
+ */
+shared_ptr <token> p_code_8_inst() {
+    shared_ptr <token> result;
+    int save = tnext;
+
+    (tnext = save, result = term(T_PSH)) ||
+    (tnext = save, result = term(T_CAL));
+
+    return result;
+}
+
+/*
+ * code_9_inst ::= PSH.
+ * code_9_inst ::= CAL.
+ */
+shared_ptr <token> p_code_9_inst() {
+    shared_ptr <token> result;
+    int save = tnext;
+
+    (tnext = save, result = term(T_PSH)) ||
+    (tnext = save, result = term(T_CAL));
+
+    return result;
+}
+
+/*
+ * code_10_inst ::= PSH.
+ * code_10_inst ::= CAL.
+ */
+shared_ptr <token> p_code_10_inst() {
+    shared_ptr <token> result;
+    int save = tnext;
+
+    (tnext = save, result = term(T_PSH)) ||
+    (tnext = save, result = term(T_CAL));
+
+    return result;
+}
+
+/*
+ * code_11_inst ::= RET.
+ */
+shared_ptr <token> p_code_11_inst() {
+    shared_ptr <token> result;
+    int save = tnext;
+
+    (tnext = save, result = term(T_RET));
+
+    return result;
+}
+
+/*
+ * code_12_inst ::= JMP.
+ * code_12_inst ::= JE.
+ * code_12_inst ::= JNE.
+ * code_12_inst ::= JL.
+ * code_12_inst ::= JLE.
+ * code_12_inst ::= JG.
+ * code_12_inst ::= JGE.
+ */
+shared_ptr <token> p_code_12_inst() {
+    shared_ptr <token> result;
+    int save = tnext;
+
+    (tnext = save, result = term(T_JMP)) ||
+    (tnext = save, result = term(T_JE)) ||
+    (tnext = save, result = term(T_JNE)) ||
+    (tnext = save, result = term(T_JL)) ||
+    (tnext = save, result = term(T_JLE)) ||
+    (tnext = save, result = term(T_JG)) ||
+    (tnext = save, result = term(T_JGE));
+
+    return result;
+}
+
+/*
+ * code_13_inst ::= JMP.
+ * code_13_inst ::= JE.
+ * code_13_inst ::= JNE.
+ * code_13_inst ::= JL.
+ * code_13_inst ::= JLE.
+ * code_13_inst ::= JG.
+ * code_13_inst ::= JGE.
+ */
+shared_ptr <token> p_code_13_inst() {
+    shared_ptr <token> result;
+    int save = tnext;
+
+    (tnext = save, result = term(T_JMP)) ||
+    (tnext = save, result = term(T_JE)) ||
+    (tnext = save, result = term(T_JNE)) ||
+    (tnext = save, result = term(T_JL)) ||
+    (tnext = save, result = term(T_JLE)) ||
+    (tnext = save, result = term(T_JG)) ||
+    (tnext = save, result = term(T_JGE));
+
+    return result;
+}
+
+/*
+ * code_14_inst ::= JMP.
+ * code_14_inst ::= JE.
+ * code_14_inst ::= JNE.
+ * code_14_inst ::= JL.
+ * code_14_inst ::= JLE.
+ * code_14_inst ::= JG.
+ * code_14_inst ::= JGE.
+ */
+shared_ptr <token> p_code_14_inst() {
+    shared_ptr <token> result;
+    int save = tnext;
+
+    (tnext = save, result = term(T_JMP)) ||
+    (tnext = save, result = term(T_JE)) ||
+    (tnext = save, result = term(T_JNE)) ||
+    (tnext = save, result = term(T_JL)) ||
+    (tnext = save, result = term(T_JLE)) ||
+    (tnext = save, result = term(T_JG)) ||
+    (tnext = save, result = term(T_JGE));
 
     return result;
 }
