@@ -564,7 +564,7 @@ bool p_code_4_line() {
         f.instruction.reg2 = 0;
         f.instruction.immed4 = 0;
 
-        if(pass == 2) {
+        if(pass > 1) {
             bin_words.push_back(f);
         }
 
@@ -594,7 +594,7 @@ bool p_code_5_line() {
         f.instruction.reg2 = TNY_REG_ZERO;
         f.instruction.immed4 = 1;
 
-        if(pass == 2) {
+        if(pass > 1) {
             bin_words.push_back(f);
         }
 
