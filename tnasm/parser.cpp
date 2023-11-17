@@ -47,6 +47,7 @@ bool p_code_3_line();
 bool p_code_4_line();
 bool p_code_5_line();
 bool p_code_6_line();
+bool p_code_7_line();
 
 tny_uword token_to_opcode(int id);
 
@@ -186,7 +187,8 @@ bool p_loc() {
            (tnext = save, p_code_3_line())   ||
            (tnext = save, p_code_4_line())   ||
            (tnext = save, p_code_5_line())   ||
-           (tnext = save, p_code_6_line());
+           (tnext = save, p_code_6_line())   ||
+           (tnext = save, p_code_7_line());
 }
 
 /*
@@ -651,6 +653,42 @@ bool p_code_6_line() {
             if(!make_teeny) {
                 bin_words.push_back(inst.second);
             }
+        }
+
+        result = true;
+    }
+
+    return result;
+}
+
+/*
+ * code_7_line ::= code_7_inst immediate COMMA REGISTER.
+ */
+bool p_code_7_line() {
+    bool result = false;
+    shared_ptr <token> oper, sreg;
+    shared_ptr <tny_word> immed;
+    int save = tnext;
+    if((oper = p_code_7_inst()) && (immed = p_immediate()) && term(T_COMMA) &&
+       (sreg = term(T_REGISTER)) && term(T_EOL)) {
+
+        instruction inst;
+        inst.line_no = sreg->line_no;
+
+        tny_word &f = inst.first;
+        f.instruction.opcode = token_to_opcode(oper->id);
+        f.instruction.teeny = 0;
+        f.instruction.reg1 = TNY_REG_ZERO;
+        f.instruction.reg2 = sreg->value.u;
+        f.instruction.immed4 = 0;
+
+        inst.second.s = immed->s;
+
+        address += 2;
+
+        if(pass > 1) {
+            bin_words.push_back(f);
+            bin_words.push_back(inst.second);
         }
 
         result = true;

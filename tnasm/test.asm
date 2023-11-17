@@ -19,7 +19,7 @@
 ;--------------------
 
     sub PC, PC - !main  ;1 this is an unconditional jmp :-)
-    
+
     neg r1              ;1
     inc r2              ;1
     dec r2              ;1
@@ -35,4 +35,6 @@
     BTF r1, r3 + thirty_one ;2
     ;str SP - aero, amos
     rOt rB, !early ;2
+
+    STR aero, r6
 ; and that's all
