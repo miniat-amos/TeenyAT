@@ -44,4 +44,10 @@
     rOt rB, !early ;2
 
     STR aero, r6
+
+    Psh r4
+    CAL PC ; oooh... what could this be used for? >:-)
+
+    PSH PC - !more
+    CAL rB + 0xF7
 ; and that's all

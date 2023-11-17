@@ -694,11 +694,21 @@ bool p_code_7_line() {
 
         inst.second.s = immed->s;
 
-        address += 2;
+        bool make_teeny = is_teeny(inst.second.s);
+        if(make_teeny) {
+            f.instruction.immed4 = inst.second.s;
+            f.instruction.teeny = true;
+            address++;
+        }
+        else {
+            address += 2;
+        }
 
         if(pass > 1) {
             bin_words.push_back(f);
-            bin_words.push_back(inst.second);
+            if(!make_teeny) {
+                bin_words.push_back(inst.second);
+            }
         }
 
         result = true;
@@ -713,6 +723,7 @@ bool p_code_7_line() {
 bool p_code_8_line() {
     bool result = false;
     shared_ptr <token> oper, sreg;
+    shared_ptr <tny_word> immed;
     int save = tnext;
     if((oper = p_code_8_inst()) && (sreg = term(T_REGISTER)) && term(T_EOL)) {
 
