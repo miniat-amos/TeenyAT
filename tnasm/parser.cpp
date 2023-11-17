@@ -98,15 +98,6 @@ bool parse(token_lines &parse_lines, vector <string> asm_lines) {
      */
     labels_updated_this_pass = true;
 
-/*
-    struct listing_block {
-        string asm_line;
-        bool uses_words = false;
-        int line_no;
-        tny_uword address;
-        vector <tny_uword> bin_uwords;
-    };
-*/
     while(labels_updated_this_pass && (result == true)) {
         labels_updated_this_pass = false;
         pass++;
