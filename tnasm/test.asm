@@ -44,6 +44,9 @@
     rOt rB, !early ;2
 
     STR aero, r6
+    DLy r3 + 5
+    DLy r5
+    DLy 31
 
     Psh r4
     CAL PC ; oooh... what could this be used for? >:-)

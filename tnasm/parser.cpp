@@ -757,7 +757,7 @@ bool p_code_9_line() {
     shared_ptr <token> oper, sreg, sign;
     shared_ptr <tny_word> immed;
     int save = tnext;
-    if((oper = p_code_9_inst()) && (sreg = term(T_REGISTER)) && (sign = p_plus_or_minus()) 
+    if((oper = p_code_9_inst()) && (sreg = term(T_REGISTER)) && (sign = p_plus_or_minus())
         && (immed = p_immediate()) && term(T_EOL)) {
 
         instruction inst;
@@ -924,6 +924,7 @@ tny_uword token_to_opcode(int id) {
     case T_ROT:   result = TNY_OPCODE_ROT;   break;
     case T_NEG:   result = TNY_OPCODE_NEG;   break;
     case T_CMP:   result = TNY_OPCODE_CMP;   break;
+    case T_DLY:   result = TNY_OPCODE_DLY;   break;
     case T_JMP:   result = TNY_OPCODE_JMP;   break;
     case T_DJZ:   result = TNY_OPCODE_DJZ;   break;
     /*
@@ -1120,6 +1121,7 @@ shared_ptr <token> p_code_7_inst() {
 
 /*
  * code_8_inst ::= PSH.
+ * code_8_inst ::= DLY.
  * code_8_inst ::= CAL.
  */
 shared_ptr <token> p_code_8_inst() {
@@ -1127,6 +1129,7 @@ shared_ptr <token> p_code_8_inst() {
     int save = tnext;
 
     (tnext = save, result = term(T_PSH)) ||
+    (tnext = save, result = term(T_DLY)) ||
     (tnext = save, result = term(T_CAL));
 
     return result;
@@ -1134,6 +1137,7 @@ shared_ptr <token> p_code_8_inst() {
 
 /*
  * code_9_inst ::= PSH.
+ * code_9_inst ::= DLY.
  * code_9_inst ::= CAL.
  */
 shared_ptr <token> p_code_9_inst() {
@@ -1141,6 +1145,7 @@ shared_ptr <token> p_code_9_inst() {
     int save = tnext;
 
     (tnext = save, result = term(T_PSH)) ||
+    (tnext = save, result = term(T_DLY)) ||
     (tnext = save, result = term(T_CAL));
 
     return result;
@@ -1148,6 +1153,7 @@ shared_ptr <token> p_code_9_inst() {
 
 /*
  * code_10_inst ::= PSH.
+ * code_10_inst ::= DLY.
  * code_10_inst ::= CAL.
  */
 shared_ptr <token> p_code_10_inst() {
@@ -1155,6 +1161,7 @@ shared_ptr <token> p_code_10_inst() {
     int save = tnext;
 
     (tnext = save, result = term(T_PSH)) ||
+    (tnext = save, result = term(T_DLY)) ||
     (tnext = save, result = term(T_CAL));
 
     return result;

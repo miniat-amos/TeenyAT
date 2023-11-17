@@ -114,12 +114,15 @@ code_6_inst ::= STR.
 code_7_inst ::= STR.
 
 code_8_inst ::= PSH.
+code_8_inst ::= DLY.
 code_8_inst ::= CAL.
 
 code_9_inst ::= PSH.
+code_9_inst ::= DLY.
 code_9_inst ::= CAL.
 
 code_10_inst ::= PSH.
+code_10_inst ::= DLY.
 code_10_inst ::= CAL.
 
 code_11_inst ::= RET.
