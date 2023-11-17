@@ -37,4 +37,7 @@
     rOt rB, !early ;2
 
     STR aero, r6
+
+    Psh r4
+    CAL PC ; oooh... what could this be used for? >:-)
 ; and that's all
