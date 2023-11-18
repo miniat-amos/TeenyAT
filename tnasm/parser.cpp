@@ -876,7 +876,7 @@ bool p_code_12_line() {
         f.instruction.opcode = token_to_opcode(oper->id);
         f.instruction.teeny = 1;
         f.instruction.reg1 = sreg->value.u;
-        f.instruction.reg2 = TNY_REG_ZERO;
+        f.instruction.reg2 = 0;
 
         f.instruction.immed4 = 0;
         if(oper->id == T_JNE || oper->id == T_JG || oper->id == T_JGE) {
@@ -919,7 +919,7 @@ bool p_code_13_line() {
         f.instruction.opcode = token_to_opcode(oper->id);
         f.instruction.teeny = 0;
         f.instruction.reg1 = sreg->value.u;
-        f.instruction.reg2 = TNY_REG_ZERO;
+        f.instruction.reg2 = 0;
 
         f.instruction.immed4 = 0;
         if(oper->id == T_JNE || oper->id == T_JG || oper->id == T_JGE) {
@@ -966,7 +966,7 @@ bool p_code_14_line() {
         f.instruction.opcode = token_to_opcode(oper->id);
         f.instruction.teeny = 0;
         f.instruction.reg1 = TNY_REG_ZERO;
-        f.instruction.reg2 = TNY_REG_ZERO;
+        f.instruction.reg2 = 0;
 
         f.instruction.immed4 = 0;
         if(oper->id == T_JNE || oper->id == T_JG || oper->id == T_JGE) {
