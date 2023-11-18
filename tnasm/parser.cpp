@@ -59,6 +59,7 @@ bool p_code_14_line();
 tny_uword token_to_opcode(int id);
 
 shared_ptr <token> p_code_1_inst();
+shared_ptr <token> p_code_1_mem_inst();
 shared_ptr <token> p_code_2_inst();
 shared_ptr <token> p_code_3_inst();
 shared_ptr <token> p_code_4_inst();
@@ -446,8 +447,17 @@ bool is_teeny(tny_sword n) {
 bool p_code_1_line() {
     bool result = false;
     shared_ptr <token> dreg, oper, sreg;
-    if((oper = p_code_1_inst()) && (dreg = term(T_REGISTER)) && term(T_COMMA) &&
-       (sreg = term(T_REGISTER)) && term(T_EOL)) {
+    int save = tnext;
+    if(
+        (tnext = save,
+         (oper = p_code_1_inst()) && (dreg = term(T_REGISTER)) && term(T_COMMA) &&
+         (sreg = term(T_REGISTER)) && term(T_EOL))
+        ||
+        (tnext = save,
+         (oper = p_code_1_mem_inst()) && (dreg = term(T_REGISTER)) && term(T_COMMA) &&
+         term(T_LBRACKET) && (sreg = term(T_REGISTER)) && term(T_RBRACKET) &&
+         term(T_EOL))
+    ) {
 
         instruction inst;
         inst.line_no = oper->line_no;
@@ -477,7 +487,8 @@ bool p_code_2_line() {
     bool result = false;
     shared_ptr <token> dreg, oper, sreg, sign;
     shared_ptr <tny_word> immed;
-    if((oper = p_code_2_inst()) && (dreg = term(T_REGISTER)) && term(T_COMMA) &&
+    if(
+       (oper = p_code_2_inst()) && (dreg = term(T_REGISTER)) && term(T_COMMA) &&
        (sreg = term(T_REGISTER)) && (sign = p_plus_or_minus()) && (immed = p_immediate()) &&
        term(T_EOL)) {
 
@@ -1052,8 +1063,6 @@ tny_uword token_to_opcode(int id) {
  * code_1_inst ::= SHF.
  * code_1_inst ::= ROT.
  * code_1_inst ::= SET.
- * code_1_inst ::= LOD.
- * code_1_inst ::= STR.
  * code_1_inst ::= BTF.
  * code_1_inst ::= CMP.
  * code_1_inst ::= DJZ.
@@ -1073,11 +1082,23 @@ shared_ptr <token> p_code_1_inst() {
     (tnext = save, result = term(T_SHF)) ||
     (tnext = save, result = term(T_ROT)) ||
     (tnext = save, result = term(T_SET)) ||
-    (tnext = save, result = term(T_LOD)) ||
-    (tnext = save, result = term(T_STR)) ||
     (tnext = save, result = term(T_BTF)) ||
     (tnext = save, result = term(T_CMP)) ||
     (tnext = save, result = term(T_DJZ));
+
+    return result;
+}
+
+/*
+ * code_1_mem_inst ::= LOD.
+ * code_1_mem_inst ::= STR.
+ */
+shared_ptr <token> p_code_1_mem_inst() {
+    shared_ptr <token> result;
+    int save = tnext;
+
+    (tnext = save, result = term(T_LOD)) ||
+    (tnext = save, result = term(T_STR));
 
     return result;
 }

@@ -38,7 +38,7 @@
 
     mpy r2, !more           ;2
     SHF rD, r2 - !middle    ;2
-
+    lod r3, [rD]
 !more
     BTF r1, r3 + thirty_one ;2
     ;str SP - aero, amos

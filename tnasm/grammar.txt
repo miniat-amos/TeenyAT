@@ -40,6 +40,7 @@ plus_or_minus ::= PLUS.
 plus_or_minus ::= MINUS.
 
 code_1_line ::= code_1_inst REGISTER COMMA REGISTER.
+code_1_line ::= code_1_mem_inst REGISTER COMMA LBRACKET REGISTER RBRACKET.
 code_2_line ::= code_2_inst REGISTER COMMA REGISTER plus_or_minus immediate.
 code_3_line ::= code_3_inst REGISTER COMMA immediate.
 code_4_line ::= code_4_inst REGISTER.
@@ -65,11 +66,12 @@ code_1_inst ::= XOR.
 code_1_inst ::= SHF.
 code_1_inst ::= ROT.
 code_1_inst ::= SET.
-code_1_inst ::= LOD.
-code_1_inst ::= STR.
 code_1_inst ::= BTF.
 code_1_inst ::= CMP.
 code_1_inst ::= DJZ.
+
+code_1_mem_inst ::= LOD.
+code_1_mem_inst ::= STR.
 
 code_2_inst ::= ADD.
 code_2_inst ::= SUB.
