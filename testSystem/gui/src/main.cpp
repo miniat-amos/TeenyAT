@@ -43,7 +43,7 @@ int main( int argc, char* argv[]){
         return 1;
     }
 
-    Screen s(40000); 
+    Screen s(3636); 
 
     std::string fileName = argv[1];
     teenyat t;
@@ -57,7 +57,7 @@ int main( int argc, char* argv[]){
 
     while (!tigrClosed(s.window) && !tigrKeyDown(s.window, TK_ESCAPE)){
         
-        tigrMouse(s.window,&s.mouseX, &s.mouseY, nullptr);
+        tigrMouse(s.window,&s.mouseX, &s.mouseY, &s.mouseButton);
         //std::cout << s.mouseX << " " << s.mouseY << std::endl;
         tny_clock(&t);
     }
@@ -65,11 +65,6 @@ int main( int argc, char* argv[]){
     tigrFree(s.window);
 	fclose(bin_file);
     return EXIT_SUCCESS;
-}
-
-// Used to map address space to grid space
-int map(int num, int in_min, int in_max, int out_min, int out_max){
-    return (int)(num - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
 
 void bus_read(teenyat *t, tny_uword addr, tny_word *data, uint16_t *delay) {

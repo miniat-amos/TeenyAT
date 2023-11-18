@@ -1,5 +1,5 @@
-#ifndef ROBOT_H
-#define ROBOT_H
+#ifndef SCREEN_H
+#define SCREEN_H
 
 #include <iostream>
 #include <ctime>
@@ -22,7 +22,7 @@ class Screen{
     uint16_t currFillColor = 0;
 
     // 354 - lightLavender 
-    double hue = 4000;
+    double hue = 3636;
 
     // 1150 - orig
     double sat = 27;
@@ -32,7 +32,8 @@ class Screen{
     double res = (double) Window_WIDTH / size;
     int mouseX = 0;
     int mouseY = 0;
-    
+    int mouseButton = 0;
+
     int x1 = 0;
     int y1 = 0;
     int x2 = 0;
@@ -93,7 +94,7 @@ class Screen{
         unsigned char r,g,b;
         unsigned char a = 255;
         //std::cout << col << " " << 50 << " " << 55 << std::endl;
-        HSVtoRGB(col, sat, val, &r, &g, &b);
+        HSVtoRGB(col, &r, &g, &b);
         currFill = TPixel{r,g,b,a};
         //std::cout << (int)r << " " << (int)g << " " << (int)b << std::endl;
     }
@@ -102,7 +103,7 @@ class Screen{
         // default saturation & value are 50%
         unsigned char r,g,b;
         unsigned char a = 255;
-        HSVtoRGB(col, sat, val, &r, &g, &b);
+        HSVtoRGB(col, &r, &g, &b);
         currStroke = TPixel{r,g,b,a};
         //std::cout << (int)r << " " << (int)g << " " << (int)b << std::endl;
     }

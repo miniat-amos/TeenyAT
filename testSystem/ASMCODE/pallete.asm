@@ -3,7 +3,7 @@ JMP !main
 !Screen #8000
 
 !main
-    SET $a $z
+    SET $a 1
     SET $b $z
     SET $c $z
 !loop

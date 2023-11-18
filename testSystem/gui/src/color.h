@@ -1,37 +1,59 @@
+#ifndef COLOR_H
+#define COLOR_H
+
+
 #include <cmath>
-void HSVtoRGB(float H, float S,float V,unsigned char *red, unsigned char *green, unsigned char *blue){
-               
+int map(int num, int in_min, int in_max, int out_min, int out_max){
+    return (int)(num - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+}
+
+// Takes in a value from 0 -> 65536(2^16) and gives back the rgb to draw
+void HSVtoRGB(int H,unsigned char *red, unsigned char *green, unsigned char *blue){
+    
+				// Prevent bad values
+				H = H % 65537;
+				H = map(H,0,65536,-32768,32768);
+
+				int section = (int)std::floor(H / 8192);
+				// Pretty Jank but provents the only 4 section 'clips'
+				if((H >= -24607 && H <= -24607+31) ||
+				   (H >= -16415 && H <= -16415+31) ||
+				   (H >= -8223 && H <= -8223+31)   ||
+				   (H >= -31 && H <= -31+31)){
+					return;
+				}
+
                 *red = 0;
                 *green = 0;
-                *blue = 0;
-				int section = (int)floor(H / 8192);
-				int remainder = (int)floor(H) % 8192;
+                *blue = 0; 
+            
+				int remainder = (int)std::floor(H) % 8192;
 				switch (section)
 				{
 				case 0:
 					// just increasing blue
-					*blue = (int)round((remainder * 256) / 8192);
+					*blue = (int)std::round((remainder * 256) / 8192);
 					break;
 				case 1:
 					// max blue increasing green
 					*blue = 255;
-					*green = (int)round((remainder * 256) / 8192);
+					*green = (int)std::round((remainder * 256) / 8192);
 					break;
 				case 2:
 					// max green decreasing blue
 					*green = 255;
-					*blue = 255 - (int)round((remainder * 256) / 8192);
+					*blue = 255 - (int)std::round((remainder * 256) / 8192);
 					break;
 				case 3:
 					// max green increasing red
 					*green = 255;
-					*red = (int)round((remainder * 256) / 8192);
+					*red = (int)std::round((remainder * 256) / 8192);
 					break;
 				case -4:
 					// max red and green increasing blue
 					*red = 255;
 					*green = 255;
-					*blue = (int)round((remainder * 256) / 8192);
+					*blue = (int)std::round((remainder * 256) / 8192);
 					break;
 				case 4:
 					*green = *red = 255;
@@ -40,19 +62,22 @@ void HSVtoRGB(float H, float S,float V,unsigned char *red, unsigned char *green,
 					// max red and blue decreasing green
 					*red = 255;
 					*blue = 255;
-					*green = 255 - (int)round((remainder * 256) / 8192);
+					*green = 255 - (int)std::round((remainder * 256) / 8192);
 					break;
 				case -2:
 					// max red decreasing blue
 					*red = 255;
-					*blue = 255 - (int)round((remainder * 256) / 8192);
+					*blue = 255 - (int)std::round((remainder * 256) / 8192);
 					break;
 				case -1:
 					// decreasing red
-					*red = 255 - (int)round((remainder * 256) / 8192);
+					*red = 255 - (int)std::round((remainder * 256) / 8192);
 					break;
 				default:
-					std::cerr << "something went wrong calculating the section: " << H << " : " << section << std::endl;
+                    // Something went wrong ...
 					break;
 				}
 }
+
+
+#endif
