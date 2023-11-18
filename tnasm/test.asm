@@ -30,6 +30,7 @@
     psh -20              ;2
     psh r3 - 4          ;1
     psh r3              ;1
+    jGE !main
     psh r3 + 14         ;2
     str r4 + 3, r3      ;1
 
