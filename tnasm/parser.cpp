@@ -1032,6 +1032,12 @@ tny_uword token_to_opcode(int id) {
     case T_CMP:   result = TNY_OPCODE_CMP;   break;
     case T_DLY:   result = TNY_OPCODE_DLY;   break;
     case T_JMP:   result = TNY_OPCODE_JMP;   break;
+    case T_JE:    result = TNY_OPCODE_JMP;   break;
+    case T_JNE:   result = TNY_OPCODE_JMP;   break;
+    case T_JL:    result = TNY_OPCODE_JMP;   break;
+    case T_JLE:   result = TNY_OPCODE_JMP;   break;
+    case T_JG:    result = TNY_OPCODE_JMP;   break;
+    case T_JGE:   result = TNY_OPCODE_JMP;   break;
     case T_DJZ:   result = TNY_OPCODE_DJZ;   break;
     /*
      * The following are pseudo-instructions
