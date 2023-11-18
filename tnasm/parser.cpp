@@ -875,9 +875,22 @@ bool p_code_12_line() {
         tny_word &f = inst.first;
         f.instruction.opcode = token_to_opcode(oper->id);
         f.instruction.teeny = 1;
-        f.instruction.reg1 = TNY_REG_PC;
-        f.instruction.reg2 = sreg->value.u;
-        f.instruction.immed4 = 0;//TODO: needs a conversion from oper token to set these flags
+        f.instruction.reg1 = sreg->value.u;
+        f.instruction.reg2 = TNY_REG_ZERO;
+
+        f.instruction.immed4 = 0;
+        if(oper->id == T_JNE || oper->id == T_JG || oper->id == T_JGE) {
+            f.inst_flags.greater = 1;
+        }
+        if(oper->id == T_JNE || oper->id == T_JL || oper->id == T_JLE) {
+            f.inst_flags.less = 1;
+        }
+        if(oper->id == T_JE || oper->id == T_JLE || oper->id == T_JGE) {
+            f.inst_flags.equals = 1;
+        }
+        if(false) {
+            f.inst_flags.carry = 1;
+        }
 
         if(pass > 1) {
             bin_words.push_back(f);
