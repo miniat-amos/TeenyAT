@@ -450,7 +450,7 @@ bool p_code_1_line() {
        (sreg = term(T_REGISTER)) && term(T_EOL)) {
 
         instruction inst;
-        inst.line_no = dreg->line_no;
+        inst.line_no = oper->line_no;
 
         tny_word &f = inst.first;
         f.instruction.opcode = token_to_opcode(oper->id);
@@ -482,7 +482,7 @@ bool p_code_2_line() {
        term(T_EOL)) {
 
         instruction inst;
-        inst.line_no = dreg->line_no;
+        inst.line_no = oper->line_no;
 
         tny_word &f = inst.first;
         f.instruction.opcode = token_to_opcode(oper->id);
@@ -527,7 +527,7 @@ bool p_code_3_line() {
         term(T_EOL)) {
 
         instruction inst;
-        inst.line_no = dreg->line_no;
+        inst.line_no = oper->line_no;
 
         tny_word &f = inst.first;
         f.instruction.opcode = token_to_opcode(oper->id);
@@ -570,7 +570,7 @@ bool p_code_4_line() {
     if((oper = p_code_4_inst()) && (dreg = term(T_REGISTER)) && term(T_EOL)) {
 
         instruction inst;
-        inst.line_no = dreg->line_no;
+        inst.line_no = oper->line_no;
 
         tny_word &f = inst.first;
         f.instruction.opcode = token_to_opcode(oper->id);
@@ -601,7 +601,7 @@ bool p_code_5_line() {
     if((oper = p_code_5_inst()) && (dreg = term(T_REGISTER)) && term(T_EOL)) {
 
         instruction inst;
-        inst.line_no = dreg->line_no;
+        inst.line_no = oper->line_no;
 
         tny_word &f = inst.first;
         f.instruction.opcode = token_to_opcode(oper->id);
@@ -632,7 +632,7 @@ bool p_code_6_line() {
     (immed = p_immediate()) && term(T_COMMA) && (sreg = term(T_REGISTER)) && term(T_EOL)) {
 
         instruction inst;
-        inst.line_no = dreg->line_no;
+        inst.line_no = oper->line_no;
 
         tny_word &f = inst.first;
         f.instruction.opcode = token_to_opcode(oper->id);
@@ -677,7 +677,7 @@ bool p_code_7_line() {
        (sreg = term(T_REGISTER)) && term(T_EOL)) {
 
         instruction inst;
-        inst.line_no = sreg->line_no;
+        inst.line_no = oper->line_no;
 
         tny_word &f = inst.first;
         f.instruction.opcode = token_to_opcode(oper->id);
@@ -721,7 +721,7 @@ bool p_code_8_line() {
     if((oper = p_code_8_inst()) && (sreg = term(T_REGISTER)) && term(T_EOL)) {
 
         instruction inst;
-        inst.line_no = sreg->line_no;
+        inst.line_no = oper->line_no;
 
         tny_word &f = inst.first;
         f.instruction.opcode = token_to_opcode(oper->id);
@@ -753,7 +753,7 @@ bool p_code_9_line() {
         && (immed = p_immediate()) && term(T_EOL)) {
 
         instruction inst;
-        inst.line_no = sreg->line_no;
+        inst.line_no = oper->line_no;
 
         tny_word &f = inst.first;
         f.instruction.opcode = token_to_opcode(oper->id);
@@ -870,7 +870,7 @@ bool p_code_12_line() {
     if((oper = p_code_12_inst()) && (sreg = term(T_REGISTER)) && term(T_EOL)) {
 
         instruction inst;
-        inst.line_no = sreg->line_no;
+        inst.line_no = oper->line_no;
 
         tny_word &f = inst.first;
         f.instruction.opcode = token_to_opcode(oper->id);
@@ -913,7 +913,7 @@ bool p_code_13_line() {
        (sign = p_plus_or_minus()) && (immed = p_immediate()) && term(T_EOL)) {
 
         instruction inst;
-        inst.line_no = sreg->line_no;
+        inst.line_no = oper->line_no;
 
         tny_word &f = inst.first;
         f.instruction.opcode = token_to_opcode(oper->id);
