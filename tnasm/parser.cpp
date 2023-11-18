@@ -496,7 +496,7 @@ bool p_code_2_line() {
         bool make_teeny = is_teeny(inst.second.s);
         if(make_teeny) {
             f.instruction.immed4 = inst.second.s;
-            f.instruction.teeny = true;
+            f.instruction.teeny = 1;
             address++;
         }
         else {
@@ -541,7 +541,7 @@ bool p_code_3_line() {
         bool make_teeny = is_teeny(inst.second.s);
         if(make_teeny) {
             f.instruction.immed4 = inst.second.s;
-            f.instruction.teeny = true;
+            f.instruction.teeny = 1;
             address++;
         }
         else {
@@ -576,8 +576,6 @@ bool p_code_4_line() {
         f.instruction.opcode = token_to_opcode(oper->id);
         f.instruction.teeny = 1;
         f.instruction.reg1 = dreg->value.u;
-
-        // TODO: these are not used need a decision about how to set these to a predictable value
         f.instruction.reg2 = 0;
         f.instruction.immed4 = 0;
 
@@ -646,7 +644,7 @@ bool p_code_6_line() {
         bool make_teeny = is_teeny(inst.second.s);
         if(make_teeny) {
             f.instruction.immed4 = inst.second.s;
-            f.instruction.teeny = true;
+            f.instruction.teeny = 1;
             address++;
         }
         else {
@@ -691,7 +689,7 @@ bool p_code_7_line() {
         bool make_teeny = is_teeny(inst.second.s);
         if(make_teeny) {
             f.instruction.immed4 = inst.second.s;
-            f.instruction.teeny = true;
+            f.instruction.teeny = 1;
             address++;
         }
         else {
@@ -767,7 +765,7 @@ bool p_code_9_line() {
         bool make_teeny = is_teeny(inst.second.s);
         if(make_teeny) {
             f.instruction.immed4 = inst.second.s;
-            f.instruction.teeny = true;
+            f.instruction.teeny = 1;
             address++;
         }
         else {
@@ -811,7 +809,7 @@ bool p_code_10_line() {
         bool make_teeny = is_teeny(inst.second.s);
         if(make_teeny) {
             f.instruction.immed4 = inst.second.s;
-            f.instruction.teeny = true;
+            f.instruction.teeny = 1;
             address++;
         }
         else {
