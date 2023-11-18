@@ -15,7 +15,7 @@ void HSVtoRGB(int H,unsigned char *red, unsigned char *green, unsigned char *blu
 				H = map(H,0,65536,-32768,32768);
 
 				int section = (int)std::floor(H / 8192);
-				// Pretty Jank but provents the only 4 section 'clips'
+				// Pretty Jank but prevents the only 4 section 'clips'
 				if((H >= -24607 && H <= -24607+31) ||
 				   (H >= -16415 && H <= -16415+31) ||
 				   (H >= -8223 && H <= -8223+31)   ||
