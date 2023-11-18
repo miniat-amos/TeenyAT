@@ -43,6 +43,7 @@
     ;str SP - aero, amos
     rOt rB, !early ;2
 
+    JMP PC - 4
     STR aero, r6
     DLy r3 + 5
     DLy r5
@@ -53,4 +54,6 @@
 
     PSH PC - !more
     CAL rB + 0xF7
+
+    JNE rZ + !more
 ; and that's all

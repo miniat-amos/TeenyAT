@@ -53,6 +53,7 @@ bool p_code_9_line();
 bool p_code_10_line();
 bool p_code_11_line();
 bool p_code_12_line();
+bool p_code_13_line();
 
 tny_uword token_to_opcode(int id);
 
@@ -198,7 +199,8 @@ bool p_loc() {
            (tnext = save, p_code_9_line())   ||
            (tnext = save, p_code_10_line())  ||
            (tnext = save, p_code_11_line())  ||
-           (tnext = save, p_code_12_line());
+           (tnext = save, p_code_12_line())  ||
+           (tnext = save, p_code_13_line());
 }
 
 /*
@@ -878,6 +880,54 @@ bool p_code_12_line() {
         if(pass > 1) {
             bin_words.push_back(f);
         }
+
+        result = true;
+    }
+
+    return result;
+}
+
+/*
+ * code_13_line ::= code_13_inst REGISTER plus_or_minus immediate.
+ */
+bool p_code_13_line() {
+    bool result = false;
+    shared_ptr <token> oper, sreg, sign;
+    shared_ptr <tny_word> immed;
+    if((oper = p_code_13_inst()) && (sreg = term(T_REGISTER)) &&
+       (sign = p_plus_or_minus()) && (immed = p_immediate()) && term(T_EOL)) {
+
+        instruction inst;
+        inst.line_no = sreg->line_no;
+
+        tny_word &f = inst.first;
+        f.instruction.opcode = token_to_opcode(oper->id);
+        f.instruction.teeny = 0;
+        f.instruction.reg1 = sreg->value.u;
+        f.instruction.reg2 = TNY_REG_ZERO;
+
+        f.instruction.immed4 = 0;
+        if(oper->id == T_JNE || oper->id == T_JG || oper->id == T_JGE) {
+            f.inst_flags.greater = 1;
+        }
+        if(oper->id == T_JNE || oper->id == T_JL || oper->id == T_JLE) {
+            f.inst_flags.less = 1;
+        }
+        if(oper->id == T_JE || oper->id == T_JLE || oper->id == T_JGE) {
+            f.inst_flags.equals = 1;
+        }
+        if(false) {
+            f.inst_flags.carry = 1;
+        }
+
+        inst.second.s = immed->s * (sign->id == T_PLUS ? +1 : -1);
+
+        address += 2;
+
+        if(pass > 1) {
+            bin_words.push_back(f);
+            bin_words.push_back(inst.second);
+         }
 
         result = true;
     }
