@@ -30,28 +30,32 @@ label_line ::= LABEL.
 
 immediate ::= number.
 immediate ::= LABEL.
+immediate ::= IDENTIFIER.
 
-number ::= PLUS NUMBER.
-number ::= MINUS NUMBER.
+number ::= IDENTIFIER.
 number ::= NUMBER.
+number ::= plus_or_minus NUMBER.
+
+plus_or_minus ::= PLUS.
+plus_or_minus ::= MINUS.
 
 code_1_line ::= code_1_inst REGISTER COMMA REGISTER.
-code_2_line ::= code_2_inst REGISTER COMMA REGISTER add_or_subtract immediate.
+code_1_line ::= code_1_mem_inst REGISTER COMMA LBRACKET REGISTER RBRACKET.
+code_2_line ::= code_2_inst REGISTER COMMA REGISTER plus_or_minus immediate.
+code_2_line ::= code_2_inst REGISTER COMMA LBRACKET REGISTER plus_or_minus immediate RBRACKET.
 code_3_line ::= code_3_inst REGISTER COMMA immediate.
+code_3_line ::= code_3_mem_inst REGISTER COMMA LBRACKET immediate RBRACKET.
 code_4_line ::= code_4_inst REGISTER.
 code_5_line ::= code_5_inst REGISTER.
-code_6_line ::= code_6_inst REGISTER add_or_subtract immediate COMMA REGISTER.
-code_7_line ::= code_7_inst immediate COMMA REGISTER.
+code_6_line ::= code_6_inst LBRACKET REGISTER plus_or_minus immediate RBRACKET COMMA REGISTER.
+code_7_line ::= code_7_inst LBRACKET immediate RBRACKET COMMA REGISTER.
 code_8_line ::= code_8_inst REGISTER.
-code_9_line ::= code_9_inst REGISTER add_or_subtract immediate.
+code_9_line ::= code_9_inst REGISTER plus_or_minus immediate.
 code_10_line ::= code_10_inst immediate.
 code_11_line ::= code_11_inst.
 code_12_line ::= code_12_inst REGISTER.
-code_13_line ::= code_13_inst REGISTER add_or_subtract immediate.
+code_13_line ::= code_13_inst REGISTER plus_or_minus immediate.
 code_14_line ::= code_14_inst immediate.
-
-add_or_subtract ::= PLUS.
-add_or_subtract ::= MINUS.
 
 code_1_inst ::= ADD.
 code_1_inst ::= SUB.
@@ -64,11 +68,12 @@ code_1_inst ::= XOR.
 code_1_inst ::= SHF.
 code_1_inst ::= ROT.
 code_1_inst ::= SET.
-code_1_inst ::= LOD.
-code_1_inst ::= STR.
 code_1_inst ::= BTF.
 code_1_inst ::= CMP.
 code_1_inst ::= DJZ.
+
+code_1_mem_inst ::= LOD.
+code_1_mem_inst ::= STR.
 
 code_2_inst ::= ADD.
 code_2_inst ::= SUB.
@@ -81,10 +86,11 @@ code_2_inst ::= XOR.
 code_2_inst ::= SHF.
 code_2_inst ::= ROT.
 code_2_inst ::= SET.
-code_2_inst ::= LOD.
 code_2_inst ::= BTF.
 code_2_inst ::= CMP.
 code_2_inst ::= DJZ.
+
+code_2_mem_inst ::= LOD.
 
 code_3_inst ::= ADD.
 code_3_inst ::= SUB.
@@ -97,10 +103,11 @@ code_3_inst ::= XOR.
 code_3_inst ::= SHF.
 code_3_inst ::= ROT.
 code_3_inst ::= SET.
-code_3_inst ::= LOD.
 code_3_inst ::= BTF.
 code_3_inst ::= CMP.
 code_3_inst ::= DJZ.
+
+code_3_mem_inst ::= LOD.
 
 code_4_inst ::= NEG.
 code_4_inst ::= POP.
@@ -113,12 +120,15 @@ code_6_inst ::= STR.
 code_7_inst ::= STR.
 
 code_8_inst ::= PSH.
+code_8_inst ::= DLY.
 code_8_inst ::= CAL.
 
 code_9_inst ::= PSH.
+code_9_inst ::= DLY.
 code_9_inst ::= CAL.
 
 code_10_inst ::= PSH.
+code_10_inst ::= DLY.
 code_10_inst ::= CAL.
 
 code_11_inst ::= RET.
