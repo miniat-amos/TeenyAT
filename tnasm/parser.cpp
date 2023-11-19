@@ -653,14 +653,15 @@ bool p_code_5_line() {
 }
 
 /*
- * code_6_line ::= code_6_inst REGISTER plus_or_minus immediate COMMA REGISTER.
+ * code_6_line ::= code_6_inst LBRACKET REGISTER plus_or_minus immediate RBRACKET COMMA REGISTER.
  */
 bool p_code_6_line() {
     bool result = false;
     shared_ptr <token> dreg, oper, sreg, sign;
     shared_ptr <tny_word> immed;
-    if((oper = p_code_6_inst()) && (dreg = term(T_REGISTER)) && (sign = p_plus_or_minus()) &&
-    (immed = p_immediate()) && term(T_COMMA) && (sreg = term(T_REGISTER)) && term(T_EOL)) {
+    if((oper = p_code_6_inst()) && term(T_LBRACKET) && (dreg = term(T_REGISTER)) &&
+       (sign = p_plus_or_minus()) && (immed = p_immediate()) && term(T_RBRACKET) &&
+       term(T_COMMA) && (sreg = term(T_REGISTER)) && term(T_EOL)) {
 
         instruction inst;
         inst.line_no = oper->line_no;
