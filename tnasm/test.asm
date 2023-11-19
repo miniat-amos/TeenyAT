@@ -57,6 +57,7 @@
     CAL rB + 0xF7
 
     lod r5, [r1 - Amos]
+    lod PC, aero
 
     JNE rZ + !more
 ; and that's all

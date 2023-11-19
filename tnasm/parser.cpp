@@ -63,6 +63,7 @@ shared_ptr <token> p_code_1_mem_inst();
 shared_ptr <token> p_code_2_inst();
 shared_ptr <token> p_code_2_mem_inst();
 shared_ptr <token> p_code_3_inst();
+shared_ptr <token> p_code_3_mem_inst();
 shared_ptr <token> p_code_4_inst();
 shared_ptr <token> p_code_5_inst();
 shared_ptr <token> p_code_6_inst();
@@ -540,13 +541,23 @@ bool p_code_2_line() {
 
 /*
  * code_3_line ::= code_3_inst REGISTER COMMA immediate.
+ * code_3_line ::= code_3_mem_inst REGISTER COMMA LBRACKET immediate RBRACKET.
  */
 bool p_code_3_line() {
     bool result = false;
     shared_ptr <token> dreg, oper;
     shared_ptr <tny_word> immed;
-    if((oper = p_code_3_inst()) && (dreg = term(T_REGISTER)) && term(T_COMMA) && (immed = p_immediate()) &&
-        term(T_EOL)) {
+    int save = tnext;
+    if(
+        (tnext = save,
+         (oper = p_code_3_inst()) && (dreg = term(T_REGISTER)) && term(T_COMMA) &&
+         (immed = p_immediate()) && term(T_EOL))
+        ||
+        (tnext = save,
+         (oper = p_code_3_mem_inst()) && (dreg = term(T_REGISTER)) && term(T_COMMA) &&
+         term(T_LBRACKET) && (immed = p_immediate()) && term(T_RBRACKET) &&
+         term(T_EOL))
+    ) {
 
         instruction inst;
         inst.line_no = oper->line_no;
@@ -1206,6 +1217,18 @@ shared_ptr <token> p_code_3_inst() {
     (tnext = save, result = term(T_BTF)) ||
     (tnext = save, result = term(T_CMP)) ||
     (tnext = save, result = term(T_DJZ));
+
+    return result;
+}
+
+/*
+ * code_3_mem_inst ::= LOD.
+ */
+shared_ptr <token> p_code_3_mem_inst() {
+    shared_ptr <token> result;
+    int save = tnext;
+
+    (tnext = save, result = term(T_LOD));
 
     return result;
 }

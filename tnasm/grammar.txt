@@ -44,6 +44,7 @@ code_1_line ::= code_1_mem_inst REGISTER COMMA LBRACKET REGISTER RBRACKET.
 code_2_line ::= code_2_inst REGISTER COMMA REGISTER plus_or_minus immediate.
 code_2_line ::= code_2_inst REGISTER COMMA LBRACKET REGISTER plus_or_minus immediate RBRACKET.
 code_3_line ::= code_3_inst REGISTER COMMA immediate.
+code_3_line ::= code_3_mem_inst REGISTER COMMA LBRACKET immediate RBRACKET.
 code_4_line ::= code_4_inst REGISTER.
 code_5_line ::= code_5_inst REGISTER.
 code_6_line ::= code_6_inst REGISTER plus_or_minus immediate COMMA REGISTER.
@@ -102,10 +103,11 @@ code_3_inst ::= XOR.
 code_3_inst ::= SHF.
 code_3_inst ::= ROT.
 code_3_inst ::= SET.
-code_3_inst ::= LOD.
 code_3_inst ::= BTF.
 code_3_inst ::= CMP.
 code_3_inst ::= DJZ.
+
+code_3_mem_inst ::= LOD.
 
 code_4_inst ::= NEG.
 code_4_inst ::= POP.
