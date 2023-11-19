@@ -85,10 +85,11 @@ code_2_inst ::= XOR.
 code_2_inst ::= SHF.
 code_2_inst ::= ROT.
 code_2_inst ::= SET.
-code_2_inst ::= LOD.
 code_2_inst ::= BTF.
 code_2_inst ::= CMP.
 code_2_inst ::= DJZ.
+
+code_2_mem_inst ::= LOD.
 
 code_3_inst ::= ADD.
 code_3_inst ::= SUB.
