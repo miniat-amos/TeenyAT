@@ -74,7 +74,7 @@ int main(int argc, char *argv[]) {
 	filesystem::path bin_filename = asm_filename.filename().replace_extension(".bin");
 
 	vector <string> asm_lines;
-	read_file(asm_filename, asm_lines);
+	read_file(asm_filename.string(), asm_lines);
 
 	vector <token_regex> patterns;
 	initialize_lexical_regex(patterns);
