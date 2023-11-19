@@ -56,5 +56,7 @@
     PSH PC - !more
     CAL rB + 0xF7
 
+    lod r5, [r1 - Amos]
+
     JNE rZ + !more
 ; and that's all

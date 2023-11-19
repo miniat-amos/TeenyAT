@@ -42,6 +42,7 @@ plus_or_minus ::= MINUS.
 code_1_line ::= code_1_inst REGISTER COMMA REGISTER.
 code_1_line ::= code_1_mem_inst REGISTER COMMA LBRACKET REGISTER RBRACKET.
 code_2_line ::= code_2_inst REGISTER COMMA REGISTER plus_or_minus immediate.
+code_2_line ::= code_2_inst REGISTER COMMA LBRACKET REGISTER plus_or_minus immediate RBRACKET.
 code_3_line ::= code_3_inst REGISTER COMMA immediate.
 code_4_line ::= code_4_inst REGISTER.
 code_5_line ::= code_5_inst REGISTER.
