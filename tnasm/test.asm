@@ -45,7 +45,7 @@
     rOt rB, !early ;2
 
     JMP PC - 4
-    STR aero, r6
+    STR [aero], r6
     DLy r3 + 5
     DLy r5
     DLy 31
