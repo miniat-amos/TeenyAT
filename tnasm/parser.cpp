@@ -443,6 +443,7 @@ bool is_teeny(tny_sword n) {
 
 /*
  * code_1_line ::= code_1_inst REGISTER COMMA REGISTER.
+ * code_1_line ::= code_1_mem_inst REGISTER COMMA LBRACKET REGISTER RBRACKET.
  */
 bool p_code_1_line() {
     bool result = false;
