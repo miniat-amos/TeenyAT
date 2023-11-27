@@ -5,8 +5,8 @@
 #include <ctime>
 #include <sstream>
 #include <cstdint>
-#include "../tigr.h"
 #include <vector>
+#include "tigr.h"
 #include "color.h"
 
 class Screen{

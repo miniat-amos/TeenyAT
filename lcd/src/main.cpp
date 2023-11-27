@@ -7,9 +7,9 @@
 
 #include <iostream>
 #include <cstdlib>
-#include "../tigr.h"
+#include "tigr.h"
 #include "Screen.h"
-#include "../../../teenyat.h"
+#include "teenyat.h"
 #include "util.h"
 
 #define LIVESCREEN 0x8000
