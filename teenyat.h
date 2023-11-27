@@ -82,46 +82,46 @@ typedef void(*TNY_WRITE_TO_BUS_FNPTR)(teenyat *t, tny_uword addr, tny_word data,
 
 union tny_word {
 	struct {
-		int16_t immed4  : 4;
-		uint16_t reg2   : 3;
-		uint16_t reg1   : 3;
-		uint16_t teeny  : 1;
-		uint16_t opcode : 5;
+		tny_sword immed4  : 4;
+		tny_uword reg2   : 3;
+		tny_uword reg1   : 3;
+		tny_uword teeny  : 1;
+		tny_uword opcode : 5;
 	} instruction;
 
 	struct {
-		uint16_t greater  : 1;
-		uint16_t less     : 1;
-		uint16_t equals   : 1;
-		uint16_t carry    : 1;
-		uint16_t reserved : 12;
+		tny_uword greater  : 1;
+		tny_uword less     : 1;
+		tny_uword equals   : 1;
+		tny_uword carry    : 1;
+		tny_uword reserved : 12;
 	} inst_flags;
 
 	struct {
-		uint16_t byte0 : 8;
-		uint16_t byte1 : 8;
+		tny_uword byte0 : 8;
+		tny_uword byte1 : 8;
 	} bytes;
 
 	tny_uword u;
 	tny_sword s;
 
 	struct {
-		uint16_t bit0  : 1;
-		uint16_t bit1  : 1;
-		uint16_t bit2  : 1;
-		uint16_t bit3  : 1;
-		uint16_t bit4  : 1;
-		uint16_t bit5  : 1;
-		uint16_t bit6  : 1;
-		uint16_t bit7  : 1;
-		uint16_t bit8  : 1;
-		uint16_t bit9  : 1;
-		uint16_t bit10 : 1;
-		uint16_t bit11 : 1;
-		uint16_t bit12 : 1;
-		uint16_t bit13 : 1;
-		uint16_t bit14 : 1;
-		uint16_t bit15 : 1;
+		tny_uword bit0  : 1;
+		tny_uword bit1  : 1;
+		tny_uword bit2  : 1;
+		tny_uword bit3  : 1;
+		tny_uword bit4  : 1;
+		tny_uword bit5  : 1;
+		tny_uword bit6  : 1;
+		tny_uword bit7  : 1;
+		tny_uword bit8  : 1;
+		tny_uword bit9  : 1;
+		tny_uword bit10 : 1;
+		tny_uword bit11 : 1;
+		tny_uword bit12 : 1;
+		tny_uword bit13 : 1;
+		tny_uword bit14 : 1;
+		tny_uword bit15 : 1;
 	} bits;
 };
 
@@ -209,7 +209,7 @@ struct teenyat {
 #define TNY_OPCODE_CMP 20
 #define TNY_OPCODE_JMP 21
 #define TNY_OPCODE_DJZ 22
-#define TNY_OPCODE_DEL 23
+#define TNY_OPCODE_DLY 23
 
 #define TNY_REG_PC   0
 #define TNY_REG_SP   1

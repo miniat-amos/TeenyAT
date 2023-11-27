@@ -34,7 +34,14 @@ enum token_type {
     T_ROT,
     T_NEG,
     T_CMP,
+    T_DLY,
     T_JMP,
+    T_JE,
+    T_JNE,
+    T_JL,
+    T_JLE,
+    T_JG,
+    T_JGE,
     T_DJZ,
     T_INC,
     T_DEC,
@@ -49,7 +56,7 @@ enum token_type {
     T_BAD
 };
 
-string tstr[] = {
+inline string tstr[] = {
     "T_IGNORE",
     "T_EOL",
     "T_LABEL",
@@ -77,7 +84,14 @@ string tstr[] = {
     "T_ROT",
     "T_NEG",
     "T_CMP",
+    "T_DLY",
     "T_JMP",
+    "T_JE",
+    "T_JNE",
+    "T_JL",
+    "T_JLE",
+    "T_JG",
+    "T_JGE",
     "T_DJZ",
     "T_INC",
     "T_DEC",

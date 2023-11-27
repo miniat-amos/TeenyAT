@@ -420,7 +420,7 @@ void tny_clock(teenyat *t) {
 			set_pc(t, t->reg[reg2].s + immed);
 		}
 		break;
-	case TNY_OPCODE_DEL:
+	case TNY_OPCODE_DLY:
 		{
 			tny_sword delay_cnt = t->reg[reg2].s + immed;
 			if(delay_cnt >= 1) {

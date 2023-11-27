@@ -8,4 +8,12 @@ Thumbs.db
 *.out
 *.exe
 
+# IDE stuff
+*.dSYM
+.vscode
+
+# IDE stuff
+*.dSYM
+.vscode
+
 .vscode
