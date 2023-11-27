@@ -10,7 +10,7 @@ else
 	endif
 endif
 
-buildWin: src/main.cpp tigr.c ../../teenyat.c
+buildWin: src/main.cpp src/util.cpp src/color.cpp tigr.c ../../teenyat.c
 	g++ $^ -Os -o ../bin/system.exe $(CFLAGS) $(LDFLAGS) 
 
 buildLinux: src/main.cpp tigr.c ../../teenyat.c
