@@ -54,7 +54,7 @@
 
     STR [X2], rA
 
-    CAL !rand_rA_-10...+10
+    CAL !rand_rA_-10...+10 ; function call
     LOD rB, [Y2]
     ADD rA, rB
 

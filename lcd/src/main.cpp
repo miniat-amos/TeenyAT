@@ -46,7 +46,7 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    initScreen(3636);
+    initScreen(2903);
 
     std::string fileName = argv[1];
     teenyat t;
@@ -56,6 +56,9 @@ int main(int argc, char *argv[])
     {
         success = true;
         tny_init_from_file(&t, bin_file, bus_read, bus_write);
+    }else{
+        std::cout << "Failed to init bin file (invalid path?)" << std::endl;
+        return 0;
     }
 
     while (!tigrClosed(window) && !tigrKeyDown(window, TK_ESCAPE))

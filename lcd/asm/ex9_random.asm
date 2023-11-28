@@ -24,12 +24,13 @@
     SET rD, rZ
     STR [UPDATE], rZ
 !loop
-    ; get random x and y values
+    ;; get random x and y values
     LOD rA, [RAND]
     MOD rA, 64
     LOD rB, [RAND]
     MOD rB, 64
-    ; get random color valye
+
+    ;; get random color valye
     LOD rC, [RAND]
     STR [STROKE], rC
 
