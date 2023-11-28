@@ -62,11 +62,6 @@ void HSVtoRGB(int H, unsigned char *red, unsigned char *green, unsigned char *bl
       *red = RGB_MAX_VALUE - (int)std::round((remainder * RGB_RESOLUTION) / COLORS_PER_SECTION);
       break;
    case 8: // shouldn't really end up here either
-
-      // Something went wrong ...
-      std::cout << "error with color section: " << section << std::endl;
-      std::cout << "remainder ended up: " << remainder << std::endl;
-      break;
    default:
       // Something went wrong ...
       std::cout << "error with color section: " << section << std::endl;

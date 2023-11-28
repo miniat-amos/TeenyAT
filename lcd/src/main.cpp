@@ -8,7 +8,7 @@
 #include <iostream>
 #include <cstdlib>
 #include "tigr.h"
-#include "Screen.h"
+#include "screen.h"
 #include "teenyat.h"
 #include "util.h"
 
@@ -34,7 +34,7 @@
 
 void bus_read(teenyat *t, tny_uword addr, tny_word *data, uint16_t *delay);
 void bus_write(teenyat *t, tny_uword addr, tny_word data, uint16_t *delay);
-bool resized = false;
+bool regridLengthd = false;
 
 // Screen to write too
 int main(int argc, char *argv[])
@@ -46,7 +46,7 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    Screen s(3636);
+    initScreen(3636);
 
     std::string fileName = argv[1];
     teenyat t;
@@ -57,42 +57,36 @@ int main(int argc, char *argv[])
         success = true;
         tny_init_from_file(&t, bin_file, bus_read, bus_write);
     }
-    t.ex_data = &s;
 
-    while (!tigrClosed(s.window) && !tigrKeyDown(s.window, TK_ESCAPE))
+    while (!tigrClosed(window) && !tigrKeyDown(window, TK_ESCAPE))
     {
 
-        tigrMouse(s.window, &s.mouseX, &s.mouseY, &s.mouseButton);
+        tigrMouse(window, &mouseX, &mouseY, &mouseButton);
         // std::cout << s.mouseX << " " << s.mouseY << std::endl;
         tny_clock(&t);
     }
 
-    tigrFree(s.window);
+    tigrFree(window);
     fclose(bin_file);
     return EXIT_SUCCESS;
 }
 
 void bus_read(teenyat *t, tny_uword addr, tny_word *data, uint16_t *delay)
 {
-
-    Screen *s = (Screen *)t->ex_data;
     *delay = 0;
-    if (s == NULL)
-        return;
-
     // Handle pixel screen reads
     if (addr >= UPDATESCREEN && addr <= (UPDATESCREEN + 0xFFF))
     {
-        int index = map(addr, UPDATESCREEN, (UPDATESCREEN + 0xFFF), 0, (s->size * s->size) - 1);
-        data->u = s->update_screen[index];
+        int index = map(addr, UPDATESCREEN, (UPDATESCREEN + 0xFFF), 0, (gridLength * gridLength) - 1);
+        data->u = update_screen[index];
         *delay = 1;
         return;
     }
 
     if (addr >= LIVESCREEN && addr <= (LIVESCREEN + 0xFFF))
     {
-        int index = map(addr, LIVESCREEN, (LIVESCREEN + 0xFFF), 0, (s->size * s->size) - 1);
-        data->u = s->live_screen[index];
+        int index = map(addr, LIVESCREEN, (LIVESCREEN + 0xFFF), 0, (gridLength * gridLength) - 1);
+        data->u = live_screen[index];
         *delay = 2;
         return;
     }
@@ -100,37 +94,37 @@ void bus_read(teenyat *t, tny_uword addr, tny_word *data, uint16_t *delay)
     switch (addr)
     {
     case X1:
-        data->u = s->x1;
+        data->u = x1;
         break;
     case Y1:
-        data->u = s->y1;
+        data->u = y1;
         break;
     case X2:
-        data->u = s->x2;
+        data->u = x2;
         break;
     case Y2:
-        data->u = s->y2;
+        data->u = y2;
         break;
     case STROKE:
-        data->u = s->currStrokeColor;
+        data->u = currStrokeColor;
         break;
     case FILL:
-        data->u = s->currFillColor;
+        data->u = currFillColor;
         break;
     case DRAWFILL:
-        data->u = s->drawFill;
+        data->u = drawFill;
         break;
     case DRAWSTROKE:
-        data->u = s->drawStroke;
+        data->u = drawStroke;
         break;
     case RAND:
-        data->u = s->rand16();
+        data->u = rand16();
         break;
     case MOUSEX:
-        data->u = (uint16_t)(s->mouseX / s->res);
+        data->u = (uint16_t)(mouseX / res);
         break;
     case MOUSEY:
-        data->u = (uint16_t)(s->mouseY / s->res);
+        data->u = (uint16_t)(mouseY / res);
         break;
     default:
         // apply lag spike for a read from an unused address
@@ -143,67 +137,62 @@ void bus_read(teenyat *t, tny_uword addr, tny_word *data, uint16_t *delay)
 
 void bus_write(teenyat *t, tny_uword addr, tny_word data, uint16_t *delay)
 {
-
-    Screen *s = (Screen *)t->ex_data;
     *delay = 0;
-    if (s == NULL)
-        return;
-
     // Handle pixel screen writes
     if (addr >= UPDATESCREEN && addr <= (UPDATESCREEN + 0xFFF))
     {
-        int index = map(addr, UPDATESCREEN, (UPDATESCREEN + 0xFFF), 0, (s->size * s->size) - 1);
-        s->update_screen[index] = data.u;
+        int index = map(addr, UPDATESCREEN, (UPDATESCREEN + 0xFFF), 0, (gridLength * gridLength) - 1);
+        update_screen[index] = data.u;
         *delay = 0;
         return;
     }
 
     if (addr >= LIVESCREEN && addr <= (LIVESCREEN + 0xFFF))
     {
-        int index = map(addr, LIVESCREEN, (LIVESCREEN + 0xFFF), 0, (s->size * s->size) - 1);
-        s->live_screen[index] = data.u;
+        int index = map(addr, LIVESCREEN, (LIVESCREEN + 0xFFF), 0, (gridLength * gridLength) - 1);
+        live_screen[index] = data.u;
         *delay = 2;
-        s->render();
+        render();
         return;
     }
 
     switch (addr)
     {
     case X1:
-        s->setVal(data.u, &s->x1);
+        setVal(data.u, &x1);
         break;
     case Y1:
-        s->setVal(data.u, &s->y1);
+        setVal(data.u, &y1);
         break;
     case X2:
-        s->setVal(data.u, &s->x2);
+        setVal(data.u, &x2);
         break;
     case Y2:
-        s->setVal(data.u, &s->y2);
+        setVal(data.u, &y2);
         break;
     case STROKE:
-        s->setStroke(data.u);
+        setStroke(data.u);
         break;
     case FILL:
-        s->setFill(data.u);
+        setFill(data.u);
         break;
     case DRAWFILL:
-        s->setVal(data.u, &s->drawFill);
+        setVal(data.u, &drawFill);
         break;
     case DRAWSTROKE:
-        s->setVal(data.u, &s->drawStroke);
+        setVal(data.u, &drawStroke);
         break;
     case UPDATE:
-        s->update();
+        update();
         break;
     case RECT:
-        s->rect();
+        rect();
         break;
     case LINE:
-        s->line();
+        line();
         break;
     case POINT:
-        s->point();
+        point();
         break;
     default:
         // apply a lag spike for a write to an unused address
