@@ -18,7 +18,7 @@
 .const TERM 0xFFFF
 .const KEY 0xFFFE
 
-.const AMT 1029
+.const AMT 65
 
 !main
     SET rA, 63
