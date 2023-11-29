@@ -29,6 +29,7 @@
 #define POINT 0xE012 // use x1 & y1 and stroke color
 #define MOUSEX 0xFFFC
 #define MOUSEY 0xFFFD
+#define MOUSEB 0xFFFB // return the mouse input
 #define TERM 0xFFFF
 #define KEY 0xFFFE
 
@@ -65,7 +66,6 @@ int main(int argc, char *argv[])
     {
 
         tigrMouse(window, &mouseX, &mouseY, &mouseButton);
-        // std::cout << s.mouseX << " " << s.mouseY << std::endl;
         tny_clock(&t);
     }
 
@@ -128,6 +128,9 @@ void bus_read(teenyat *t, tny_uword addr, tny_word *data, uint16_t *delay)
         break;
     case MOUSEY:
         data->u = (uint16_t)(mouseY / res);
+        break;
+    case MOUSEB:
+        data->u = mouseButton;
         break;
     default:
         // apply lag spike for a read from an unused address

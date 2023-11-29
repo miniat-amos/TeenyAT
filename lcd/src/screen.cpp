@@ -28,9 +28,6 @@ uint16_t currFillColor = 0;
 const int gridLength = 64;
 // 354 - lightLavender 
 double hue = 3636;
-// 1150 - orig
-double sat = 27;
-double val = 100;
 // Resoulution of each pixel
 double res = (double) Window_WIDTH / gridLength;
 
@@ -192,6 +189,7 @@ void line() {
         y += sy;
       }
     }
+    update_screen[y2 * gridLength + x2] = currStrokeColor;
   }
 }
 
