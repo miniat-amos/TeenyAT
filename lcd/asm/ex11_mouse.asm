@@ -20,6 +20,7 @@
 .const KEY 0xFFFE
 
 .const MUTATEAMT 50
+.const CHANGEAMT 50
 
 SET rD, 0
 !main
@@ -52,11 +53,11 @@ SET rD, 0
     JMP !main
 
 !changecolor
-    ADD rD, 50
+    ADD rD, CHANGEAMT
     JMP !main
 
 !changecolor_and_paint
-    ADD rD, 50
+    ADD rD, CHANGEAMT
     STR [X1], rA
     STR [Y1], rB
     STR [STROKE], rD
