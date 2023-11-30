@@ -66,14 +66,12 @@ SET rD, 0
 
 !mutate
     SET rA, 0
-    SET rB, UPDATESCREEN
     !loop
 
         LOD rC, [MOUSEB]
         CMP rC, 2 ; middle down
         JNE !main
-
-        ADD rB, rA
+        
         LOD rE, [rA + UPDATESCREEN]
         ADD rE, MUTATEAMT
         STR [rA + UPDATESCREEN], rE
