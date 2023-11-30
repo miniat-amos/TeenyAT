@@ -29,7 +29,7 @@
 #define POINT 0xE012 // use x1 & y1 and stroke color
 #define MOUSEX 0xFFFC
 #define MOUSEY 0xFFFD
-#define MOUSEB 0xFFFB // return the mouse input
+#define MOUSEB 0xFFFB // return the mouse input 0->7
 #define TERM 0xFFFF
 #define KEY 0xFFFE
 

@@ -63,17 +63,6 @@ uint16_t update_screen[gridLength * gridLength] = {
   0
 };
 
-void initScreen(double v) {
-  hue = v;
-  srand(time(nullptr));
-  window = tigrWindow(Window_WIDTH, Window_HEIGHT, "Test Program", 0);
-  // Create renderer and initialize update_screen to lavender
-  for (int i = 0; i < gridLength * gridLength; i++) {
-    live_screen[i] = hue;
-    update_screen[i] = hue;
-  }
-}
-
 void point() {
   int index = y1 * gridLength + x1;
   update_screen[index] = currStrokeColor;
@@ -239,4 +228,17 @@ void update() {
   }
   render();
 }
+
+void initScreen(double v) {
+  hue = v;
+  srand(time(nullptr));
+  window = tigrWindow(Window_WIDTH, Window_HEIGHT, "Test Program", 0);
+  // Create renderer and initialize update_screen to lavender
+  for (int i = 0; i < gridLength * gridLength; i++) {
+    live_screen[i] = hue;
+    update_screen[i] = hue;
+  }
+  render();
+}
+
 #endif
