@@ -28,7 +28,7 @@
 .const MOUSE_LRC 7 
 
 .const MUTATEAMT 50
-.const CHANGEAMT 50
+.const COLORAMT 50
 
 SET rD, 0
 !main
@@ -64,11 +64,11 @@ SET rD, 0
     JMP !main
 
 !changecolor
-    ADD rD, CHANGEAMT
+    ADD rD, COLORAMT
     JMP !main
 
 !changecolor_and_paint
-    ADD rD, CHANGEAMT
+    ADD rD, COLORAMT
     STR [X1], rA
     STR [Y1], rB
     STR [STROKE], rD
