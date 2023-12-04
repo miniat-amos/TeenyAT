@@ -23,19 +23,22 @@ variable_line ::= VARIABLE IDENTIFIER immediate.
 
 constant_line ::= CONSTANT IDENTIFIER immediate.
 
-raw_line ::= raw_line number.
-raw_line ::= number.
+raw_line ::= raw_line raw_value.
+raw_line ::= raw_value.
+
+raw_value ::= number.
+raw_value ::= CHARACTER.
 
 label_line ::= LABEL.
 
 immediate ::= number.
 immediate ::= LABEL.
 immediate ::= IDENTIFIER.
+immediate ::= CHARACTER.
 
 number ::= IDENTIFIER.
 number ::= NUMBER.
 number ::= plus_or_minus NUMBER.
-number ::= CHARACTER
 
 plus_or_minus ::= PLUS.
 plus_or_minus ::= MINUS.
