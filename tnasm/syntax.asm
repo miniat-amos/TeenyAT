@@ -25,7 +25,7 @@
 .var age 27
 .variable count
 
-;--- Common Instruction formats
+;--- Common Instruction formats 
 ; The great majority of instructions have three main forms supported by tnasm.
 ; These forms are differentiated by whether a particular operand is a register,
 ; an immediate, or a register added to an immediate.  Not all instructions can

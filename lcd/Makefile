@@ -15,12 +15,12 @@ else
 endif
 
 all:
-	gcc -c src/tigr.c -o tigr.o $(CFLAGS) 
+	gcc -c tigr.c -o tigr.o $(CFLAGS) 
 	gcc -c ../teenyat.c -o teenyat.o $(CFLAGS)
-	g++ -c src/color.cpp -o color.o $(CPPFLAGS)
-	g++ -c src/util.cpp -o util.o $(CPPFLAGS)
-	g++ -c src/screen.cpp -o screen.o $(CPPFLAGS)
-	g++ -c src/main.cpp -o main.o $(CPPFLAGS)
+	g++ -c color.cpp -o color.o $(CPPFLAGS)
+	g++ -c util.cpp -o util.o $(CPPFLAGS)
+	g++ -c screen.cpp -o screen.o $(CPPFLAGS)
+	g++ -c main.cpp -o main.o $(CPPFLAGS)
 	g++ tigr.o screen.o teenyat.o main.o color.o util.o -o ./bin/system $(LDFLAGS)
 
 clean:
