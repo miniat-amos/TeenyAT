@@ -14,7 +14,7 @@
  *  - read/write
  *  - any writes to this address automatically renders to the lcd
  *  
- *  UPDATESCREEN:
+ *  UPDATESCREENxxxx:
  *  - 0x9000 -- 0x9FFF each address is 1 pixel in a 64x64 lcd grid
  *  - read/write
  *  - any reads/writes to the update screen work with an off screen buffer
@@ -38,24 +38,24 @@
  *  STROKE:
  *  - 0xD010
  *  - read/write
- *  - on write sets the stroke color used by other memory addresses
+ *  - on write sets the stroke color used by other functions
  *  - on read sends back the current stroke color
  * 
  *  FILL:
  *  - 0xD011
  *  - read/write
- *  - on write sets the current fill color used by other memory addresses
+ *  - on write sets the current fill color used by other functions
  *  - on read sends back the current fill color
  *  
  *  DRAWFILL:
  *  - 0xD012
  *  - read/write
- *  - if non zero will draw fill 
+ *  - used by fillable draw functions such as RECT
  * 
  *  DRAWSTROKE:
  *  - 0xD013
  *  - read/write
- *  - if non zero will draw srtoke 
+ *  - used by fuctions such as LINE
  * 
  *  RAND:
  *  - 0xD700
@@ -77,7 +77,6 @@
  *  - 0xE011
  *  - write only
  *  - draws a line to update buffer using X1,Y2 & X2,Y2 
- *  - if DRAWSTROKE is zero will not draw the line
  *  - color is based on STROKE
  *  
  *  POINT:
@@ -164,6 +163,7 @@ int main(int argc, char *argv[])
     if(bin_file != NULL) {
         success = true;
         tny_init_from_file(&t, bin_file, bus_read, bus_write);
+        fclose(bin_file);
     }else {
         std::cout << "Failed to init bin file (invalid path?)" << std::endl;
         return 0;
@@ -176,26 +176,21 @@ int main(int argc, char *argv[])
     }
 
     tigrFree(window);
-    fclose(bin_file);
     return EXIT_SUCCESS;
 }
 
 void bus_read(teenyat *t, tny_uword addr, tny_word *data, uint16_t *delay)
 {
-    *delay = 0;
-
     /* Handles pixel screen reads */
     if(addr >= UPDATESCREEN_START && addr <= UPDATESCREEN_END) {
         int index = map(addr, UPDATESCREEN_START, UPDATESCREEN_END, 0, (gridLength * gridLength) - 1);
         data->u = update_screen[index];
-        *delay = 1;
         return;
     }
 
     if(addr >= LIVESCREEN_START && addr <= LIVESCREEN_END) {
         int index = map(addr, LIVESCREEN_START, LIVESCREEN_END, 0, (gridLength * gridLength) - 1);
         data->u = live_screen[index];
-        *delay = 2;
         return;
     }
 
@@ -237,9 +232,6 @@ void bus_read(teenyat *t, tny_uword addr, tny_word *data, uint16_t *delay)
         data->u = mouseButton;
         break;
     default:
-        // apply lag spike for a read from an unused addpixelSizes
-        data->u = 0;
-        *delay = 20;
         break;
     }
     return;
@@ -247,19 +239,17 @@ void bus_read(teenyat *t, tny_uword addr, tny_word *data, uint16_t *delay)
 
 void bus_write(teenyat *t, tny_uword addr, tny_word data, uint16_t *delay)
 {
-    *delay = 0;
     
+    /* Handles pixel screen writes */
     if(addr >= UPDATESCREEN_START && addr <= UPDATESCREEN_END) {
         int index = map(addr, UPDATESCREEN_START, UPDATESCREEN_END, 0, (gridLength * gridLength) - 1);
         update_screen[index] = data.u;
-        *delay = 0;
         return;
     }
 
     if(addr >= LIVESCREEN_START && addr <= LIVESCREEN_END) {
         int index = map(addr, LIVESCREEN_START, LIVESCREEN_END, 0, (gridLength * gridLength) - 1);
         live_screen[index] = data.u;
-        *delay = 2;
         render();
         return;
     }
@@ -302,8 +292,6 @@ void bus_write(teenyat *t, tny_uword addr, tny_word data, uint16_t *delay)
         point();
         break;
     default:
-        // apply a lag spike for a write to an unused addpixelSizes
-        *delay = 20;
         break;
     }
     return;

@@ -100,7 +100,7 @@ SET rD, 0
     CMP rC, MOUSE_RC ; so they cant just keep resetting it over and over
     JNE !main
     !reset_screen_loop    
-        SET rE, 2903 ; our original lavender color
+        SET rE, 0xA81 ; our original lavender color
         STR [rA + UPDATESCREEN], rE
         INC rA
         CMP rA, 0x1000

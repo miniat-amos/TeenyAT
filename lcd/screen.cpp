@@ -41,46 +41,51 @@ TPixel currStroke = TPixel {
   255
 };
 
-//Start 0x8000 - 0x8FFF
 uint16_t live_screen[gridLength * gridLength] = {
   0
 };
 
-//Start 0x9000 - 0x9FFF
 uint16_t update_screen[gridLength * gridLength] = {
   0
 };
 
 void point() {
+
   int index = y1 * gridLength + x1;
   update_screen[index] = currStrokeColor;
 }
 
 uint16_t rand16() {
+
   return (uint16_t)(rand() << 1) ^ rand();
 }
 
 void noFill() {
+
   drawFill = 0;
 }
 
 void noStroke() {
+
   drawStroke = 0;
 }
 
-// setFill and setStroke are used by main.cpp 
+/* setFill and setStroke are used by main.cpp */
 void setFill(uint16_t col) {
+
   drawFill = 1;
   currFillColor = col;
 }
 
 void setStroke(uint16_t col) {
+
   drawStroke = 1;
   currStrokeColor = col;
 }
 
-// fill and stroke are only used by the renderer
+/* fill and stroke are only used by the renderer */
 void fill(uint16_t col) {
+
   unsigned char r, g, b;
   unsigned char a = 255;
   HSVtoRGB(col, & r, & g, & b);
@@ -93,6 +98,7 @@ void fill(uint16_t col) {
 }
 
 void stroke(uint16_t col) {
+
   unsigned char r, g, b;
   unsigned char a = 255;
   HSVtoRGB(col, & r, & g, & b);
@@ -104,13 +110,15 @@ void stroke(uint16_t col) {
   };
 }
 
-// Set the x1,x2,y1,y2 values
+/* Sets the x1,x2,y1,y2 values */
 void setVal(int val, int * ret) {
-  * ret = (val % (gridLength));
+
+  *ret = (val % (gridLength));
 }
 
 /* Fast horizontal and vertical line drawer */  
 void verticalLine(int x1, int y1, int y2) {
+
   int dist = abs(y2 - y1) + 1;
   int y = std::min(y1, y2);
   for (int i = 0; i < dist; i++) {
@@ -119,6 +127,7 @@ void verticalLine(int x1, int y1, int y2) {
 }
 
 void horizontalLine(int y1, int x1, int x2) {
+
   int dist = abs(x2 - x1) + 1;
   int x = std::min(x1, x2);
   for (int i = 0; i < dist; i++) {
@@ -127,8 +136,7 @@ void horizontalLine(int y1, int x1, int x2) {
 }
 
 void line() {
-  if (drawStroke) {
-
+ 
     int dx = x2 - x1;
     int dy = y2 - y1;
 
@@ -170,12 +178,14 @@ void line() {
       }
     }
     update_screen[y2 * gridLength + x2] = currStrokeColor;
-  }
 }
 
-// Draw rectangle centered at corner (x1,y1) {technically takes in a 16bit width value}
+/*
+* Draw rectangle with corners at (x1,y2) & (x2,y2)
+*/
 void rect() {
-  // Draw Stroke Lines
+
+  /* Draw Stroke Lines */
   if (drawStroke) {
     horizontalLine(y1, x1, x2);
     horizontalLine(y2, x1, x2);
@@ -183,7 +193,7 @@ void rect() {
     verticalLine(x2, y1, y2);
   }
   int h = abs(y2 - y1);
-  // Draw Fill lines
+  /* Draw Fill lines */
   if (drawFill) {
     uint16_t temp = currStrokeColor;
     currStrokeColor = currFillColor;
@@ -195,9 +205,9 @@ void rect() {
 
 }
 
-// renders the pixels to tigr
+/* Render Pixels using live screen */
 void render() {
-  // Render Pixels and turn live_screen into update_screen
+
   for (int y = 0; y < gridLength; y++) {
     for (int x = 0; x < gridLength; x++) {
       int index = y * gridLength + x;
@@ -208,9 +218,9 @@ void render() {
   tigrUpdate(window);
 }
 
-// update game and draw all pixels 
+/* Render Pixels and turn live_screen into update_screen */
 void update() {
-  // Render Pixels and turn live_screen into update_screen
+
   for (int y = 0; y < gridLength; y++) {
     for (int x = 0; x < gridLength; x++) {
       int index = y * gridLength + x;
@@ -221,10 +231,11 @@ void update() {
 }
 
 void initScreen(double v) {
+
   hue = v;
   srand(time(nullptr));
   window = tigrWindow(windowWidth, windowHeight, "Test Program", 0);
-  // Create renderer and initialize update_screen to lavender
+  /* Create renderer and initialize update_screen to hue */
   for (int i = 0; i < gridLength * gridLength; i++) {
     live_screen[i] = hue;
     update_screen[i] = hue;

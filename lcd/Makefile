@@ -21,7 +21,7 @@ all:
 	g++ -c util.cpp -o util.o $(CPPFLAGS)
 	g++ -c screen.cpp -o screen.o $(CPPFLAGS)
 	g++ -c main.cpp -o main.o $(CPPFLAGS)
-	g++ tigr.o screen.o teenyat.o main.o color.o util.o -o ./bin/system $(LDFLAGS)
+	g++ tigr.o screen.o teenyat.o main.o color.o util.o -o lcd $(LDFLAGS)
 
 clean:
-	$(RMCMD) ./bin/system *.o
+	$(RMCMD) lcd *.o
