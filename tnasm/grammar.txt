@@ -35,6 +35,7 @@ immediate ::= IDENTIFIER.
 number ::= IDENTIFIER.
 number ::= NUMBER.
 number ::= plus_or_minus NUMBER.
+number ::= CHARACTER
 
 plus_or_minus ::= PLUS.
 plus_or_minus ::= MINUS.
