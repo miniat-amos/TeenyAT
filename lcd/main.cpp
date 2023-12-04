@@ -61,8 +61,64 @@
  *  - 0xD700
  *  - read only
  *  - returns an ensured 16 bit random number
+ *  
+ *  UPDATE:
+ *  - 0xE000
+ *  - write only
+ *  - fills the screen with whatever is in the update buffer
+ *  
+ *  RECT:
+ *  - 0xE010
+ *  - write only
+ *  - draws a rectangle to the update buffer using X1,Y1 & X2,Y2 as corners
+ *  - will draw a stroke and fill if the corresponding boolean is nonzero
+ *  
+ *  LINE:
+ *  - 0xE011
+ *  - write only
+ *  - draws a line to update buffer using X1,Y2 & X2,Y2 
+ *  - if DRAWSTROKE is zero will not draw the line
+ *  - color is based on STROKE
+ *  
+ *  POINT:
+ *  - 0xE012
+ *  - write only
+ *  - draws point to the update buffer using X1,Y1
+ *  - color is based on STROKE
+ *  
+ *  MOUSEX:
+ *  - 0xFFFC
+ *  - read only
+ *  - returns the current mouse X cooridiante
  * 
+ *  MOUSEY:
+ *  - 0xFFFD
+ *  - read only
+ *  - returns the current mouse Y cooridiante
  * 
+ *  MOUSEB:
+ *  - 0xFFFB
+ *  - read only
+ *  - returns the current mouse Button 
+ *  - 0 means no button
+ *  - 1 means left button
+ *  - 2 means center button
+ *  - 3 means left and center button together
+ *  - 4 means right button
+ *  - 5 means left and right button together
+ *  - 6 means right and center together
+ *  - 7 means left right and center together
+ *  
+ *  TERM:
+ *  - 0xFFFF
+ *  - write only
+ *  - prints value passed into it to the terminal
+ *  
+ *  KEY:
+ *  - 0xFFFE
+ *  - read only
+ *  - returns current key down
+ *   
  */
 
 #define LIVESCREEN_START 0x8000 
