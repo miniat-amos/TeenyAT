@@ -56,6 +56,7 @@ tny_sword string_to_value(string s, tny_sword base);
 void handle_register(token &t);
 void handle_decimal_number(token &t);
 void handle_prefixed_number(token &t);
+void handle_single_character(token &t);
 
 int main(int argc, char *argv[]) {
 	if(argc != 2) {
@@ -174,6 +175,7 @@ void initialize_lexical_regex(vector <token_regex> &patterns) {
 	patterns.push_back(regex_token("0b(_*[01])+", T_NUMBER, handle_prefixed_number));
 	patterns.push_back(regex_token("\\+", T_PLUS, nullptr));
 	patterns.push_back(regex_token("-", T_MINUS, nullptr));
+	patterns.push_back(regex_token("'.'", T_CHARACTER, handle_single_character));
 	patterns.push_back(regex_token(",", T_COMMA, nullptr));
 	patterns.push_back(regex_token("\\[", T_LBRACKET, nullptr));
 	patterns.push_back(regex_token("\\]", T_RBRACKET, nullptr));
@@ -376,6 +378,16 @@ void handle_prefixed_number(token &t) {
 	else {
 		t.value.s = 0;
 	}
+
+	return;
+}
+
+void handle_single_character(token &t) {
+	/*
+	 * "'.'"
+	 */
+	t.value.bytes.byte1 = 0;
+	t.value.bytes.byte0 = t.token_str[1];
 
 	return;
 }

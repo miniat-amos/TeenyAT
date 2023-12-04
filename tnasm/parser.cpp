@@ -390,7 +390,7 @@ shared_ptr <tny_word> p_immediate() {
  */
 shared_ptr <tny_word> p_number() {
     shared_ptr <tny_word> val = nullptr;
-    shared_ptr <token> ident, num, sign;
+    shared_ptr <token> ident, num, sign, s_char;
     int save = tnext;
     if((tnext = save, ident = term(T_IDENTIFIER))) {
         if(pass == 1) {
@@ -418,6 +418,9 @@ shared_ptr <tny_word> p_number() {
         if(sign->id == T_MINUS) {
             val->s *= -1;
         }
+    }
+    else if((tnext = save, s_char = term(T_CHARACTER))) {
+        val = shared_ptr <tny_word>(new tny_word(s_char->value));
     }
     return val;
 }
