@@ -50,9 +50,13 @@ uint16_t update_screen[gridLength * gridLength] = {
 };
 
 void point() {
-
   int index = y1 * gridLength + x1;
   update_screen[index] = currStrokeColor;
+}
+
+uint16_t pointColor(){
+  int index = y1 * gridLength + x1;
+  return update_screen[index];
 }
 
 uint16_t rand16() {

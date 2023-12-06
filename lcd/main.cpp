@@ -170,7 +170,6 @@ int main(int argc, char *argv[])
     }
 
     while(!tigrClosed(window) && !tigrKeyDown(window, TK_ESCAPE)) {
-
         tigrMouse(window, &mouseX, &mouseY, &mouseButton);
         tny_clock(&t);
     }
@@ -230,6 +229,12 @@ void bus_read(teenyat *t, tny_uword addr, tny_word *data, uint16_t *delay)
         break;
     case MOUSEB:
         data->u = mouseButton;
+        break;
+    case POINT:
+        data->u = pointColor();
+        break;
+    case KEY:
+        data->u = tigrReadChar(window);
         break;
     default:
         break;
@@ -291,6 +296,9 @@ void bus_write(teenyat *t, tny_uword addr, tny_word data, uint16_t *delay)
     case POINT:
         point();
         break;
+    case TERM:
+         std::cout << data.u << std::endl;
+         break;
     default:
         break;
     }

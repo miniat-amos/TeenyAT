@@ -26,6 +26,7 @@ extern uint16_t live_screen[];
 extern uint16_t update_screen[];
 
 void point();
+uint16_t pointColor();
 uint16_t rand16();
 void noFill();
 void noStroke();
