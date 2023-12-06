@@ -38,8 +38,6 @@ CAL !draw_trunk
     SET rA, 0
     LOD rA, [RAND]
     MOD rA, 65
-    CMP rA, 0
-    JE !main
     SET rB, WHITE
     STR [STROKE], rB
     STR [X1], rA
