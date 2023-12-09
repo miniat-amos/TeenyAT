@@ -81,8 +81,9 @@
  *  
  *  POINT:
  *  - 0xE012
- *  - write only
- *  - draws point to the update buffer using X1,Y1
+ *  - read/write 
+ *  - on read returns color found at coordinate X1,Y1
+ *  - on write draws point to the update buffer using X1,Y1
  *  - color is based on STROKE
  *  
  *  MOUSEX:
@@ -149,7 +150,7 @@ void bus_write(teenyat *t, tny_uword addr, tny_word data, uint16_t *delay);
 int main(int argc, char *argv[])
 {   
     if(argc < 2) {
-        std::cout << "Please provide an asm file" << std::endl;
+        std::cout << "Please provide an binary file" << std::endl;
         return 1;
     }
 
