@@ -1,0 +1,25 @@
+{
+  "name": "teenyat-assembly-language",
+  "displayName": "TeenyAT Assembly Language",
+  "description": "TeenyAT assembly language syntax highlighting",
+  "version": "1.0.0",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "contributes": {
+    "languages": [{
+      "id": "teenyat-assembly",
+      "aliases": ["TeenyAT Assembly Language", "teenyat-assembly"],
+      "extensions": [".asm",".tnasm"],
+      "configuration": "./language-configuration.json"
+    }],
+    "grammars": [{
+      "language": "teenyat-assembly",
+      "scopeName": "source.tnasm",
+      "path": "./syntaxes/teenyat-assembly.tmLanguage.json"
+    }]
+  }
+}
