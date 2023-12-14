@@ -1,0 +1,150 @@
+{
+	"$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+	"name": "TeenyAT Assembly Language",
+	"patterns": [
+		{
+			"include": "#ignore"
+		},
+		{
+			"include": "#comment"
+		},
+		{
+			"include": "#label"
+		},
+		{
+			"include": "#directive"
+		},
+		{
+			"include": "#register"
+		},
+		{
+			"include": "#instruction"
+		},
+		{
+			"include": "#identifier"
+		},
+		{
+			"include": "#immediate"
+		},
+		{
+			"include": "#operator"
+		},
+		{
+			"include": "#comma"
+		},
+		{
+			"include": "#string"
+		},
+		{
+			"include": "#invalid"
+		}
+	],
+	"__COMMENT__": "Using the naming coventions from https://macromates.com/manual/en/language_grammars",
+	"repository": {
+		"ignore": {
+			"patterns": [{
+				"__COMMENT__": "non-standard name to avoid coloring",
+				"name": "ignore.teenyat-assembly",
+				"match": "[ \\t\\b\\v\\f\\r]+"
+			}]
+		},
+		"comment": {
+			"patterns": [{
+				"__COMMENT__": "***** Line Comment *****",
+				"name": "comment.line.teenyat-assembly",
+				"match": ";.*"
+			}]
+		},
+		"label": {
+			"patterns": [{
+					"__COMMENT__": "***** Labels *****",
+					"name": "markup.underline.support.other.teenyat-assembly",
+					"match": "![^ \\t\\b\\v\\r\\n;]+"
+			}]
+		},
+		"directive": {
+			"patterns": [
+				{
+					"__COMMENT__": "***** Variable Directive *****",
+					"name": "storage.type.teenyat-assembly.variable",
+					"match": "(?i)\\.var(iable)?"
+				},
+				{
+					"__COMMENT__": "***** Constant Directive *****",
+					"name": "storage.type.teenyat-assembly.constant",
+					"match": "(?i)\\.const(ant)?"
+				}
+			]
+		},
+		"register": {
+			"patterns": [{
+					"__COMMENT__": "***** Registers *****",
+					"name": "keyword.other.teenyat-assembly",
+					"match": "\\b(?i)(r[0-7a-e]|rZ|SP|PC)\\b"
+			}]
+		},
+		"instruction": {
+			"patterns": [{
+					"__COMMENT__": "***** Instruction Mnemonics *****",
+					"name": "keyword.control.teenyat-assembly",
+					"match": "\\b(?i)(SET|LOD|STR|PSH|POP|BTS|BTC|BTF|CAL|ADD|SUB|MPY|DIV|MOD|AND|OR|XOR|SHF|ROT|NEG|CMP|DLY|JMP|JE|JNE|JL|JLE|JG|JGE|DJZ|INC|DEC|RET)\\b"
+			}]
+		},
+		"identifier": {
+			"patterns": [{
+				"__COMMENT__": "***** Identifiers *****",
+				"name": "variable.teenyat-assembly",
+				"match": "\\b(?i)[_a-z][_a-z0-9]*\\b"
+			}]
+		},
+		"immediate": {
+			"patterns": [
+				{
+					"__COMMENT__": "***** Hexadecimal immediates *****",
+					"name": "constant.numeric.hex.teenyat-assembly",
+					"match": "\\b(?i)0x(_*[0-9a-f])+\\b"
+				},
+				{
+					"__COMMENT__": "***** Decimal Immediates *****",
+					"name": "constant.numeric.dec.teenyat-assembly",
+					"match": "\\b[-+]?[0-9]([0-9])*\\b"
+				},
+				{
+					"__COMMENT__": "***** Binary Immediates *****",
+					"name": "constant.numeric.bin.teenyat-assembly",
+					"match": "\\b(?i)0b(_*[01])+\\b"
+				}
+			]
+		},
+		"operator": {
+			"patterns": [{
+					"__COMMENT__": "***** Operators *****",
+					"name": "support.teenyat-assembly",
+					"match": "[+-]"
+			}]
+		},
+		"comma": {
+			"patterns": [{
+					"__COMMENT__": "***** Operand Seperators *****",
+					"name": "support.teenyat-assembly",
+					"match": "[,]"
+			}]
+		},
+		"string": {
+			"patterns": [{
+				"__COMMENT__": "***** Double-Quoted Strings *****",
+				"name": "string.quoted.double.teenyat-assembly",
+				"begin": "\"",
+				"end": "\""
+			}]
+		},
+		"invalid": {
+			"patterns": [{
+				"__COMMENT__": "***** Illegal / Unexpected Character *****",
+				"name": "invalid.illegal.teenyat-assembly",
+				"match": "."
+			}]
+		}
+	},
+	"scopeName": "source.tnasm"
+}
