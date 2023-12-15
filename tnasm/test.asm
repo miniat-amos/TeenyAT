@@ -49,7 +49,7 @@
     DLy r3 + 5
     DLy r5
     DLy 31
-    DLy 't'
+    lod r4, 'a'
 
     Psh r4
     CAL PC ; oooh... what could this be used for? >:-)
