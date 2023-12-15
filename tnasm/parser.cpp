@@ -35,6 +35,8 @@ shared_ptr <token> p_constant_line();
 bool p_raw_line();
 shared_ptr <token> p_label_line();
 
+shared_ptr <tny_word> p_raw_value();
+
 shared_ptr <tny_word> p_immediate();
 shared_ptr <tny_word> p_number();
 shared_ptr <token> p_plus_or_minus();
@@ -261,7 +263,7 @@ shared_ptr <token> p_constant_line() {
 }
 
 /*
- * raw_line ::= NUMBER+.
+ * raw_line ::= raw_value.
  * We'll implement the "one-or-more" NUMBER check manually rather than via the
  * recursive descent approach.
  */
@@ -273,7 +275,7 @@ bool p_raw_line() {
         int save = tnext;
         shared_ptr <tny_word> d;
 
-        if((d = p_number())) {
+        if(d = p_raw_value()) {
             data.push_back(d);
         }
         else if(tnext = save, (term(T_EOL) != nullptr)) {
@@ -331,6 +333,24 @@ shared_ptr <token> p_label_line() {
 }
 
 /*
+ * raw_value ::= number.
+ * raw_value ::= CHARACTER.
+ */
+shared_ptr <tny_word> p_raw_value() {
+    shared_ptr <tny_word> val = nullptr;
+    shared_ptr <token> num, c;
+    int save = tnext;
+    if((tnext = save, c = term(T_CHARACTER))) {
+        val = shared_ptr <tny_word>(new tny_word(c->value));
+    } 
+    else if((tnext = save, val = p_number())) {
+        /* nothing to do */
+    }
+
+    return val;
+}
+
+/*
  * immediate ::= number.
  * immediate ::= LABEL.
  * immediate ::= IDENTIFIER.
@@ -340,7 +360,7 @@ shared_ptr <tny_word> p_immediate() {
     shared_ptr <token> ident, label;
     int save = tnext;
 
-    if((tnext = save, val = p_number())) {
+    if((tnext = save, val = p_raw_value())) {
         /* nothing to do */
     }
     else if((tnext = save, label = term(T_LABEL))) {
@@ -418,9 +438,6 @@ shared_ptr <tny_word> p_number() {
         if(sign->id == T_MINUS) {
             val->s *= -1;
         }
-    }
-    else if((tnext = save, s_char = term(T_CHARACTER))) {
-        val = shared_ptr <tny_word>(new tny_word(s_char->value));
     }
     return val;
 }
