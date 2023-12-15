@@ -31,10 +31,9 @@ raw_value ::= CHARACTER.
 
 label_line ::= LABEL.
 
-immediate ::= number.
+immediate ::= raw_value.
 immediate ::= LABEL.
 immediate ::= IDENTIFIER.
-immediate ::= CHARACTER.
 
 number ::= IDENTIFIER.
 number ::= NUMBER.
