@@ -187,7 +187,7 @@ void tny_clock(teenyat *t) {
 	case TNY_OPCODE_STR:
 		{
 			tny_uword addr = t->reg[reg1].s + immed;
-			if(addr >= TNY_MAX_RAM_ADDRESS) {
+			if(addr > TNY_MAX_RAM_ADDRESS) {
 				/* write to peripheral address */
 				uint16_t delay = 0;
 				t->bus_write(t, addr, t->reg[reg2], &delay);
@@ -429,7 +429,7 @@ void tny_clock(teenyat *t) {
 		}
 		break;
 	default:
-		fprintf(stderr, "Unknown opcode (%d) encountered at 0x%04X on cycle  %" PRIu64 "\n",
+		fprintf(stderr, "Unknown opcode (%d) encountered at 0x%04X on cycle %" PRIu64 "\n",
 		        opcode, orig_PC, t->cycle_cnt);
 		break;
 	}

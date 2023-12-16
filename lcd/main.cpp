@@ -82,7 +82,7 @@
  *  POINT:
  *  - 0xE012
  *  - read/write 
- *  - on read returns color found at coordinate X1,Y1
+ *  - on read returns color found in update buffer at coordinate X1,Y1 
  *  - on write draws point to the update buffer using X1,Y1
  *  - color is based on STROKE
  *  
