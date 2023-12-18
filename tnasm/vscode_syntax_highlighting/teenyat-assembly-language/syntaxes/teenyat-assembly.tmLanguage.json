@@ -113,6 +113,16 @@
 					"__COMMENT__": "***** Binary Immediates *****",
 					"name": "constant.numeric.bin.teenyat-assembly",
 					"match": "\\b(?i)0b(_*[01])+\\b"
+				},
+				{
+					"__COMMENT__": "***** Character Immediates *****",
+					"name": "constant.character.teenyat-assembly",
+					"match": "'.'"
+				},
+				{
+					"__COMMENT__": "***** Escape Character Immediates *****",
+					"name": "constant.character.escape.teenyat-assembly",
+					"match": "'\\\\[ntvfr]'"
 				}
 			]
 		},
