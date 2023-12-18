@@ -50,6 +50,7 @@
     DLy r5
     DLy 31
     lod r4, 'a'
+    lod r4, '\n'
 
     Psh r4
     CAL PC ; oooh... what could this be used for? >:-)
