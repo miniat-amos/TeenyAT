@@ -658,16 +658,37 @@ bool p_code_5_line() {
 
         tny_word &f = inst.first;
         f.instruction.opcode = token_to_opcode(oper->id);
-        f.instruction.teeny = 1;
-        f.instruction.reg1 = dreg->value.u;
-        f.instruction.reg2 = TNY_REG_ZERO;
-        f.instruction.immed4 = 1;
+        
+        if(oper->id == T_INC || oper->id == T_DEC) {
+            f.instruction.teeny = 1;
+            f.instruction.reg1 = dreg->value.u;
+            f.instruction.reg2 = TNY_REG_ZERO;
+            f.instruction.immed4 = 1;
+        }
+        else if(oper->id == T_INV) {
+            f.instruction.teeny = 0;
+            f.instruction.reg1 = dreg->value.u;
+            f.instruction.reg2 = TNY_REG_ZERO;
+            f.instruction.immed4 = 0;
+            inst.second.u = 0xFFFF;
+        } 
+
+        bool teeny_inst = f.instruction.teeny;
+        
+        if(teeny_inst) {
+            address++;
+        }
+        else {
+            address += 2;
+        }
 
         if(pass > 1) {
             bin_words.push_back(f);
+            if(!teeny_inst) {
+                bin_words.push_back(inst.second);
+            }
         }
 
-        address += 1;
         result = true;
     }
 
@@ -1090,6 +1111,7 @@ tny_uword token_to_opcode(int id) {
      */
     case T_INC:   result = TNY_OPCODE_ADD;   break;
     case T_DEC:   result = TNY_OPCODE_SUB;   break;
+    case T_INV:   result = TNY_OPCODE_XOR;   break;
     case T_RET:   result = TNY_OPCODE_POP;   break;
     default:
         cerr << "Error, line(" << parse_line[0].line_no << "): ";
@@ -1274,13 +1296,15 @@ shared_ptr <token> p_code_4_inst() {
 /*
  * code_5_inst ::= INC.
  * code_5_inst ::= DEC.
+ * code_5_inst ::= INV.
  */
 shared_ptr <token> p_code_5_inst() {
     shared_ptr <token> result;
     int save = tnext;
 
     (tnext = save, result = term(T_INC)) ||
-    (tnext = save, result = term(T_DEC));
+    (tnext = save, result = term(T_DEC)) ||
+    (tnext = save, result = term(T_INV));
 
     return result;
 }

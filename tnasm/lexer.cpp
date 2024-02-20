@@ -169,6 +169,7 @@ void initialize_lexical_regex(vector <token_regex> &patterns) {
 	patterns.push_back(regex_token("djz", T_DJZ, nullptr));
 	patterns.push_back(regex_token("inc", T_INC, nullptr));
 	patterns.push_back(regex_token("dec", T_DEC, nullptr));
+	patterns.push_back(regex_token("inv", T_INV, nullptr));
 	patterns.push_back(regex_token("ret", T_RET, nullptr));
 	patterns.push_back(regex_token("[_a-z][_a-z0-9]*", T_IDENTIFIER, nullptr));
 	patterns.push_back(regex_token("[0-9](_*[0-9])*", T_NUMBER, handle_decimal_number));

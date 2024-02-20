@@ -61,5 +61,7 @@
     lod r5, [r1 - Amos]
     lod PC, aero
 
+    INV rA                  ;2
+
     JNE rZ + !more
 ; and that's all
