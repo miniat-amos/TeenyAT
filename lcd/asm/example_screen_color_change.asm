@@ -18,15 +18,13 @@
 .const TERM 0xFFFF
 .const KEY 0xFFFE
 
-!main
+!main 
     STR [X1], rZ
     STR [Y1], rZ
     SET rA, 63
     STR [X2], rA
     STR [Y2], rA
-    STR [STROKE], PC  ;turns on border, but we’ll turn off
     STR [DRAWSTROKE], rZ  ;no stroke
-    XOR rC, rC
 !top
     STR [FILL], rC
     STR [RECT], rD
