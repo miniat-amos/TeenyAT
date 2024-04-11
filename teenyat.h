@@ -135,11 +135,11 @@ struct teenyat {
 	/**
 	 * Registers...
 	 *
-	 * reg[0]: Program Counter (PC)
+	 * reg[0]: Zero Register (rZ)... always contains zero and is read only
 	 *
-	 * reg[1]: Stack Pointer (SP)... address of the next top
+	 * reg[1]: Program Counter (PC)
 	 *
-	 * reg[2]: Zero Register (rZ)... always contains zero and is read only
+	 * reg[2]: Stack Pointer (SP)... address of the next top
 	 *
 	 * reg[3]-[7]: General Purpose Registers (rA -- rE)
 	 */
@@ -211,9 +211,9 @@ struct teenyat {
 #define TNY_OPCODE_DJZ 22
 #define TNY_OPCODE_DLY 23
 
-#define TNY_REG_PC   0
-#define TNY_REG_SP   1
-#define TNY_REG_ZERO 2
+#define TNY_REG_ZERO 0
+#define TNY_REG_PC   1
+#define TNY_REG_SP   2
 #define TNY_REG_A    3
 #define TNY_REG_B    4
 #define TNY_REG_C    5
