@@ -658,37 +658,22 @@ bool p_code_5_line() {
 
         tny_word &f = inst.first;
         f.instruction.opcode = token_to_opcode(oper->id);
+        f.instruction.teeny = 1;
+        f.instruction.reg1 = dreg->value.u;
+        f.instruction.reg2 = TNY_REG_ZERO;
         
         if(oper->id == T_INC || oper->id == T_DEC) {
-            f.instruction.teeny = 1;
-            f.instruction.reg1 = dreg->value.u;
-            f.instruction.reg2 = TNY_REG_ZERO;
             f.instruction.immed4 = 1;
         }
         else if(oper->id == T_INV) {
-            f.instruction.teeny = 0;
-            f.instruction.reg1 = dreg->value.u;
-            f.instruction.reg2 = TNY_REG_ZERO;
-            f.instruction.immed4 = 0;
-            inst.second.u = 0xFFFF;
+            f.instruction.immed4 = -1;
         } 
-
-        bool teeny_inst = f.instruction.teeny;
-        
-        if(teeny_inst) {
-            address++;
-        }
-        else {
-            address += 2;
-        }
 
         if(pass > 1) {
             bin_words.push_back(f);
-            if(!teeny_inst) {
-                bin_words.push_back(inst.second);
-            }
         }
 
+        address++;
         result = true;
     }
 
