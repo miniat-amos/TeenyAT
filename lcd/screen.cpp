@@ -28,6 +28,9 @@ int mouseX = 0;
 int mouseY = 0;
 int mouseButton = 0;
 
+int last_bus = 0;
+int current_frame = 0;
+
 TPixel currFill = TPixel {
   0,
   0,
@@ -211,7 +214,6 @@ void rect() {
 
 /* Render Pixels using live screen */
 void render() {
-
   for (int y = 0; y < gridLength; y++) {
     for (int x = 0; x < gridLength; x++) {
       int index = y * gridLength + x;
@@ -224,7 +226,6 @@ void render() {
 
 /* Render Pixels and turn live_screen into update_screen */
 void update() {
-
   for (int y = 0; y < gridLength; y++) {
     for (int x = 0; x < gridLength; x++) {
       int index = y * gridLength + x;

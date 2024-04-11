@@ -171,8 +171,13 @@ int main(int argc, char *argv[])
     }
 
     while(!tigrClosed(window) && !tigrKeyDown(window, TK_ESCAPE)) {
-        tigrMouse(window, &mouseX, &mouseY, &mouseButton);
+        int time_between_last_bus = (current_frame - last_bus);
+        if(time_between_last_bus > (gridLength*gridLength)){
+            tigrUpdate(window);
+            last_bus = current_frame;
+        }
         tny_clock(&t);
+        current_frame++;
     }
 
     tigrFree(window);
@@ -180,7 +185,8 @@ int main(int argc, char *argv[])
 }
 
 void bus_read(teenyat *t, tny_uword addr, tny_word *data, uint16_t *delay)
-{
+{   
+    last_bus = current_frame;
     /* Handles pixel screen reads */
     if(addr >= UPDATESCREEN_START && addr <= UPDATESCREEN_END) {
         int index = map(addr, UPDATESCREEN_START, UPDATESCREEN_END, 0, (gridLength * gridLength) - 1);
@@ -223,12 +229,15 @@ void bus_read(teenyat *t, tny_uword addr, tny_word *data, uint16_t *delay)
         data->u = rand16();
         break;
     case MOUSEX:
+        tigrMouse(window, &mouseX, &mouseY, &mouseButton);
         data->u = (uint16_t)(mouseX / pixelSize);
         break;
     case MOUSEY:
+        tigrMouse(window, &mouseX, &mouseY, &mouseButton);
         data->u = (uint16_t)(mouseY / pixelSize);
         break;
     case MOUSEB:
+        tigrMouse(window, &mouseX, &mouseY, &mouseButton);
         data->u = mouseButton;
         break;
     case POINT:
@@ -245,7 +254,7 @@ void bus_read(teenyat *t, tny_uword addr, tny_word *data, uint16_t *delay)
 
 void bus_write(teenyat *t, tny_uword addr, tny_word data, uint16_t *delay)
 {
-    
+    last_bus = current_frame;
     /* Handles pixel screen writes */
     if(addr >= UPDATESCREEN_START && addr <= UPDATESCREEN_END) {
         int index = map(addr, UPDATESCREEN_START, UPDATESCREEN_END, 0, (gridLength * gridLength) - 1);
