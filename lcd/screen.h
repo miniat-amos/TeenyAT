@@ -4,6 +4,8 @@
 
 #include <cstdint>
 
+#define KEYBOARD_INPUT_BUFFER_SIZE 3
+
 extern Tigr* window;
 extern int drawStroke;
 extern int drawFill;
@@ -24,6 +26,7 @@ extern int x2;
 extern int y2;
 extern uint16_t live_screen[];
 extern uint16_t update_screen[];
+extern int keyboard_input_buffer[KEYBOARD_INPUT_BUFFER_SIZE];
 
 void point();
 uint16_t pointColor();
@@ -46,6 +49,11 @@ void verticalLine(int x1, int y1,int y2);
 void horizontalLine(int y1, int x1,int x2);
 void line();
 void rect();
+
+// Handles all keyboard presses and adds them to buffer
+void buffer_push(int buffer[], int len,int num);
+int  buffer_pop(int buffer[], int len);
+
 
 // Just draws pixels
 void render();
