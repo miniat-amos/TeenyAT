@@ -244,7 +244,10 @@ void bus_read(teenyat *t, tny_uword addr, tny_word *data, uint16_t *delay)
         data->u = pointColor();
         break;
     case KEY:
-        data->u = tigrReadChar(window);
+        process_keyboard_input(window);
+        data->u = buffer_pop(keyboard_input_buffer,KEYBOARD_INPUT_BUFFER_SIZE);
+        /* Reading a key requires a HUGE delay */
+        *delay = 10000;
         break;
     default:
         break;

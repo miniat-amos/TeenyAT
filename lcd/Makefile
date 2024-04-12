@@ -2,7 +2,7 @@ CFLAGS += -I.. -I./include -Os
 CPPFLAGS += $(CFLAGS) --std=c++17
 ifeq ($(OS),Windows_NT)
 	LDFLAGS += -s -lopengl32 -lgdi32
-	RMCMD = del
+	RMCMD = rm
 else
 	RMCMD = rm -f
 	UNAME_S := $(shell uname -s)
