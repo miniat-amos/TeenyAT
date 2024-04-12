@@ -172,7 +172,12 @@ int main(int argc, char *argv[])
 
     while(!tigrClosed(window) && !tigrKeyDown(window, TK_ESCAPE)) {
         tigrMouse(window, &mouseX, &mouseY, &mouseButton);
+        if(current_frame > (gridLength * gridLength * gridLength)){
+            tigrUpdate(window);
+            current_frame = 0;
+        }
         tny_clock(&t);
+        current_frame++;
     }
 
     tigrFree(window);
