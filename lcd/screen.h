@@ -53,7 +53,7 @@ void rect();
 // Handles all keyboard presses and adds them to buffer
 void buffer_push(int buffer[], int len,int num);
 int  buffer_pop(int buffer[], int len);
-
+void process_keyboard_input(Tigr*);
 
 // Just draws pixels
 void render();
