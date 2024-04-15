@@ -102,12 +102,7 @@
  *  - returns the current mouse Button 
  *  - 0 means no button
  *  - 1 means left button
- *  - 2 means center button
- *  - 3 means left and center button together
- *  - 4 means right button
- *  - 5 means left and right button together
- *  - 6 means right and center together
- *  - 7 means left right and center together
+ *  - 2 means other button
  *  
  *  TERM:
  *  - 0xFFFF
