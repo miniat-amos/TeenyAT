@@ -19,14 +19,15 @@ uint16_t currFillColor = 0;
 double hue = 0;
 double pixelSize = (double) windowWidth / gridLength;
 
-int x1 = 0;
-int y1 = 0;
-int x2 = 0;
-int y2 = 0;
+int lcd_x1 = 0;
+int lcd_y1 = 0;
+int lcd_x2 = 0;
+int lcd_y2 = 0;
 
 int mouseX = 0;
 int mouseY = 0;
 int mouseButton = 0;
+int current_frame = 0;
 
 TPixel currFill = TPixel {
   0,
@@ -50,12 +51,12 @@ uint16_t update_screen[gridLength * gridLength] = {
 };
 
 void point() {
-  int index = y1 * gridLength + x1;
+  int index = lcd_y1 * gridLength + lcd_x1;
   update_screen[index] = currStrokeColor;
 }
 
 uint16_t pointColor(){
-  int index = y1 * gridLength + x1;
+  int index = lcd_y1 * gridLength + lcd_x1;
   return update_screen[index];
 }
 
@@ -141,17 +142,17 @@ void horizontalLine(int y1, int x1, int x2) {
 
 void line() {
  
-    int dx = x2 - x1;
-    int dy = y2 - y1;
+    int dx = lcd_x2 - lcd_x1;
+    int dy = lcd_y2 - lcd_y1;
 
     /*
      * Use corresponding cardinal line method if slope is 0 or infinite
      */
     if (dx == 0) {
-      verticalLine(x1, y1, y2);
+      verticalLine(lcd_x1, lcd_y1, lcd_y2);
       return;
     } else if (dy == 0) {
-      horizontalLine(y1, x1, x2);
+      horizontalLine(lcd_y1, lcd_x1, lcd_x2);
       return;
     }
 
@@ -163,9 +164,9 @@ void line() {
     int abs_dy = abs(dy);
 
     int err = abs_dx - abs_dy;
-    int x = x1, y = y1;
+    int x = lcd_x1, y = lcd_y1;
 
-    while (x != x2 || y != y2) {
+    while (x != lcd_x2 || y != lcd_y2) {
       update_screen[y * gridLength + x] = currStrokeColor;
       int double_err = 2 * err;
 
@@ -181,7 +182,7 @@ void line() {
         y += sy;
       }
     }
-    update_screen[y2 * gridLength + x2] = currStrokeColor;
+    update_screen[lcd_y2 * gridLength + lcd_x2] = currStrokeColor;
 }
 
 /*
@@ -191,18 +192,18 @@ void rect() {
 
   /* Draw Stroke Lines */
   if (drawStroke) {
-    horizontalLine(y1, x1, x2);
-    horizontalLine(y2, x1, x2);
-    verticalLine(x1, y1, y2);
-    verticalLine(x2, y1, y2);
+    horizontalLine(lcd_y1, lcd_x1, lcd_x2);
+    horizontalLine(lcd_y2, lcd_x1, lcd_x2);
+    verticalLine(lcd_x1, lcd_y1, lcd_y2);
+    verticalLine(lcd_x2, lcd_y1, lcd_y2);
   }
-  int h = abs(y2 - y1);
+  int h = abs(lcd_y2 - lcd_y1);
   /* Draw Fill lines */
   if (drawFill) {
     uint16_t temp = currStrokeColor;
     currStrokeColor = currFillColor;
     for (int i = 0; i < h - 1; i++) {
-      horizontalLine((y1 + 1) + i, (x1 + 1), (x2 - 1));
+      horizontalLine((lcd_y1 + 1) + i, (lcd_x1 + 1), (lcd_x2 - 1));
     }
     currStrokeColor = temp;
   }

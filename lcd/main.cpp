@@ -102,12 +102,7 @@
  *  - returns the current mouse Button 
  *  - 0 means no button
  *  - 1 means left button
- *  - 2 means center button
- *  - 3 means left and center button together
- *  - 4 means right button
- *  - 5 means left and right button together
- *  - 6 means right and center together
- *  - 7 means left right and center together
+ *  - 2 means other button
  *  
  *  TERM:
  *  - 0xFFFF
@@ -171,8 +166,12 @@ int main(int argc, char *argv[])
     }
 
     while(!tigrClosed(window) && !tigrKeyDown(window, TK_ESCAPE)) {
-        tigrMouse(window, &mouseX, &mouseY, &mouseButton);
+        if(current_frame > (gridLength * gridLength * gridLength)){
+            tigrUpdate(window);
+            current_frame = 0;
+        }
         tny_clock(&t);
+        current_frame++;
     }
 
     tigrFree(window);
@@ -196,16 +195,16 @@ void bus_read(teenyat *t, tny_uword addr, tny_word *data, uint16_t *delay)
 
     switch(addr) {
     case X1:
-        data->u = x1;
+        data->u = lcd_x1;
         break;
     case Y1:
-        data->u = y1;
+        data->u = lcd_y1;
         break;
     case X2:
-        data->u = x2;
+        data->u = lcd_x2;
         break;
     case Y2:
-        data->u = y2;
+        data->u = lcd_y2;
         break;
     case STROKE:
         data->u = currStrokeColor;
@@ -223,12 +222,16 @@ void bus_read(teenyat *t, tny_uword addr, tny_word *data, uint16_t *delay)
         data->u = rand16();
         break;
     case MOUSEX:
+        tigrMouse(window, &mouseX, &mouseY, &mouseButton);
         data->u = (uint16_t)(mouseX / pixelSize);
         break;
     case MOUSEY:
+        tigrMouse(window, &mouseX, &mouseY, &mouseButton);
         data->u = (uint16_t)(mouseY / pixelSize);
         break;
     case MOUSEB:
+        tigrMouse(window, &mouseX, &mouseY, &mouseButton);
+        if(mouseButton != 0 && mouseButton != 1) mouseButton = 2;
         data->u = mouseButton;
         break;
     case POINT:
@@ -262,16 +265,16 @@ void bus_write(teenyat *t, tny_uword addr, tny_word data, uint16_t *delay)
 
     switch(addr) {
     case X1:
-        setVal(data.u, &x1);
+        setVal(data.u, &lcd_x1);
         break;
     case Y1:
-        setVal(data.u, &y1);
+        setVal(data.u, &lcd_y1);
         break;
     case X2:
-        setVal(data.u, &x2);
+        setVal(data.u, &lcd_x2);
         break;
     case Y2:
-        setVal(data.u, &y2);
+        setVal(data.u, &lcd_y2);
         break;
     case STROKE:
         setStroke(data.u);
