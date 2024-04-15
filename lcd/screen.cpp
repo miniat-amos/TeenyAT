@@ -27,6 +27,7 @@ int y2 = 0;
 int mouseX = 0;
 int mouseY = 0;
 int mouseButton = 0;
+int current_frame = 0;
 
 TPixel currFill = TPixel {
   0,

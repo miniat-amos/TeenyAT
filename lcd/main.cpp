@@ -171,8 +171,12 @@ int main(int argc, char *argv[])
     }
 
     while(!tigrClosed(window) && !tigrKeyDown(window, TK_ESCAPE)) {
-        tigrMouse(window, &mouseX, &mouseY, &mouseButton);
+        if(current_frame > (gridLength * gridLength * gridLength)){
+            tigrUpdate(window);
+            current_frame = 0;
+        }
         tny_clock(&t);
+        current_frame++;
     }
 
     tigrFree(window);
@@ -223,12 +227,16 @@ void bus_read(teenyat *t, tny_uword addr, tny_word *data, uint16_t *delay)
         data->u = rand16();
         break;
     case MOUSEX:
+        tigrMouse(window, &mouseX, &mouseY, &mouseButton);
         data->u = (uint16_t)(mouseX / pixelSize);
         break;
     case MOUSEY:
+        tigrMouse(window, &mouseX, &mouseY, &mouseButton);
         data->u = (uint16_t)(mouseY / pixelSize);
         break;
     case MOUSEB:
+        tigrMouse(window, &mouseX, &mouseY, &mouseButton);
+        if(mouseButton != 0 && mouseButton != 1) mouseButton = 2;
         data->u = mouseButton;
         break;
     case POINT:

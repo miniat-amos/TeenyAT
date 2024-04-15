@@ -17,6 +17,7 @@ extern double pixelSize;
 extern int mouseX;
 extern int mouseY;
 extern int mouseButton;
+extern int current_frame;
 
 extern int x1;
 extern int y1;
