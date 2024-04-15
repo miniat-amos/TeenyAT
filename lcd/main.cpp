@@ -200,16 +200,16 @@ void bus_read(teenyat *t, tny_uword addr, tny_word *data, uint16_t *delay)
 
     switch(addr) {
     case X1:
-        data->u = x1;
+        data->u = lcd_x1;
         break;
     case Y1:
-        data->u = y1;
+        data->u = lcd_y1;
         break;
     case X2:
-        data->u = x2;
+        data->u = lcd_x2;
         break;
     case Y2:
-        data->u = y2;
+        data->u = lcd_y2;
         break;
     case STROKE:
         data->u = currStrokeColor;
@@ -270,16 +270,16 @@ void bus_write(teenyat *t, tny_uword addr, tny_word data, uint16_t *delay)
 
     switch(addr) {
     case X1:
-        setVal(data.u, &x1);
+        setVal(data.u, &lcd_x1);
         break;
     case Y1:
-        setVal(data.u, &y1);
+        setVal(data.u, &lcd_y1);
         break;
     case X2:
-        setVal(data.u, &x2);
+        setVal(data.u, &lcd_x2);
         break;
     case Y2:
-        setVal(data.u, &y2);
+        setVal(data.u, &lcd_y2);
         break;
     case STROKE:
         setStroke(data.u);

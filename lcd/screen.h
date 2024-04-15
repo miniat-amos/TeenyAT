@@ -19,10 +19,10 @@ extern int mouseY;
 extern int mouseButton;
 extern int current_frame;
 
-extern int x1;
-extern int y1;
-extern int x2;
-extern int y2;
+extern int lcd_x1;
+extern int lcd_y1;
+extern int lcd_x2;
+extern int lcd_y2;
 extern uint16_t live_screen[];
 extern uint16_t update_screen[];
 
@@ -40,11 +40,11 @@ void setStroke(uint16_t col);
 void fill(uint16_t col);
 void stroke(uint16_t col);
     
-// Set the x1,x2,y1,y2 values
+// Set the lcd_x1,lcd_x2,lcd_y1,lcd_y2 values
 void setVal(int val,int * ret);
 
-void verticalLine(int x1, int y1,int y2);
-void horizontalLine(int y1, int x1,int x2);
+void verticalLine(int lcd_x1, int lcd_y1,int lcd_y2);
+void horizontalLine(int lcd_y1, int lcd_x1,int lcd_x2);
 void line();
 void rect();
 
