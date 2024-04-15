@@ -50,6 +50,10 @@ uint16_t update_screen[gridLength * gridLength] = {
   0
 };
 
+int keyboard_input_buffer[KEYBOARD_INPUT_BUFFER_SIZE] = {
+  0
+};
+
 void point() {
   int index = lcd_y1 * gridLength + lcd_x1;
   update_screen[index] = currStrokeColor;
@@ -208,6 +212,38 @@ void rect() {
     currStrokeColor = temp;
   }
 
+}
+
+/* append values to a buffer */
+void buffer_push(int buffer[],int len,int num){
+		int index;
+		for(index = 0; index < len; index++){
+			if(buffer[index] == 0){
+				break;
+			}
+		}
+		if(index >= len) index--;
+		buffer[index] = num;
+}
+
+int buffer_pop(int buffer[],int len){
+	int num = buffer[0];
+	for(int i = 0; i < (len-1); i++){
+		buffer[i] = buffer[i + 1];
+	}
+	buffer[len-1] = 0;
+	return num;
+}
+
+/* processes key-board inputs and appends them to buffer */
+void process_keyboard_input(Tigr* win){
+        char key = 'A';
+        for(key; key <= 'Z'; key++){
+            int hit = tigrKeyHeld(win, key);
+            if(hit){
+                buffer_push(keyboard_input_buffer,KEYBOARD_INPUT_BUFFER_SIZE,key);
+            }
+        }
 }
 
 /* Render Pixels using live screen */
