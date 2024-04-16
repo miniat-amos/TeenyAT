@@ -33,7 +33,6 @@ void generate_listing() {
         if(lb.uses_words) {
             int cnt = lb.bin_uwords.size();
             int i = 0;
-            int addr = lb.address;
             while(i < cnt) {
                 if(i > 0  &&  (i % 2) == 0) {
                     /* time to add a new line of words */
@@ -43,7 +42,6 @@ void generate_listing() {
                 cout << hex << setw(4) << setfill('0') << lb.bin_uwords[i] << dec;
                 cout << " ";
                 i++;
-                addr++;
             }
             /* for odd numbers of words, fill final hex area with spaces */
             if(cnt % 2) {
