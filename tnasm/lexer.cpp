@@ -106,12 +106,6 @@ void read_file(const string path, vector <string> &asm_lines) {
 	ifstream f(path);
 	string s;
 	while(getline(f, s)) {
-		/* lowercase all input to achieve case-insensitivity */
-		for(auto &c : s) {
-			if(isupper(c)) {
-				c = c- 'A' + 'a';
-			}
-		}
 		asm_lines.push_back(s);
 	}
 	f.close();
