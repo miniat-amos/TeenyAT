@@ -33,7 +33,7 @@ The TeenyAT core architecture is made up of 16 bit words. Each memory address po
 	 
 There are 8 registers available for all register-use instructions: PC or reg[1] is the program counter. It contains the address of the next instruction. The PC is initialized to address 0x0000. The next register is the SP or reg[2] is the stack pointer. The SP contains the address of the next top element in the stack and is initialized to address 0x7FFF. This initial address means the SP is empty. It grows down in memory. The "zero" register or rZ is reg[0]. This register always contains the value 0. All attempts to modify the "zero" register are ignored. The rest of the available registers: rA through rE, reg[3] through reg[7], are general purpose registers.  
 
-Each instruction is encoded in either one or two 16 bit words. The fetch instruction must set *PC = PC + 1 - T*, where *T* is the "teeny" bit to account for this. If the teeny bit is equal to one, "teeny == 1," then the instruction is 16 bits. This essentially assumes that the second word is 0x0000. If the teeny bit is equal to zero, "teeny == 0," then the instruction is 32 bits and requires an additional cycle. We can also say that the second instruction is not teeny. Any fetches to RAM referencing addresses greater than 0x7FFF will result in the PC being reset to 0x0000.
+Each instruction is encoded in either one or two 16 bit words. The fetch instruction must set *PC = PC + 2 - T*, where *T* is the "teeny" bit to account for this. If the teeny bit is equal to one, "teeny == 1," then the instruction is 16 bits. This essentially assumes that the second word is 0x0000. If the teeny bit is equal to zero, "teeny == 0," then the instruction is 32 bits and requires an additional cycle. We can also say that the second instruction is not teeny. Any fetches to RAM referencing addresses greater than 0x7FFF will result in the PC being reset to 0x0000.
 
 A four bit immediate field can be used as flags. In order of highest to lowest order bits, the flags are: carry, equal to, less than, and greater than. The highest bit is currently reserved as the carry bit in some places but it is not fully supported at this moment. The equal flag is set when the last comparison, by virtue of a previous instruction, is found to the equal. The less than flag is set the last comparison resulted in the first register being less than the second register. Likewise, the greater than flag is set when the result of the last comparison resulted in the first register being greater than the second register.
 
@@ -49,7 +49,7 @@ A four bit immediate field can be used as flags. In order of highest to lowest o
 		-   all attempts to modify rZ are ignored
 	-   rA through rE (reg[3] through reg[7]) are general purpose registers
 -   Instructions encoded in either one or two 16 bit words
-	-   Fetch must set PC = PC + 1 - T, where T is the "teeny" bit to account for this
+	-   Fetch must set PC = PC + 2 - T, where T is the "teeny" bit to account for this
 		-   if teeny == 1, the instruction is 16 bits (essentially assumes 2nd word is 0x0000)
 		-   if teeny == 0, the instruction is 32 bits and  requires an additional cycle
      -   Fetches to RAM greater than 0x7FFF will result in the PC being set to 0
