@@ -237,8 +237,7 @@ int buffer_pop(int buffer[],int len){
 
 /* processes key-board inputs and appends them to buffer */
 void process_keyboard_input(Tigr* win){
-        char key = 'A';
-        for(key; key <= 'Z'; key++){
+        for(char key = 'A'; key <= 'Z'; key++){
             int hit = tigrKeyHeld(win, key);
             if(hit){
                 buffer_push(keyboard_input_buffer,KEYBOARD_INPUT_BUFFER_SIZE,key);
