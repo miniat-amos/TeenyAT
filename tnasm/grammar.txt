@@ -73,7 +73,7 @@ code_1_inst ::= ROT.
 code_1_inst ::= SET.
 code_1_inst ::= BTF.
 code_1_inst ::= CMP.
-code_1_inst ::= DJZ.
+code_1_inst ::= LUP.
 
 code_1_mem_inst ::= LOD.
 code_1_mem_inst ::= STR.
@@ -91,7 +91,7 @@ code_2_inst ::= ROT.
 code_2_inst ::= SET.
 code_2_inst ::= BTF.
 code_2_inst ::= CMP.
-code_2_inst ::= DJZ.
+code_2_inst ::= LUP.
 
 code_2_mem_inst ::= LOD.
 
@@ -108,7 +108,7 @@ code_3_inst ::= ROT.
 code_3_inst ::= SET.
 code_3_inst ::= BTF.
 code_3_inst ::= CMP.
-code_3_inst ::= DJZ.
+code_3_inst ::= LUP.
 
 code_3_mem_inst ::= LOD.
 
