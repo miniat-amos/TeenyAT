@@ -33,16 +33,16 @@ set rC, 0
     LOD rD, [KEY]
   
     ; Player Movement
-    CMP rD, 87 ; W
+    CMP rD, 'W'
     JE !UP
 
-    CMP rD, 83 ; S
+    CMP rD, 'S'
     JE !DOWN
 
-    CMP rD, 65 ; A
+    CMP rD, 'A'
     JE !LEFT
 
-    CMP rD, 68 ; D
+    CMP rD, 'D'
     JE !RIGHT
 
     !end_movement
