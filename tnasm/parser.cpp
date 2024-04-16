@@ -1090,7 +1090,7 @@ tny_uword token_to_opcode(int id) {
     case T_JLE:   result = TNY_OPCODE_JMP;   break;
     case T_JG:    result = TNY_OPCODE_JMP;   break;
     case T_JGE:   result = TNY_OPCODE_JMP;   break;
-    case T_DJZ:   result = TNY_OPCODE_DJZ;   break;
+    case T_LUP:   result = TNY_OPCODE_LUP;   break;
     /*
      * The following are pseudo-instructions
      */
@@ -1124,7 +1124,7 @@ tny_uword token_to_opcode(int id) {
  * code_1_inst ::= SET.
  * code_1_inst ::= BTF.
  * code_1_inst ::= CMP.
- * code_1_inst ::= DJZ.
+ * code_1_inst ::= LUP.
  */
 shared_ptr <token> p_code_1_inst() {
     shared_ptr <token> result;
@@ -1143,7 +1143,7 @@ shared_ptr <token> p_code_1_inst() {
     (tnext = save, result = term(T_SET)) ||
     (tnext = save, result = term(T_BTF)) ||
     (tnext = save, result = term(T_CMP)) ||
-    (tnext = save, result = term(T_DJZ));
+    (tnext = save, result = term(T_LUP));
 
     return result;
 }
@@ -1176,7 +1176,7 @@ shared_ptr <token> p_code_1_mem_inst() {
  * code_2_inst ::= SET.
  * code_2_inst ::= BTF.
  * code_2_inst ::= CMP.
- * code_2_inst ::= DJZ.
+ * code_2_inst ::= LUP.
  */
 shared_ptr <token> p_code_2_inst() {
     shared_ptr <token> result;
@@ -1195,7 +1195,7 @@ shared_ptr <token> p_code_2_inst() {
     (tnext = save, result = term(T_SET)) ||
     (tnext = save, result = term(T_BTF)) ||
     (tnext = save, result = term(T_CMP)) ||
-    (tnext = save, result = term(T_DJZ));
+    (tnext = save, result = term(T_LUP));
 
     return result;
 }
@@ -1227,7 +1227,7 @@ shared_ptr <token> p_code_2_mem_inst() {
  * code_3_inst ::= LOD.
  * code_3_inst ::= BTF.
  * code_3_inst ::= CMP.
- * code_3_inst ::= DJZ.
+ * code_3_inst ::= LUP.
  */
 shared_ptr <token> p_code_3_inst() {
     shared_ptr <token> result;
@@ -1247,7 +1247,7 @@ shared_ptr <token> p_code_3_inst() {
     (tnext = save, result = term(T_LOD)) ||
     (tnext = save, result = term(T_BTF)) ||
     (tnext = save, result = term(T_CMP)) ||
-    (tnext = save, result = term(T_DJZ));
+    (tnext = save, result = term(T_LUP));
 
     return result;
 }

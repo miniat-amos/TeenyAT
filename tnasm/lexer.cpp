@@ -160,7 +160,7 @@ void initialize_lexical_regex(vector <token_regex> &patterns) {
 	patterns.push_back(regex_token("jle", T_JLE, nullptr));
 	patterns.push_back(regex_token("jg", T_JG, nullptr));
 	patterns.push_back(regex_token("jge", T_JGE, nullptr));
-	patterns.push_back(regex_token("djz", T_DJZ, nullptr));
+	patterns.push_back(regex_token("lup", T_LUP, nullptr));
 	patterns.push_back(regex_token("inc", T_INC, nullptr));
 	patterns.push_back(regex_token("dec", T_DEC, nullptr));
 	patterns.push_back(regex_token("inv", T_INV, nullptr));
