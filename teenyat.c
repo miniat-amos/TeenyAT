@@ -60,8 +60,8 @@ bool tny_init_from_file(teenyat *t, FILE *bin_file,
 	memset(t, 0, sizeof(teenyat));
 
 	/* backup .bin file */
-	fread(t->bin_image, sizeof(tny_word), TNY_RAM_SIZE, bin_file);
-	if(ferror(bin_file)) return false;
+	size_t words_read = fread(t->bin_image, sizeof(tny_word), TNY_RAM_SIZE, bin_file);
+	if((words_read <= 0) || ferror(bin_file)) return false;
 
 	/* store bus callbacks */
 	t->bus_read = bus_read;
