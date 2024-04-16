@@ -237,12 +237,15 @@ int buffer_pop(int buffer[],int len){
 
 /* processes key-board inputs and appends them to buffer */
 void process_keyboard_input(Tigr* win){
-        for(char key = 'A'; key <= 'Z'; key++){
-            int hit = tigrKeyHeld(win, key);
-            if(hit){
-                buffer_push(keyboard_input_buffer,KEYBOARD_INPUT_BUFFER_SIZE,key);
-            }
-        }
+
+  char keys[] = "1234567890QWERTYUIOPASDFGHJKLZXCVBNM";
+  for(char *c = keys; *c != '\0'; c++){
+      char key = *c;
+      int hit = tigrKeyHeld(win, key);
+      if(hit){
+          buffer_push(keyboard_input_buffer,KEYBOARD_INPUT_BUFFER_SIZE,key);
+      }
+  }
 }
 
 /* Render Pixels using live screen */
