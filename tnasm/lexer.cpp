@@ -317,7 +317,11 @@ void handle_register(token &t) {
 	 * "(PC)|(SP)|(rZ)"
 	 * "r[A-E0-7]"
 	 */
-	string &s = t.token_str;
+	string s = t.token_str;
+	for(auto &c : s) {
+		c = tolower(c);
+	}
+
 	if(s == "pc") {
 		t.value.u = TNY_REG_PC;
 	}
@@ -332,7 +336,7 @@ void handle_register(token &t) {
 			t.value.u = (int)(s[1] - '0');
 		}
 		else {
-			t.value.u = (int)(s[1] - 'A') + TNY_REG_A;
+			t.value.u = (int)(s[1] - 'a') + TNY_REG_A;
 		}
 	}
 
