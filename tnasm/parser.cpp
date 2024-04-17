@@ -789,7 +789,7 @@ bool p_code_8_line() {
 
         tny_word &f = inst.first;
         f.instruction.opcode = token_to_opcode(oper->id);
-        f.instruction.teeny = 0;
+        f.instruction.teeny = 1;
         f.instruction.reg1 = dreg->value.u;
         f.instruction.reg2 = sreg->value.u;
         f.instruction.immed4 = 0;
