@@ -274,24 +274,22 @@ A four bit immediate field can be used as flags. In order of highest to lowest o
     - JMP register1 + immed
     - JMP register1
     - JMP immed
-### 4.23 DJZ
+### 4.23 DLY
 - Opcode: 22
-- Desc: Decrements register1 and then if its zero will set PC an address
-     - The instance flags are set as: 
-          - Equal = 1, Less = 0, Greater = 0 
-- Flags: N/A
-- Usage: 
-    - DJZ register1, register2 + immed
-    - DJZ register1, register2 
-    - DJZ register1, immed
-### 4.24 DLY
-- Opcode: 23
 - Desc: Delays for a certain amount of clock cycles
 - Flags: N/A
 - Usage: 
     - DLY register2 + immed
     - DLY register2 
     - DLY immed
+### 4.24 LUP
+- Opcode: 23
+- Desc: The "Loop" instruction.  Decrements register1 and jumps to the calculated target address if the register is non-zero
+- Flags: N/A
+- Usage: 
+    - LUP register1, register2 + immed
+    - LUP register1, register2 
+    - LUP register1, immed
 
 ##***\*Pseudo instructions:** These instructions can be synthesized with a single different instruction. Reference the opcode for this.*
 ### 4.25 INC
@@ -403,8 +401,8 @@ A four bit immediate field can be used as flags. In order of highest to lowest o
 |      NEG                       |     19       |
 |      CMP                       |     20       |
 |      JMP                       |     21       |
-|      DJZ                       |     22       |
-|      DLY                       |     23       |
+|      DLY                       |     22       |
+|      LUP                       |     23       |
 
 <a/>
 

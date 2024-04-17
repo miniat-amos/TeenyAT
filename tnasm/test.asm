@@ -52,6 +52,12 @@
     lod r4, 'a'
     lod r4, '\n'
 
+    ; here's an example do..loop using LUP
+    SET rC, 17
+!top_of_loop
+    ; do some stuff
+    LUP rC, !top_of_loop
+
     Psh r4
     CAL PC ; oooh... what could this be used for? >:-)
 

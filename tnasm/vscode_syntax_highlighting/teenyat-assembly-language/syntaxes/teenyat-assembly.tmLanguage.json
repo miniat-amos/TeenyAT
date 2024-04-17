@@ -87,7 +87,7 @@
 			"patterns": [{
 					"__COMMENT__": "***** Instruction Mnemonics *****",
 					"name": "keyword.control.teenyat-assembly",
-					"match": "\\b(?i)(SET|LOD|STR|PSH|POP|BTS|BTC|BTF|CAL|ADD|SUB|MPY|DIV|MOD|AND|OR|XOR|SHF|ROT|NEG|CMP|DLY|JMP|JE|JNE|JL|JLE|JG|JGE|DJZ|INC|DEC|INV|RET)\\b"
+					"match": "\\b(?i)(SET|LOD|STR|PSH|POP|BTS|BTC|BTF|CAL|ADD|SUB|MPY|DIV|MOD|AND|OR|XOR|SHF|ROT|NEG|CMP|DLY|JMP|JE|JNE|JL|JLE|JG|JGE|LUP|INC|DEC|INV|RET)\\b"
 			}]
 		},
 		"identifier": {

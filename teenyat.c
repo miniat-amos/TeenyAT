@@ -411,12 +411,12 @@ void tny_clock(teenyat *t) {
 			}
 		}
 		break;
-	case TNY_OPCODE_DJZ:
+	case TNY_OPCODE_LUP:
 		tmp = (uint32_t)(t->reg[reg1].s) - 1;
 		t->flags.carry = tmp & (1 << 16);
 		t->reg[reg1].s = tmp;
 		set_elg_flags(t, (tny_sword)tmp);
-		if(tmp == 0) {
+		if(tmp != 0) {
 			set_pc(t, t->reg[reg2].s + immed);
 		}
 		break;
