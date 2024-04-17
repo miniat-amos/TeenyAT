@@ -1150,14 +1150,12 @@ shared_ptr <token> p_code_1_inst() {
 
 /*
  * code_1_mem_inst ::= LOD.
- * code_1_mem_inst ::= STR.
  */
 shared_ptr <token> p_code_1_mem_inst() {
     shared_ptr <token> result;
     int save = tnext;
 
-    (tnext = save, result = term(T_LOD)) ||
-    (tnext = save, result = term(T_STR));
+    (tnext = save, result = term(T_LOD));
 
     return result;
 }
