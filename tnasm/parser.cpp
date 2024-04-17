@@ -776,13 +776,44 @@ bool p_code_7_line() {
 }
 
 /*
- * code_8_line ::= code_8_inst REGISTER.
+ * code_8_line ::= code_8_inst LBRACKET REGISTER RBRACKET COMMA REGISTER.
  */
 bool p_code_8_line() {
     bool result = false;
+    shared_ptr <token> dreg, oper, sreg;
+    if((oper = p_code_8_inst()) && term(T_LBRACKET) && (dreg = term(T_REGISTER)) &&
+       term(T_RBRACKET) && term(T_COMMA) && (sreg = term(T_REGISTER)) && term(T_EOL)) {
+
+        instruction inst;
+        inst.line_no = oper->line_no;
+
+        tny_word &f = inst.first;
+        f.instruction.opcode = token_to_opcode(oper->id);
+        f.instruction.teeny = 0;
+        f.instruction.reg1 = dreg->value.u;
+        f.instruction.reg2 = sreg->value.u;
+        f.instruction.immed4 = 0;
+
+        address++;
+
+        if(pass > 1) {
+            bin_words.push_back(f);
+        }
+
+        result = true;
+    }
+
+    return result;
+}
+
+/*
+ * code_9_line ::= code_9_inst REGISTER.
+ */
+bool p_code_9_line() {
+    bool result = false;
     shared_ptr <token> oper, sreg;
     shared_ptr <tny_word> immed;
-    if((oper = p_code_8_inst()) && (sreg = term(T_REGISTER)) && term(T_EOL)) {
+    if((oper = p_code_9_inst()) && (sreg = term(T_REGISTER)) && term(T_EOL)) {
 
         instruction inst;
         inst.line_no = oper->line_no;
@@ -807,13 +838,13 @@ bool p_code_8_line() {
 }
 
 /*
- * code_9_line ::= code_9_inst REGISTER plus_or_minus immediate.
+ * code_10_line ::= code_10_inst REGISTER plus_or_minus immediate.
  */
-bool p_code_9_line() {
+bool p_code_10_line() {
     bool result = false;
     shared_ptr <token> oper, sreg, sign;
     shared_ptr <tny_word> immed;
-    if((oper = p_code_9_inst()) && (sreg = term(T_REGISTER)) && (sign = p_plus_or_minus())
+    if((oper = p_code_10_inst()) && (sreg = term(T_REGISTER)) && (sign = p_plus_or_minus())
         && (immed = p_immediate()) && term(T_EOL)) {
 
         instruction inst;
@@ -852,13 +883,13 @@ bool p_code_9_line() {
 }
 
 /*
- * code_10_line ::= code_10_inst immediate.
+ * code_11_line ::= code_11_inst immediate.
  */
-bool p_code_10_line() {
+bool p_code_11_line() {
     bool result = false;
     shared_ptr <token> oper;
     shared_ptr <tny_word> immed;
-    if((oper = p_code_10_inst()) && (immed = p_immediate()) && term(T_EOL)) {
+    if((oper = p_code_11_inst()) && (immed = p_immediate()) && term(T_EOL)) {
 
         instruction inst;
         inst.line_no = oper->line_no;
@@ -896,12 +927,12 @@ bool p_code_10_line() {
 }
 
 /*
- * code_11_line ::= code_11_inst.
+ * code_12_line ::= code_12_inst.
  */
-bool p_code_11_line() {
+bool p_code_12_line() {
     bool result = false;
     shared_ptr <token> oper;
-    if((oper = p_code_11_inst()) && term(T_EOL)) {
+    if((oper = p_code_12_inst()) && term(T_EOL)) {
 
         instruction inst;
         inst.line_no = oper->line_no;
@@ -926,12 +957,12 @@ bool p_code_11_line() {
 }
 
 /*
- * code_12_line ::= code_12_inst REGISTER.
+ * code_13_line ::= code_13_inst REGISTER.
  */
-bool p_code_12_line() {
+bool p_code_13_line() {
     bool result = false;
     shared_ptr <token> oper, sreg;
-    if((oper = p_code_12_inst()) && (sreg = term(T_REGISTER)) && term(T_EOL)) {
+    if((oper = p_code_13_inst()) && (sreg = term(T_REGISTER)) && term(T_EOL)) {
 
         instruction inst;
         inst.line_no = oper->line_no;
@@ -967,13 +998,13 @@ bool p_code_12_line() {
 }
 
 /*
- * code_13_line ::= code_13_inst REGISTER plus_or_minus immediate.
+ * code_14_line ::= code_14_inst REGISTER plus_or_minus immediate.
  */
-bool p_code_13_line() {
+bool p_code_14_line() {
     bool result = false;
     shared_ptr <token> oper, sreg, sign;
     shared_ptr <tny_word> immed;
-    if((oper = p_code_13_inst()) && (sreg = term(T_REGISTER)) &&
+    if((oper = p_code_14_inst()) && (sreg = term(T_REGISTER)) &&
        (sign = p_plus_or_minus()) && (immed = p_immediate()) && term(T_EOL)) {
 
         instruction inst;
@@ -1015,13 +1046,13 @@ bool p_code_13_line() {
 }
 
 /*
- * code_14_line ::= code_14_inst immediate.
+ * code_15_line ::= code_15_inst immediate.
  */
-bool p_code_14_line() {
+bool p_code_15_line() {
     bool result = false;
     shared_ptr <token> oper;
     shared_ptr <tny_word> immed;
-    if((oper = p_code_14_inst()) && (immed = p_immediate()) && term(T_EOL)) {
+    if((oper = p_code_15_inst()) && (immed = p_immediate()) && term(T_EOL)) {
 
         instruction inst;
         inst.line_no = oper->line_no;
@@ -1054,37 +1085,6 @@ bool p_code_14_line() {
             bin_words.push_back(f);
             bin_words.push_back(inst.second);
          }
-
-        result = true;
-    }
-
-    return result;
-}
-
-/*
- * code_15_line ::= code_15_inst LBRACKET REGISTER RBRACKET COMMA REGISTER.
- */
-bool p_code_15_line() {
-    bool result = false;
-    shared_ptr <token> dreg, oper, sreg;
-    if((oper = p_code_15_inst()) && term(T_LBRACKET) && (dreg = term(T_REGISTER)) &&
-       term(T_RBRACKET) && term(T_COMMA) && (sreg = term(T_REGISTER)) && term(T_EOL)) {
-
-        instruction inst;
-        inst.line_no = oper->line_no;
-
-        tny_word &f = inst.first;
-        f.instruction.opcode = token_to_opcode(oper->id);
-        f.instruction.teeny = 0;
-        f.instruction.reg1 = dreg->value.u;
-        f.instruction.reg2 = sreg->value.u;
-        f.instruction.immed4 = 0;
-
-        address++;
-
-        if(pass > 1) {
-            bin_words.push_back(f);
-        }
 
         result = true;
     }
@@ -1351,17 +1351,13 @@ shared_ptr <token> p_code_7_inst() {
 }
 
 /*
- * code_8_inst ::= PSH.
- * code_8_inst ::= DLY.
- * code_8_inst ::= CAL.
+ * code_8_inst ::= STR.
  */
 shared_ptr <token> p_code_8_inst() {
     shared_ptr <token> result;
     int save = tnext;
 
-    (tnext = save, result = term(T_PSH)) ||
-    (tnext = save, result = term(T_DLY)) ||
-    (tnext = save, result = term(T_CAL));
+    (tnext = save, result = term(T_STR));
 
     return result;
 }
@@ -1399,37 +1395,29 @@ shared_ptr <token> p_code_10_inst() {
 }
 
 /*
- * code_11_inst ::= RET.
+ * code_11_inst ::= PSH.
+ * code_11_inst ::= DLY.
+ * code_11_inst ::= CAL.
  */
 shared_ptr <token> p_code_11_inst() {
     shared_ptr <token> result;
     int save = tnext;
 
-    (tnext = save, result = term(T_RET));
+    (tnext = save, result = term(T_PSH)) ||
+    (tnext = save, result = term(T_DLY)) ||
+    (tnext = save, result = term(T_CAL));
 
     return result;
 }
 
 /*
- * code_12_inst ::= JMP.
- * code_12_inst ::= JE.
- * code_12_inst ::= JNE.
- * code_12_inst ::= JL.
- * code_12_inst ::= JLE.
- * code_12_inst ::= JG.
- * code_12_inst ::= JGE.
+ * code_12_inst ::= RET.
  */
 shared_ptr <token> p_code_12_inst() {
     shared_ptr <token> result;
     int save = tnext;
 
-    (tnext = save, result = term(T_JMP)) ||
-    (tnext = save, result = term(T_JE)) ||
-    (tnext = save, result = term(T_JNE)) ||
-    (tnext = save, result = term(T_JL)) ||
-    (tnext = save, result = term(T_JLE)) ||
-    (tnext = save, result = term(T_JG)) ||
-    (tnext = save, result = term(T_JGE));
+    (tnext = save, result = term(T_RET));
 
     return result;
 }
@@ -1483,13 +1471,25 @@ shared_ptr <token> p_code_14_inst() {
 }
 
 /*
- * code_15_inst ::= STR.
+ * code_15_inst ::= JMP.
+ * code_15_inst ::= JE.
+ * code_15_inst ::= JNE.
+ * code_15_inst ::= JL.
+ * code_15_inst ::= JLE.
+ * code_15_inst ::= JG.
+ * code_15_inst ::= JGE.
  */
 shared_ptr <token> p_code_15_inst() {
     shared_ptr <token> result;
     int save = tnext;
 
-    (tnext = save, result = term(T_STR));
+    (tnext = save, result = term(T_JMP)) ||
+    (tnext = save, result = term(T_JE)) ||
+    (tnext = save, result = term(T_JNE)) ||
+    (tnext = save, result = term(T_JL)) ||
+    (tnext = save, result = term(T_JLE)) ||
+    (tnext = save, result = term(T_JG)) ||
+    (tnext = save, result = term(T_JGE));
 
     return result;
 }

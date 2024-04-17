@@ -18,6 +18,7 @@ loc ::= code_11_line.
 loc ::= code_12_line.
 loc ::= code_13_line.
 loc ::= code_14_line.
+loc ::= code_15_line.
 
 variable_line ::= VARIABLE IDENTIFIER immediate.
 
@@ -52,14 +53,14 @@ code_4_line ::= code_4_inst REGISTER.
 code_5_line ::= code_5_inst REGISTER.
 code_6_line ::= code_6_inst LBRACKET REGISTER plus_or_minus immediate RBRACKET COMMA REGISTER.
 code_7_line ::= code_7_inst LBRACKET immediate RBRACKET COMMA REGISTER.
-code_8_line ::= code_8_inst REGISTER.
-code_9_line ::= code_9_inst REGISTER plus_or_minus immediate.
-code_10_line ::= code_10_inst immediate.
-code_11_line ::= code_11_inst.
-code_12_line ::= code_12_inst REGISTER.
-code_13_line ::= code_13_inst REGISTER plus_or_minus immediate.
-code_14_line ::= code_14_inst immediate.
-code_15_line ::= code_15_inst LBRACKET REGISTER RBRACKET COMMA REGISTER.
+code_8_line ::= code_8_inst LBRACKET REGISTER RBRACKET COMMA REGISTER.
+code_9_line ::= code_9_inst REGISTER.
+code_10_line ::= code_10_inst REGISTER plus_or_minus immediate.
+code_11_line ::= code_11_inst immediate.
+code_12_line ::= code_12_inst.
+code_13_line ::= code_13_inst REGISTER.
+code_14_line ::= code_14_inst REGISTER plus_or_minus immediate.
+code_15_line ::= code_15_inst immediate.
 
 code_1_inst ::= ADD.
 code_1_inst ::= SUB.
@@ -123,9 +124,7 @@ code_6_inst ::= STR.
 
 code_7_inst ::= STR.
 
-code_8_inst ::= PSH.
-code_8_inst ::= DLY.
-code_8_inst ::= CAL.
+code_8_inst ::= STR.
 
 code_9_inst ::= PSH.
 code_9_inst ::= DLY.
@@ -135,15 +134,11 @@ code_10_inst ::= PSH.
 code_10_inst ::= DLY.
 code_10_inst ::= CAL.
 
-code_11_inst ::= RET.
+code_11_inst ::= PSH.
+code_11_inst ::= DLY.
+code_11_inst ::= CAL.
 
-code_12_inst ::= JMP.
-code_12_inst ::= JE.
-code_12_inst ::= JNE.
-code_12_inst ::= JL.
-code_12_inst ::= JLE.
-code_12_inst ::= JG.
-code_12_inst ::= JGE.
+code_12_inst ::= RET.
 
 code_13_inst ::= JMP.
 code_13_inst ::= JE.
@@ -161,4 +156,10 @@ code_14_inst ::= JLE.
 code_14_inst ::= JG.
 code_14_inst ::= JGE.
 
-code_15_inst ::= STR.
+code_15_inst ::= JMP.
+code_15_inst ::= JE.
+code_15_inst ::= JNE.
+code_15_inst ::= JL.
+code_15_inst ::= JLE.
+code_15_inst ::= JG.
+code_15_inst ::= JGE.
