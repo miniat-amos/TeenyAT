@@ -1,4 +1,4 @@
-# **TeenyAT Robot Instruction Set Architecture**
+# **TeenyAT Instruction Set Architecture**
 
 ## Elements
     16 bit words (each memory address points to a 16 bit value)

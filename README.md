@@ -1,5 +1,4 @@
-
-# TeenyAT Robot Architecture
+# TeenyAT Architecture
 **/ˈtē∙nē∙ət/**  
 **An Architecture to Virtualize**
 
