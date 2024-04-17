@@ -59,6 +59,7 @@ code_11_line ::= code_11_inst.
 code_12_line ::= code_12_inst REGISTER.
 code_13_line ::= code_13_inst REGISTER plus_or_minus immediate.
 code_14_line ::= code_14_inst immediate.
+code_15_line ::= code_15_inst LBRACKET REGISTER RBRACKET COMMA REGISTER.
 
 code_1_inst ::= ADD.
 code_1_inst ::= SUB.
@@ -76,7 +77,6 @@ code_1_inst ::= CMP.
 code_1_inst ::= LUP.
 
 code_1_mem_inst ::= LOD.
-code_1_mem_inst ::= STR.
 
 code_2_inst ::= ADD.
 code_2_inst ::= SUB.
@@ -160,3 +160,5 @@ code_14_inst ::= JL.
 code_14_inst ::= JLE.
 code_14_inst ::= JG.
 code_14_inst ::= JGE.
+
+code_15_inst ::= STR.
