@@ -374,7 +374,7 @@ void handle_prefixed_number(token &t) {
 	}
 
 	if(base != 0) {
-		t.value.s = string_to_value(t.token_str, base);
+		t.value.s = string_to_value(t.token_str.substr(2), base);
 	}
 	else {
 		t.value.s = 0;
