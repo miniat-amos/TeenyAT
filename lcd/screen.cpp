@@ -277,7 +277,7 @@ void initScreen(double v) {
 
   hue = v;
   srand(time(nullptr));
-  window = tigrWindow(windowWidth, windowHeight, "Test Program", 0);
+  window = tigrWindow(windowWidth, windowHeight, "TeenyAT LCD", TIGR_FIXED);
   /* Create renderer and initialize update_screen to hue */
   for (int i = 0; i < gridLength * gridLength; i++) {
     live_screen[i] = hue;
