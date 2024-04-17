@@ -302,8 +302,18 @@ void bus_write(teenyat * /*t*/, tny_uword addr, tny_word data, uint16_t * /*dela
         point();
         break;
     case TERM:
-         std::cout << data.u << std::endl;
-         break;
+        std::cout << "0x" << std::hex << data.u << std::dec;
+        std::cout << "    unsigned: " << data.u;
+        std::cout << "    signed: " << data.s;
+        std::cout << "    char: ";
+        if(data.u < 256) {
+            std::cout << (char)(data.u);
+        }
+        else {
+            std::cout << "<out of range>";
+        }
+        std::cout << std::endl;
+        break;
     default:
         break;
     }
