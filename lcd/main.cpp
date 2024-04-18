@@ -1,4 +1,5 @@
 #include <iostream>
+#include <iomanip>
 #include <cstdlib>
 #include "tigr.h"
 #include "screen.h"
@@ -302,7 +303,8 @@ void bus_write(teenyat * /*t*/, tny_uword addr, tny_word data, uint16_t * /*dela
         point();
         break;
     case TERM:
-        std::cout << "0x" << std::hex << data.u << std::dec;
+        std::cout << "0x" << std::hex << std::setfill('0') << std::setw(4) << data.u;
+        std::cout << std::dec << std::setfill(' ') << std::setw(5);
         std::cout << "    unsigned: " << data.u;
         std::cout << "    signed: " << data.s;
         std::cout << "    char: ";
