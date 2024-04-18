@@ -1156,6 +1156,8 @@ tny_uword token_to_opcode(int id) {
  * code_1_inst ::= SHF.
  * code_1_inst ::= ROT.
  * code_1_inst ::= SET.
+ * code_1_inst ::= BTS.
+ * code_1_inst ::= BTC.
  * code_1_inst ::= BTF.
  * code_1_inst ::= CMP.
  * code_1_inst ::= LUP.
@@ -1175,6 +1177,8 @@ shared_ptr <token> p_code_1_inst() {
     (tnext = save, result = term(T_SHF)) ||
     (tnext = save, result = term(T_ROT)) ||
     (tnext = save, result = term(T_SET)) ||
+    (tnext = save, result = term(T_BTS)) ||
+    (tnext = save, result = term(T_BTC)) ||
     (tnext = save, result = term(T_BTF)) ||
     (tnext = save, result = term(T_CMP)) ||
     (tnext = save, result = term(T_LUP));
@@ -1206,6 +1210,8 @@ shared_ptr <token> p_code_1_mem_inst() {
  * code_2_inst ::= SHF.
  * code_2_inst ::= ROT.
  * code_2_inst ::= SET.
+ * code_2_inst ::= BTS.
+ * code_2_inst ::= BTC.
  * code_2_inst ::= BTF.
  * code_2_inst ::= CMP.
  * code_2_inst ::= LUP.
@@ -1225,6 +1231,8 @@ shared_ptr <token> p_code_2_inst() {
     (tnext = save, result = term(T_SHF)) ||
     (tnext = save, result = term(T_ROT)) ||
     (tnext = save, result = term(T_SET)) ||
+    (tnext = save, result = term(T_BTS)) ||
+    (tnext = save, result = term(T_BTC)) ||
     (tnext = save, result = term(T_BTF)) ||
     (tnext = save, result = term(T_CMP)) ||
     (tnext = save, result = term(T_LUP));
@@ -1257,6 +1265,8 @@ shared_ptr <token> p_code_2_mem_inst() {
  * code_3_inst ::= ROT.
  * code_3_inst ::= SET.
  * code_3_inst ::= LOD.
+ * code_3_inst ::= BTS.
+ * code_3_inst ::= BTC.
  * code_3_inst ::= BTF.
  * code_3_inst ::= CMP.
  * code_3_inst ::= LUP.
@@ -1277,6 +1287,8 @@ shared_ptr <token> p_code_3_inst() {
     (tnext = save, result = term(T_ROT)) ||
     (tnext = save, result = term(T_SET)) ||
     (tnext = save, result = term(T_LOD)) ||
+    (tnext = save, result = term(T_BTS)) ||
+    (tnext = save, result = term(T_BTC)) ||
     (tnext = save, result = term(T_BTF)) ||
     (tnext = save, result = term(T_CMP)) ||
     (tnext = save, result = term(T_LUP));

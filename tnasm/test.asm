@@ -41,6 +41,8 @@
     lod r3, [rD]
 !more
     BTF r1, r3 + thirty_one ;2
+    BtS r3, 5
+    bTc rB, 4
     ;str SP - aero, amos
     rOt rB, !early ;2
 
