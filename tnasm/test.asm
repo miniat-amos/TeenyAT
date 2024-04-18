@@ -64,7 +64,7 @@
     PSH PC - !more
     CAL rB + 0xF7
 
-    lod r5, [r1 - Amos]
+    lod r5, [r1 - amos]
     lod PC, aero
 
     INV rA                  ;2
