@@ -201,13 +201,19 @@ void rect() {
     verticalLine(lcd_x1, lcd_y1, lcd_y2);
     verticalLine(lcd_x2, lcd_y1, lcd_y2);
   }
-  int h = abs(lcd_y2 - lcd_y1);
+  
   /* Draw Fill lines */
   if (drawFill) {
+    int min_x = std::min(lcd_x1,lcd_x2);
+    int max_x = std::max(lcd_x1,lcd_x2);
+
+    int min_y = std::min(lcd_y1,lcd_y2);
+    int max_y = std::max(lcd_y1,lcd_y2);
+
     uint16_t temp = currStrokeColor;
     currStrokeColor = currFillColor;
-    for (int i = 0; i < h - 1; i++) {
-      horizontalLine((lcd_y1 + 1) + i, (lcd_x1 + 1), (lcd_x2 - 1));
+    for (int i = 0; i < std::abs(max_y-min_y)+1; i++) {
+      horizontalLine((min_y) + i, (min_x), (max_x));
     }
     currStrokeColor = temp;
   }
