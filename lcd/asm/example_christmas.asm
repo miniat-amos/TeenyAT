@@ -146,7 +146,7 @@ CAL !draw_trunk
     STR [X1], rA
     STR [Y1], rB
     SET rA, 35
-    SET rB, 64
+    SET rB, 63
     STR [X2], rA
     STR [Y2], rB
 
