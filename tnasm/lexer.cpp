@@ -126,7 +126,7 @@ token_regex regex_token(string s, token_type id, token_handler_ptr handler) {
 void initialize_lexical_regex(vector <token_regex> &patterns) {
     patterns.push_back(regex_token("[ \\t\\b\\v\\f\\r]+", T_IGNORE, nullptr));
 	patterns.push_back(regex_token(";.*", T_IGNORE, nullptr));
-	patterns.push_back(regex_token("![^ \\t\\b\\v\\r\\n;]+", T_LABEL, nullptr));
+	patterns.push_back(regex_token("![^ \\[\\]\\t\\b\\v\\r\\n;]+", T_LABEL, nullptr));
 	patterns.push_back(regex_token("\\.const(ant)?", T_CONSTANT, nullptr));
 	patterns.push_back(regex_token("\\.var(iable)?", T_VARIABLE, nullptr));
 	patterns.push_back(regex_token("(pc)|(sp)|(rz)", T_REGISTER, handle_register));
