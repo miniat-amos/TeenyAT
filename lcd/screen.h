@@ -4,7 +4,7 @@
 
 #include <cstdint>
 
-#define KEYBOARD_INPUT_BUFFER_SIZE 3
+#define KEYBOARD_INPUT_BUFFER_SIZE 8
 
 extern Tigr* window;
 extern int drawStroke;
