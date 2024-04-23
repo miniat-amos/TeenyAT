@@ -4,6 +4,7 @@
 
 #include <cstdint>
 
+// This represents the maximum amount of inputs that can be saved and later processed 
 #define KEYBOARD_INPUT_BUFFER_SIZE 8
 
 extern Tigr* window;
