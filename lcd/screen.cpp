@@ -194,14 +194,6 @@ void line() {
 */
 void rect() {
 
-  /* Draw Stroke Lines */
-  if (drawStroke) {
-    horizontalLine(lcd_y1, lcd_x1, lcd_x2);
-    horizontalLine(lcd_y2, lcd_x1, lcd_x2);
-    verticalLine(lcd_x1, lcd_y1, lcd_y2);
-    verticalLine(lcd_x2, lcd_y1, lcd_y2);
-  }
-  
   /* Draw Fill lines */
   if (drawFill) {
     int min_x = std::min(lcd_x1,lcd_x2);
@@ -217,6 +209,15 @@ void rect() {
     }
     currStrokeColor = temp;
   }
+
+   /* Draw Stroke Lines */
+  if (drawStroke) {
+    horizontalLine(lcd_y1, lcd_x1, lcd_x2);
+    horizontalLine(lcd_y2, lcd_x1, lcd_x2);
+    verticalLine(lcd_x1, lcd_y1, lcd_y2);
+    verticalLine(lcd_x2, lcd_y1, lcd_y2);
+  }
+  
 
 }
 
