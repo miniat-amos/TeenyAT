@@ -73,6 +73,12 @@ int main(int argc, char *argv[]) {
 		exit(EXIT_FAILURE);
 	}
 
+	if((!std::filesystem::exists(asm_filename))) {
+		cerr << "File " << asm_filename << " does not exist." << endl;
+		cerr << "Usage:   tnasm <file>" << endl;
+		exit(EXIT_FAILURE);
+	}
+
 	filesystem::path bin_filename = asm_filename.filename().replace_extension(".bin");
 
 	vector <string> asm_lines;
