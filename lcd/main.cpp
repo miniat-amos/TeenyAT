@@ -11,12 +11,12 @@
  *  See .... document for more detail 
  * 
  *  LIVESCREENxxxx: 
- *  - 0x8000 -- 0x8FFF each address is 1 pixel in a 64x64 lcd grid
+ *  - 0x9000 -- 0x9FFF each address is 1 pixel in a 64x64 lcd grid
  *  - read/write
  *  - any writes to this address automatically renders to the lcd
  *  
  *  UPDATESCREENxxxx:
- *  - 0x9000 -- 0x9FFF each address is 1 pixel in a 64x64 lcd grid
+ *  - 0xA000 -- 0xAFFF each address is 1 pixel in a 64x64 lcd grid
  *  - read/write
  *  - any reads/writes to the update screen work with an off screen buffer
  *  
@@ -90,17 +90,17 @@
  *  MOUSEX:
  *  - 0xFFFC
  *  - read only
- *  - returns the current mouse X cooridiante
+ *  - returns the current mouse X coordinate
  * 
  *  MOUSEY:
  *  - 0xFFFD
  *  - read only
- *  - returns the current mouse Y cooridiante
+ *  - returns the current mouse Y coordinate
  * 
  *  MOUSEB:
  *  - 0xFFFB
  *  - read only
- *  - returns the current mouse Button 
+ *  - returns the current mouse button 
  *  - 0 means no button
  *  - 1 means left button
  *  - 2 means other button
@@ -146,7 +146,7 @@ void bus_write(teenyat *t, tny_uword addr, tny_word data, uint16_t *delay);
 int main(int argc, char *argv[])
 {   
     if(argc < 2) {
-        std::cout << "Please provide an binary file" << std::endl;
+        std::cout << "Please provide a binary file" << std::endl;
         return 1;
     }
 
