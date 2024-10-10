@@ -221,16 +221,24 @@ void rect() {
 
 }
 
-/* append values to a buffer */
+/* append values to a buffer 
+*  
+*  if a push is attempted but the buffer if full 
+*  it will pop off the most recent value to allow 
+*  for new inputs to be later pushed  
+*/
 void buffer_push(int buffer[],int len,int num){
+
 		int index;
-		for(index = 0; index < len; index++){
-			if(buffer[index] == 0){
-				break;
-			}
+		for(index = (len-1); index > -1; index--){
+
+			  if(buffer[index] == 0) break;
 		}
-		if(index >= len) index--;
-		buffer[index] = num;
+		if(index >= 0){
+      buffer[index] = num;
+      return;
+    } 
+    buffer_pop(buffer,len);
 }
 
 int buffer_pop(int buffer[],int len){
