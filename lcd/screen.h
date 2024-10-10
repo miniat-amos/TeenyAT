@@ -4,7 +4,8 @@
 
 #include <cstdint>
 
-#define KEYBOARD_INPUT_BUFFER_SIZE 3
+// This represents the maximum amount of inputs that can be saved and later processed 
+#define KEYBOARD_INPUT_BUFFER_SIZE 8
 
 extern Tigr* window;
 extern int drawStroke;
