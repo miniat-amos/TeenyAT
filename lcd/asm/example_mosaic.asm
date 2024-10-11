@@ -1,7 +1,7 @@
 ; Hit key A to draw new mosaic
 ; Hit key S to mutate mosaic
-.const LIVESCREEN 0x8000
-.const UPDATESCREEN 0x9000
+.const LIVESCREEN 0x9000
+.const UPDATESCREEN 0xA000
 .const X1 0xD000
 .const Y1 0xD001
 .const X2 0xD002

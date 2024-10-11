@@ -1,8 +1,8 @@
 ;; This is a little christmas demo I made in a half hour. the codes not very clean ;;
 ;; but whatever.....MERRY CHRISTMAS................................................;;
 
-.const LIVESCREEN 0x8000
-.const UPDATESCREEN 0x9000
+.const LIVESCREEN 0x9000
+.const UPDATESCREEN 0xA000
 .const X1 0xD000
 .const Y1 0xD001
 .const X2 0xD002
@@ -23,7 +23,7 @@
 .const YELLOW 2116
 .const LAVENDER 2689
 
-.const BOTTOMSCREEN 40960
+.const BOTTOMSCREEN 45056
 
 
 CAL !draw_trunk
