@@ -8,8 +8,8 @@
 ; see all the LCD colors and use your mouse to find 
 ; out its integer value from the output on the terminal.
 
-.const LIVESCREEN 0x8000
-.const UPDATESCREEN 0x9000
+.const LIVESCREEN 0x9000
+.const UPDATESCREEN 0xA000
 .const X1 0xD000
 .const Y1 0xD001
 .const X2 0xD002
