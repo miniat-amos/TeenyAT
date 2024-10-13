@@ -2,6 +2,7 @@
 #include "teenyat.h"
 #include "tigr.h"
 #include "edison_board.h"
+#include "lcd_screen.h"
 
 /*
  *  These are the start of the address ranges or the addresses themselves: 
