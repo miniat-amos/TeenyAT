@@ -75,6 +75,27 @@ typedef void(*TNY_READ_FROM_BUS_FNPTR)(teenyat *t, tny_uword addr, tny_word *dat
  */
 typedef void(*TNY_WRITE_TO_BUS_FNPTR)(teenyat *t, tny_uword addr, tny_word data, uint16_t *delay);
 
+/**
+ * @brief
+ *   System calllback function to handle TeenyAT output port pin changes
+ *
+ * Whenever a store instruction (STR) writes to one of the two GPIO port addresses,
+ * values in bits identified for output may change.  If any are actually modified
+ * as a result of the store, this registered callback would be run.  It is the 
+ * responsibility of the callback author to determine which bits have changed
+ * (and to what).
+ * 
+ * @param t
+ *   The TeenyAT instance making the request
+ *
+ * @param a
+ *   The externally held pin levels for port A
+ *
+ * @param b
+ *   The externally held pin levels for port B
+ */
+typedef void(*TNY_PORT_CHANGE_FNPTR)(teenyat *t, tny_word a, tny_word b);
+
 /** While the TeenyAT has a 16 bit address space, RAM is only 32K words */
 #define TNY_RAM_SIZE (1 << 15)
 #define TNY_MAX_RAM_ADDRESS (TNY_RAM_SIZE - 1)
@@ -174,6 +195,30 @@ struct teenyat {
 	 * previous instruction.
 	 */
 	unsigned int delay_cycles;
+	/**
+	 * The held values on port A
+	 */
+	tny_word port_a;
+	/**
+	 * The held values on port B
+	 */
+	tny_word port_b;
+	/**
+	 * The I/O directions for each bit of port A.
+	 * 
+	 * 0 indicates output, 1 indicates input.
+	 */
+	tny_word port_a_directions;
+	/**
+	 * The I/O directions for each bit of port B.
+	 * 
+	 * 0 indicates output, 1 indicates input.
+	 */
+	tny_word port_b_directions;
+	/**
+	 * System callback for whenever output port pins have changed
+	 */
+	TNY_PORT_CHANGE_FNPTR port_change;
 	/**
 	 * The number of cycles this instance has been running since initialization
 	 * or reset.
@@ -288,6 +333,55 @@ bool tny_reset(teenyat *t);
  *   The TeenyAT instance
  */
 void tny_clock(teenyat *t);
+
+/**
+ * @brief
+ *   Get the current bit levels on ports A and B.
+ *
+ * @param t
+ *   The TeenyAT instance
+ * 
+ * @param[out] a
+ *   Returns the current bit levels held on port A
+ * 
+ * @param[out] b
+ *   Returns the current bit levels held on port B
+ * 
+ * @note
+ *   A NULL tny_word pointer argument identifies that port is to be ignored.
+ */
+void tny_get_ports(teenyat *t, tny_word *a, tny_word *b);
+
+/**
+ * @brief
+ *   Set the current bit levels on ports A and B for those pins operating
+ *   as input pins.
+ *
+ * @param t
+ *   The TeenyAT instance
+ * 
+ * @param a
+ *   New potential bits levels for port A
+ * 
+ * @param b
+ *   Returns the current bit levels held on port B
+ * 
+ * @note
+ *   A NULL tny_word pointer argument identifies that port is to be ignored.
+ */
+void tny_set_ports(teenyat *t, tny_word *a, tny_word *b);
+
+/**
+ * @brief
+ *   Register a callback for external port level changes
+ *
+ * @param t
+ *   The TeenyAT instance
+ * 
+ * @param port_change
+ *   Callback for handling external port level changes
+ */
+void tny_port_change(teenyat *t, TNY_PORT_CHANGE_FNPTR port_change);
 
 #ifdef __cplusplus
 }
