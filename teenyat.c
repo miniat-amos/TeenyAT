@@ -142,6 +142,12 @@ void tny_modify_port_levels(teenyat *t, bool is_system_request, tny_word data, b
 	return;
 }
 
+void tny_port_change(teenyat *t, TNY_PORT_CHANGE_FNPTR port_change) {
+	t->port_change = port_change;
+
+	return;
+}
+
 void tny_clock(teenyat *t) {
 	t->cycle_cnt++;
 
