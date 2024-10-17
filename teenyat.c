@@ -172,10 +172,16 @@ void tny_clock(teenyat *t) {
 			tny_uword addr = t->reg[reg2].s + immed;
 			switch(addr) {
 			case TNY_PORTA_ADDRESS:
+				t->reg[reg1] = t->port_a;
+				break;
 			case TNY_PORTB_ADDRESS:
+				t->reg[reg1] = t->port_b;
+				break;
 			case TNY_PORTA_DIR_ADDRESS:
+				t->reg[reg1] = t->port_a_directions;
+				break;
 			case TNY_PORTB_DIR_ADDRESS:
-				/* for the moment, these do nothing */
+				t->reg[reg1] = t->port_b_directions;
 				break;
 			default:
 				if(addr >= TNY_PERIPHERAL_BASE_ADDRESS) {
@@ -213,8 +219,10 @@ void tny_clock(teenyat *t) {
 			case TNY_PORTA_ADDRESS:
 			case TNY_PORTB_ADDRESS:
 			case TNY_PORTA_DIR_ADDRESS:
+				t->port_a_directions = t->reg[reg2];
+				break;
 			case TNY_PORTB_DIR_ADDRESS:
-				/* for the moment, these do nothing */
+				t->port_b_directions = t->reg[reg2];
 				break;
 			default:
 				if(addr >= TNY_PERIPHERAL_BASE_ADDRESS) {
