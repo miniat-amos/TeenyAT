@@ -96,6 +96,12 @@ bool tny_reset(teenyat *t) {
 
 	/* "instruction" and "immediate" members do not need initialization */
 
+	/* Initialize ports to output w/ all 0s */
+	t->port_a.u = 0;
+	t->port_a_directions.u = 0;
+	t->port_b.u = 0;
+	t->port_b_directions.u = 0;
+
 	t->delay_cycles = 0;
 	t->cycle_cnt = 0;
 
