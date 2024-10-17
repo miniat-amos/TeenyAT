@@ -148,6 +148,18 @@ void tny_port_change(teenyat *t, TNY_PORT_CHANGE_FNPTR port_change) {
 	return;
 }
 
+void tny_get_ports(teenyat *t, tny_word *a, tny_word *b) {
+	if(a != NULL) {
+		*a = t->port_a;
+	}
+
+	if(b != NULL) {
+		*b = t->port_b;
+	}
+
+	return;
+}
+
 void tny_clock(teenyat *t) {
 	t->cycle_cnt++;
 
