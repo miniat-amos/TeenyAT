@@ -88,13 +88,14 @@ typedef void(*TNY_WRITE_TO_BUS_FNPTR)(teenyat *t, tny_uword addr, tny_word data,
  * @param t
  *   The TeenyAT instance making the request
  *
- * @param a
- *   The externally held pin levels for port A
+ * @param is_port_a
+ *   Used to determine whether the levels changed because of a modificatio
+ *   to port A (true) or port B (false).
  *
- * @param b
- *   The externally held pin levels for port B
+ * @param port
+ *   The updated externally held pin levels for the modified port
  */
-typedef void(*TNY_PORT_CHANGE_FNPTR)(teenyat *t, tny_word a, tny_word b);
+typedef void(*TNY_PORT_CHANGE_FNPTR)(teenyat *t, bool is_port_a, tny_word port);
 
 /** While the TeenyAT has a 16 bit address space, RAM is only 32K words */
 #define TNY_RAM_SIZE 0x8000

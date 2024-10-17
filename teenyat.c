@@ -102,10 +102,44 @@ bool tny_reset(teenyat *t) {
 	t->port_b.u = 0;
 	t->port_b_directions.u = 0;
 
+	t->port_change = NULL;
+
 	t->delay_cycles = 0;
 	t->cycle_cnt = 0;
 
 	return true;
+}
+
+void tny_modify_port_levels(teenyat *t, bool is_system_request, tny_word data, bool is_port_a) {
+	tny_word *port = (is_port_a ? &(t->port_a) : &(t->port_b));
+	tny_word dir = (is_port_a ? t->port_a_directions : t->port_b_directions);
+
+	/* 
+	 * For the masking below, we need a bit pattern of all 1s or 0s depending
+	 * on whether this is a system request (1s) or not (0s).
+	 */
+	tny_word src;
+	src.u = ~0 * is_system_request;
+
+	/* We must know for which bits the source of the request and direction
+	 * bits match.  Eg, if the system wants to modify the port levels,
+	 * it can only do that for port bits with their direction set for input.
+	 */
+	tny_word src_dir_matches;
+	src_dir_matches.u = src.u ^ dir.u;
+
+	/* Save a copy of the port bits to determine whether any change */
+	tny_word old_port = *port;
+
+	/* Modify only those bits which should change */
+	port->u = (port->u & src_dir_matches.u) + (data.u & ~src_dir_matches.u);
+
+	/* Launch the port change callback if any port bits were modify */
+	if((t->port_change != NULL) && (~src.u & ~dir.u & (old_port.u ^ port->u))) {
+		t->port_change(t, is_port_a, *port);
+	}
+
+	return;
 }
 
 void tny_clock(teenyat *t) {
@@ -217,7 +251,11 @@ void tny_clock(teenyat *t) {
 			tny_uword addr = t->reg[reg1].s + immed;
 			switch(addr) {
 			case TNY_PORTA_ADDRESS:
+				tny_modify_port_levels(t, false, t->reg[reg2], true);
+				break;
 			case TNY_PORTB_ADDRESS:
+				tny_modify_port_levels(t, false, t->reg[reg2], false);
+				break;
 			case TNY_PORTA_DIR_ADDRESS:
 				t->port_a_directions = t->reg[reg2];
 				break;
