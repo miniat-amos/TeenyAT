@@ -170,39 +170,72 @@ void tny_clock(teenyat *t) {
 	case TNY_OPCODE_LOD:
 		{
 			tny_uword addr = t->reg[reg2].s + immed;
-			if(addr > TNY_MAX_RAM_ADDRESS) {
-				/* read from peripheral address */
-				tny_word data = {.u = 0};
-				uint16_t delay = 0;
-				t->bus_read(t, addr, &data, &delay);
-				t->reg[reg1] = data;
-				t->delay_cycles += delay;
-			}
-			else {
-				/* read from RAM */
-				t->reg[reg1] = t->ram[addr];
+			switch(addr) {
+			case TNY_PORTA_ADDRESS:
+			case TNY_PORTB_ADDRESS:
+			case TNY_PORTA_DIR_ADDRESS:
+			case TNY_PORTB_DIR_ADDRESS:
+				/* for the moment, these do nothing */
+				break;
+			default:
+				if(addr >= TNY_PERIPHERAL_BASE_ADDRESS) {
+					/* read from peripheral address */
+					tny_word data = {.u = 0};
+					uint16_t delay = 0;
+					t->bus_read(t, addr, &data, &delay);
+					t->reg[reg1] = data;
+					t->delay_cycles += delay;
+				}
+				else if(addr <= TNY_MAX_RAM_ADDRESS) {
+					/* read from RAM */
+					t->reg[reg1] = t->ram[addr];
+				}
+				else {
+					/* 
+					 * This is an attempt to access an unaccounted for
+					 * address in the "Microcontroller Device Space".
+					 */
+				}
+				break;
 			}
 
 			/*
-			 * To promote student use of registers, all bus operations,
-			 * including RAM access comes with an extra penalty.
-			 */
+			* To promote student use of registers, all bus operations,
+			* including RAM access comes with an extra penalty.
+			*/
 			t->delay_cycles += TNY_BUS_DELAY;
 		}
 		break;
 	case TNY_OPCODE_STR:
 		{
 			tny_uword addr = t->reg[reg1].s + immed;
-			if(addr > TNY_MAX_RAM_ADDRESS) {
-				/* write to peripheral address */
-				uint16_t delay = 0;
-				t->bus_write(t, addr, t->reg[reg2], &delay);
-				t->delay_cycles += delay;
+			switch(addr) {
+			case TNY_PORTA_ADDRESS:
+			case TNY_PORTB_ADDRESS:
+			case TNY_PORTA_DIR_ADDRESS:
+			case TNY_PORTB_DIR_ADDRESS:
+				/* for the moment, these do nothing */
+				break;
+			default:
+				if(addr >= TNY_PERIPHERAL_BASE_ADDRESS) {
+					/* write to peripheral address */
+					uint16_t delay = 0;
+					t->bus_write(t, addr, t->reg[reg2], &delay);
+					t->delay_cycles += delay;
+				}
+				else if(addr <= TNY_MAX_RAM_ADDRESS) {
+					/* write to RAM */
+					t->ram[addr] = t->reg[reg2];
+				}
+				else {
+					/* 
+					 * This is an attempt to access an unaccounted for
+					 * address in the "Microcontroller Device Space".
+					 */
+				}
+				break;
 			}
-			else {
-				/* write to RAM */
-				t->ram[addr] = t->reg[reg2];
-			}
+
 			/*
 			 * To promote student use of registers, all bus operations,
 			 * including RAM access comes with an extra penalty.

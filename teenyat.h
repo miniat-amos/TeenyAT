@@ -97,8 +97,16 @@ typedef void(*TNY_WRITE_TO_BUS_FNPTR)(teenyat *t, tny_uword addr, tny_word data,
 typedef void(*TNY_PORT_CHANGE_FNPTR)(teenyat *t, tny_word a, tny_word b);
 
 /** While the TeenyAT has a 16 bit address space, RAM is only 32K words */
-#define TNY_RAM_SIZE (1 << 15)
-#define TNY_MAX_RAM_ADDRESS (TNY_RAM_SIZE - 1)
+#define TNY_RAM_SIZE 0x8000
+#define TNY_MAX_RAM_ADDRESS 0x7FFF
+
+#define TNY_PORTA_DIR_ADDRESS 0x8000
+#define TNY_PORTB_DIR_ADDRESS 0x8001
+#define TNY_PORTA_ADDRESS 0x8002
+#define TNY_PORTB_ADDRESS 0x8003
+
+#define TNY_PERIPHERAL_BASE_ADDRESS 0x9000
+
 #define TNY_BUS_DELAY 3
 
 union tny_word {
