@@ -23,6 +23,17 @@ void lcd_shift_screen(){
     }
 }
 
+/* Shifts the data in the lcd_data array by line */
+void lcd_shift_lines(){
+    int i;
+    for(i = 0; i < (LCD_COLUMNS * LCD_ROWS)-LCD_COLUMNS; i++){
+            lcd_data[i] = lcd_data[i + LCD_COLUMNS];
+    }
+    for(int k = i; k < i + LCD_COLUMNS; k++){
+        lcd_data[k].u = 0;
+    }
+}
+
 void lcd_increment_variable(int *var,int amt,int wrap){
     int increment = amt >= 0 ? 1: -1;
     for(int i = 0; i < abs(amt); i++){
@@ -83,6 +94,27 @@ void lcd_set_cursor_x_y(tny_word value, int ctrl,int combined){
         lcd_cursor_x_y.bytes.byte0 = y;
 }
 
+/* Creates a new line shifting screen if neccessary */
+void lcd_new_line(){
+
+    int y = lcd_cursor_x_y.bytes.byte0; 
+    int x = lcd_cursor_x_y.bytes.byte1; 
+    y++;
+
+    if(y >= LCD_ROWS){
+        y = 3;
+        lcd_shift_lines();
+    }  
+    lcd_cursor.u = y * LCD_COLUMNS + x;
+    lcd_cursor_x_y.bytes.byte0 = y;
+}
+
+/* Returns the cursor to the start of a line */
+void lcd_return_line(){
+    tny_word zero;
+    zero.u = 0;
+    lcd_set_cursor_x_y(zero, 0,0);
+}
 
 /* Writes given char to lcd and updates cursor position*/
 void lcd_draw_character(tny_word value){
@@ -90,8 +122,18 @@ void lcd_draw_character(tny_word value){
         lcd_cursor.u = (LCD_COLUMNS * LCD_ROWS) - 1;
         lcd_shift_screen();
     }
+
     lcd_data[lcd_cursor.u] = value;
+
     lcd_cursor.u = (lcd_cursor.u + 1);
+
+    if(value.u == '\r'){
+        if(lcd_cursor.u > 0) lcd_cursor.u = (lcd_cursor.u - 1);
+        lcd_return_line();
+    }else if(value.u == '\n'){
+        lcd_new_line();
+        if(lcd_cursor.u > 0) lcd_cursor.u = (lcd_cursor.u - 1);
+    }
 
     lcd_cursor_x_y.bytes.byte0 = lcd_cursor.u / LCD_COLUMNS; // byte zero is y
     lcd_cursor_x_y.bytes.byte1 = lcd_cursor.u % LCD_COLUMNS; // byte one is x
