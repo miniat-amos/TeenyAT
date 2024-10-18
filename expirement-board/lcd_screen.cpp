@@ -118,9 +118,12 @@ void lcd_return_line(){
 
 /* Writes given char to lcd and updates cursor position*/
 void lcd_draw_character(tny_word value){
-    if(lcd_cursor.u >= (LCD_COLUMNS * LCD_ROWS)){
-        lcd_cursor.u = (LCD_COLUMNS * LCD_ROWS) - 1;
-        lcd_shift_screen();
+
+    /* On write to final screen position make a new line and return cursor */
+    if(lcd_cursor.u >= (LCD_COLUMNS * LCD_ROWS)){  
+        lcd_cursor.u = (LCD_COLUMNS * LCD_ROWS) - LCD_COLUMNS;
+        lcd_new_line();
+        lcd_return_line();
     }
 
     lcd_data[lcd_cursor.u] = value;
