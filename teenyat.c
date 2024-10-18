@@ -96,10 +96,80 @@ bool tny_reset(teenyat *t) {
 
 	/* "instruction" and "immediate" members do not need initialization */
 
+	/* Initialize ports to output w/ all 0s */
+	t->port_a.u = 0;
+	t->port_a_directions.u = 0;
+	t->port_b.u = 0;
+	t->port_b_directions.u = 0;
+
+	t->port_change = NULL;
+
 	t->delay_cycles = 0;
 	t->cycle_cnt = 0;
 
 	return true;
+}
+
+void tny_modify_port_levels(teenyat *t, bool is_system_request, tny_word data, bool is_port_a) {
+	tny_word *port = (is_port_a ? &(t->port_a) : &(t->port_b));
+	tny_word dir = (is_port_a ? t->port_a_directions : t->port_b_directions);
+
+	/* 
+	 * For the masking below, we need a bit pattern of all 1s or 0s depending
+	 * on whether this is a system request (1s) or not (0s).
+	 */
+	tny_word src;
+	src.u = ~0 * is_system_request;
+
+	/* We must know for which bits the source of the request and direction
+	 * bits match.  Eg, if the system wants to modify the port levels,
+	 * it can only do that for port bits with their direction set for input.
+	 */
+	tny_word src_dir_matches;
+	src_dir_matches.u = src.u ^ dir.u;
+
+	/* Save a copy of the port bits to determine whether any change */
+	tny_word old_port = *port;
+
+	/* Modify only those bits which should change */
+	port->u = (port->u & src_dir_matches.u) + (data.u & ~src_dir_matches.u);
+
+	/* Launch the port change callback if any port bits were modify */
+	if((t->port_change != NULL) && (~src.u & ~dir.u & (old_port.u ^ port->u))) {
+		t->port_change(t, is_port_a, *port);
+	}
+
+	return;
+}
+
+void tny_port_change(teenyat *t, TNY_PORT_CHANGE_FNPTR port_change) {
+	t->port_change = port_change;
+
+	return;
+}
+
+void tny_get_ports(teenyat *t, tny_word *a, tny_word *b) {
+	if(a != NULL) {
+		*a = t->port_a;
+	}
+
+	if(b != NULL) {
+		*b = t->port_b;
+	}
+
+	return;
+}
+
+void tny_set_ports(teenyat *t, tny_word *a, tny_word *b) {
+	if(a != NULL) {
+		tny_modify_port_levels(t, true, *a, true);
+	}
+
+	if(b != NULL) {
+		tny_modify_port_levels(t, true, *b, false);
+	}
+
+	return;
 }
 
 void tny_clock(teenyat *t) {
@@ -164,39 +234,84 @@ void tny_clock(teenyat *t) {
 	case TNY_OPCODE_LOD:
 		{
 			tny_uword addr = t->reg[reg2].s + immed;
-			if(addr > TNY_MAX_RAM_ADDRESS) {
-				/* read from peripheral address */
-				tny_word data = {.u = 0};
-				uint16_t delay = 0;
-				t->bus_read(t, addr, &data, &delay);
-				t->reg[reg1] = data;
-				t->delay_cycles += delay;
-			}
-			else {
-				/* read from RAM */
-				t->reg[reg1] = t->ram[addr];
+			switch(addr) {
+			case TNY_PORTA_ADDRESS:
+				t->reg[reg1] = t->port_a;
+				break;
+			case TNY_PORTB_ADDRESS:
+				t->reg[reg1] = t->port_b;
+				break;
+			case TNY_PORTA_DIR_ADDRESS:
+				t->reg[reg1] = t->port_a_directions;
+				break;
+			case TNY_PORTB_DIR_ADDRESS:
+				t->reg[reg1] = t->port_b_directions;
+				break;
+			default:
+				if(addr >= TNY_PERIPHERAL_BASE_ADDRESS) {
+					/* read from peripheral address */
+					tny_word data = {.u = 0};
+					uint16_t delay = 0;
+					t->bus_read(t, addr, &data, &delay);
+					t->reg[reg1] = data;
+					t->delay_cycles += delay;
+				}
+				else if(addr <= TNY_MAX_RAM_ADDRESS) {
+					/* read from RAM */
+					t->reg[reg1] = t->ram[addr];
+				}
+				else {
+					/* 
+					 * This is an attempt to access an unaccounted for
+					 * address in the "Microcontroller Device Space".
+					 */
+				}
+				break;
 			}
 
 			/*
-			 * To promote student use of registers, all bus operations,
-			 * including RAM access comes with an extra penalty.
-			 */
+			* To promote student use of registers, all bus operations,
+			* including RAM access comes with an extra penalty.
+			*/
 			t->delay_cycles += TNY_BUS_DELAY;
 		}
 		break;
 	case TNY_OPCODE_STR:
 		{
 			tny_uword addr = t->reg[reg1].s + immed;
-			if(addr > TNY_MAX_RAM_ADDRESS) {
-				/* write to peripheral address */
-				uint16_t delay = 0;
-				t->bus_write(t, addr, t->reg[reg2], &delay);
-				t->delay_cycles += delay;
+			switch(addr) {
+			case TNY_PORTA_ADDRESS:
+				tny_modify_port_levels(t, false, t->reg[reg2], true);
+				break;
+			case TNY_PORTB_ADDRESS:
+				tny_modify_port_levels(t, false, t->reg[reg2], false);
+				break;
+			case TNY_PORTA_DIR_ADDRESS:
+				t->port_a_directions = t->reg[reg2];
+				break;
+			case TNY_PORTB_DIR_ADDRESS:
+				t->port_b_directions = t->reg[reg2];
+				break;
+			default:
+				if(addr >= TNY_PERIPHERAL_BASE_ADDRESS) {
+					/* write to peripheral address */
+					uint16_t delay = 0;
+					t->bus_write(t, addr, t->reg[reg2], &delay);
+					t->delay_cycles += delay;
+				}
+				else if(addr <= TNY_MAX_RAM_ADDRESS) {
+					/* write to RAM */
+					t->ram[addr] = t->reg[reg2];
+				}
+				else {
+					/* 
+					 * This is an attempt to access an unaccounted for
+					 * address in the "Microcontroller Device Space".
+					 */
+				}
+				break;
 			}
-			else {
-				/* write to RAM */
-				t->ram[addr] = t->reg[reg2];
-			}
+
 			/*
 			 * To promote student use of registers, all bus operations,
 			 * including RAM access comes with an extra penalty.
