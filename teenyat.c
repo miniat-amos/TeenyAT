@@ -160,6 +160,18 @@ void tny_get_ports(teenyat *t, tny_word *a, tny_word *b) {
 	return;
 }
 
+void tny_set_ports(teenyat *t, tny_word *a, tny_word *b) {
+	if(a != NULL) {
+		tny_modify_port_levels(t, true, *a, true);
+	}
+
+	if(b != NULL) {
+		tny_modify_port_levels(t, true, *b, false);
+	}
+
+	return;
+}
+
 void tny_clock(teenyat *t) {
 	t->cycle_cnt++;
 
