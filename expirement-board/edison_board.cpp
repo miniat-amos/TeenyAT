@@ -4,11 +4,13 @@
 #include "utils.h"
 #include "edison_board.h"
 #include "lcd_screen.h"
+#include "leds.h"
 #include "edison_sprite_locations.h"
 
 Tigr* window;
 Tigr* background_img;
 Tigr* lcd_font_img;
+Tigr* leds_img;
 
 /* Loads images along with window width and height */
 int initialize_board(){
@@ -24,6 +26,13 @@ int initialize_board(){
         printf("Failed to load image <teenyat_font.png> .\n");
         return EXIT_FAILURE;
     }
+
+    leds_img = tigrLoadImage("exp_board_images/leds.png");
+    if (!leds_img ) {
+        printf("Failed to load image <leds.png> .\n");
+        return EXIT_FAILURE;
+    }
+
     
     window = tigrWindow(background_img->w, background_img->h, "Edison Board", TIGR_FIXED);
     
@@ -44,6 +53,7 @@ void render_board(){
     tigrBlit(window, background_img, 0, 0, 0, 0, background_img->w, background_img->h);
     lcd_render_screen();
     tigrUpdate(window);
+    led_array_draw(NULL);
 }
 
 /* Free all memory */
@@ -51,4 +61,5 @@ void kill_board(){
     tigrFree(window);
     tigrFree(background_img);
     tigrFree(lcd_font_img);
+    tigrFree(leds_img);
 }

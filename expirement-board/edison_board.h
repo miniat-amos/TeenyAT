@@ -6,6 +6,7 @@
 extern Tigr* window;
 extern Tigr* background_img;
 extern Tigr* lcd_font_img;
+extern Tigr* leds_img;
 
 int initialize_board();
 void reset_board();
