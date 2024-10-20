@@ -12,7 +12,8 @@ extern tny_word lcd_cursor;
 extern tny_word lcd_cursor_x_y;
 extern tny_word lcd_data[LCD_ROWS * LCD_COLUMNS];
 
-void lcd_render_screen();
+void lcd_render_cursor_panel();
+void lcd_render_full_screen();
 void lcd_draw_character(tny_word);
 void lcd_clear_screen();
 void lcd_new_line();

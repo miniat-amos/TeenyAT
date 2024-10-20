@@ -49,16 +49,11 @@ int initialize_board(){
 
 /* Resets and initializes variables */
 void reset_board(){
+    /* only draw board background on reset */
+    tigrBlit(window, background_img, 0, 0, 0, 0, background_img->w, background_img->h);
     lcd_cursor.u = 0;
     lcd_cursor_x_y.u = 0;
     lcd_clear_screen();
-}
-
-/* Render background & components to window */
-void render_board(){
-    tigrBlit(window, background_img, 0, 0, 0, 0, background_img->w, background_img->h);
-    lcd_render_screen();
-    tigrUpdate(window);
     led_array_draw(NULL);
     render_push_buttons(NULL);
 }

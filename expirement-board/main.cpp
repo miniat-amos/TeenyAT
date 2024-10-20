@@ -141,7 +141,13 @@ int main(int argc, char* argv[])
     while(!tigrClosed(window) && !tigrKeyDown(window, TK_ESCAPE)) {
         process_keyboard(&t);
         tny_clock(&t);
-        render_board();
+
+        /* Prevents window from crashing on stagnant programs */
+        watchdog_timer--;
+        if(watchdog_timer<0){
+            watchdog_timer = WATCHDOG_TIMER_START;
+            tigrUpdate(window);
+        }
     }
 
     kill_board();
@@ -195,12 +201,15 @@ void bus_read(teenyat * /*t*/, tny_uword addr, tny_word *data, uint16_t */*delay
 
 void bus_write(teenyat * /*t*/, tny_uword addr, tny_word data, uint16_t */*delay*/)
 {
+    bool invalidated = false;
     switch(addr){
         case LCD_CURSOR:
             lcd_draw_character(data);
+            invalidated = true;
             break;
         case LCD_CLEAR_SCREEN:
             lcd_clear_screen();
+            invalidated = true;
             break; 
         case LCD_MOVE_LEFT:
             lcd_move_cursor_x_y(-data.u,false,false,false);
@@ -239,6 +248,10 @@ void bus_write(teenyat * /*t*/, tny_uword addr, tny_word data, uint16_t */*delay
             break;
     }
 
+    if(invalidated) {
+        watchdog_timer = 1000;
+        tigrUpdate(window);
+    }
 }
 
 void port_change(teenyat *t, bool /*is_port_a*/, tny_word /*port*/){

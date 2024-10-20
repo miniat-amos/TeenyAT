@@ -1,4 +1,9 @@
+#include <iostream>
+#include <string>
 #include "tigr.h"
+#include "utils.h"
+
+int watchdog_timer = WATCHDOG_TIMER_START;
 
 Tigr* img_flip_horizontal(Tigr* image) {
     Tigr* flipped = tigrBitmap(image->w, image->h);

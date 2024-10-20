@@ -13,7 +13,6 @@ extern Tigr* leds_img;
 
 int initialize_board();
 void reset_board();
-void render_board();
 void kill_board();
 void process_keyboard(teenyat*);
 void render_push_buttons(teenyat*);
