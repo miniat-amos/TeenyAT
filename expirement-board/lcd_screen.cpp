@@ -129,7 +129,7 @@ void lcd_draw_character(tny_word value){
     }
 
     lcd_data[lcd_cursor.u] = value;
-    lcd_render_cursor_panel();
+    lcd_render_cursor_panel(lcd_cursor);
 
     lcd_cursor.u = (lcd_cursor.u + 1);
 
@@ -145,12 +145,13 @@ void lcd_draw_character(tny_word value){
     lcd_cursor_x_y.bytes.byte1 = lcd_cursor.u % LCD_COLUMNS; // byte one is x
 }
 
-void lcd_render_cursor_panel(){
+void lcd_render_cursor_panel(tny_word val){
+
     int lcd_sprite_width = lcd_font_img->w / LCD_SPRITE_SHEET_SIZE;
     int lcd_sprite_height = lcd_font_img->h / LCD_SPRITE_SHEET_SIZE;
 
-    int x = lcd_cursor_x_y.bytes.byte1;
-    int y = lcd_cursor_x_y.bytes.byte0;
+    int x = val.u % LCD_COLUMNS;
+    int y = val.u / LCD_COLUMNS;
 
     /* Get control bits */
     int flip_vertical = lcd_data[y * LCD_COLUMNS + x].bits.bit13;
@@ -181,50 +182,13 @@ void lcd_render_cursor_panel(){
 
         tigrBlit(window, lcd_font_img, dest_x, dest_y, font_x , font_y, lcd_sprite_width, lcd_sprite_height);
     }
-
 }
 
 /* Renders lcd peripheral with corresponding flip and rotation */
 void lcd_render_full_screen(){
-
-    int lcd_sprite_width = lcd_font_img->w / LCD_SPRITE_SHEET_SIZE;
-    int lcd_sprite_height = lcd_font_img->h / LCD_SPRITE_SHEET_SIZE;
-
-    for(int y = 0; y < LCD_ROWS; y++){
-        for(int x = 0; x < LCD_COLUMNS; x++){
-        
-            /* Get control bits */
-            int flip_vertical = lcd_data[y * LCD_COLUMNS + x].bits.bit13;
-            int flip_horizontal = lcd_data[y * LCD_COLUMNS + x].bits.bit14;
-            int rotate_180 = lcd_data[y * LCD_COLUMNS + x].bits.bit15;
-
-            int font_index = lcd_data[y * LCD_COLUMNS + x].bytes.byte0; // get index into tny_sprite sheet
-            int font_x = (font_index % LCD_SPRITE_SHEET_SIZE) * lcd_sprite_width;
-            int font_y = (font_index / LCD_SPRITE_SHEET_SIZE) * lcd_sprite_height;
-            
-            int dest_x = LOC_LCD_TL[0] + (lcd_sprite_width  * x);
-            int dest_y = LOC_LCD_TL[1] + (lcd_sprite_height * y);
-
-            /* Check if sprite should be flipped or rotated */
-            if(flip_horizontal || flip_vertical || rotate_180){
-
-                Tigr* sprite_sheet = tigrBitmap(lcd_sprite_width, lcd_sprite_height);
-                tigrBlit(sprite_sheet, lcd_font_img, 0, 0, font_x , font_y, lcd_sprite_width, lcd_sprite_height);
-                if(flip_vertical){
-                    sprite_sheet = img_flip_vertical(sprite_sheet);
-                }
-                if(flip_horizontal){
-                    sprite_sheet = img_flip_horizontal(sprite_sheet);
-                }
-                if(rotate_180){
-                    sprite_sheet = img_rotate_180(sprite_sheet);
-                }
-                tigrBlit(window, sprite_sheet, dest_x, dest_y, 0 , 0, lcd_sprite_width, lcd_sprite_height);
-            }else{
-
-                tigrBlit(window, lcd_font_img, dest_x, dest_y, font_x , font_y, lcd_sprite_width, lcd_sprite_height);
-            }
-            
-        }
+    for(int i = 0; i < LCD_ROWS * LCD_COLUMNS; i++){   
+            tny_word index;
+            index.u = i; 
+            lcd_render_cursor_panel(index);
     }
 }
