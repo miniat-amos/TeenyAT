@@ -139,6 +139,7 @@ int main(int argc, char* argv[])
     }
     
     while(!tigrClosed(window) && !tigrKeyDown(window, TK_ESCAPE)) {
+        process_keyboard(&t);
         tny_clock(&t);
         render_board();
     }

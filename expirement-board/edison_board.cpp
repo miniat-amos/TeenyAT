@@ -11,6 +11,7 @@ Tigr* window;
 Tigr* background_img;
 Tigr* lcd_font_img;
 Tigr* leds_img;
+Tigr* push_buttons_img;
 
 /* Loads images along with window width and height */
 int initialize_board(){
@@ -33,6 +34,11 @@ int initialize_board(){
         return EXIT_FAILURE;
     }
 
+    push_buttons_img = tigrLoadImage("exp_board_images/buttons.png");
+    if (!push_buttons_img ) {
+        printf("Failed to load image <buttons.png> .\n");
+        return EXIT_FAILURE;
+    }
     
     window = tigrWindow(background_img->w, background_img->h, "Edison Board", TIGR_FIXED);
     
@@ -54,6 +60,7 @@ void render_board(){
     lcd_render_screen();
     tigrUpdate(window);
     led_array_draw(NULL);
+    render_push_buttons(NULL);
 }
 
 /* Free all memory */
@@ -62,4 +69,61 @@ void kill_board(){
     tigrFree(background_img);
     tigrFree(lcd_font_img);
     tigrFree(leds_img);
+    tigrFree(push_buttons_img);
+}
+
+void render_push_buttons(teenyat* t){
+
+    int dest_x = LOC_BUTTONS_PORTA_TL[0];
+    int dest_y = LOC_BUTTONS_PORTA_TL[1];
+    int src_x = 0;
+    int src_y = 0;
+    int button_width = push_buttons_img->w / 2;
+    int button_height = push_buttons_img->h;
+
+    tny_word port_a;
+    port_a.u = 0;
+    if(t) tny_get_ports(t,&port_a,NULL);
+    int index = 15;
+    for(int i = 0; i < BUTTONS_ROWS; i++){
+        for(int j = 0; j < BUTTONS_COLS; j++){
+                src_x = button_width * (port_a.u & (1<<index)) >> index;
+                tigrBlit(window, push_buttons_img, dest_x, dest_y, src_x, src_y, button_width, button_height);
+                dest_x += button_width;
+                index--;
+        } 
+        dest_x = LOC_BUTTONS_PORTA_TL[0];
+        dest_y += button_height;
+    }
+}
+
+void process_keyboard(teenyat* t){
+    
+    /* Handels button presses related to port_A */
+    tny_word inp_keyboard;
+    tny_get_ports(t,&inp_keyboard,NULL);
+    tny_word old_keyboard = inp_keyboard;
+
+    inp_keyboard.bits.bit11 = tigrKeyHeld(window, 'A');
+    inp_keyboard.bits.bit10 = tigrKeyHeld(window, 'S');
+    inp_keyboard.bits.bit9 = tigrKeyHeld(window,  'D');
+    inp_keyboard.bits.bit8 = tigrKeyHeld(window,  'F');
+
+    inp_keyboard.bits.bit15 = tigrKeyHeld(window, 'Q');
+    inp_keyboard.bits.bit14 = tigrKeyHeld(window, 'W');
+    inp_keyboard.bits.bit13 = tigrKeyHeld(window, 'E');
+    inp_keyboard.bits.bit12 = tigrKeyHeld(window, 'R');
+
+    inp_keyboard.bits.bit0 = tigrKeyHeld(window, TK_LEFT);
+    inp_keyboard.bits.bit1 = tigrKeyHeld(window, TK_UP);
+    inp_keyboard.bits.bit2 = tigrKeyHeld(window, TK_RIGHT);
+    inp_keyboard.bits.bit3 = tigrKeyHeld(window, TK_DOWN);
+    
+    tny_set_ports(t,&inp_keyboard,NULL);
+
+    /* Render displays on port change */
+    if(inp_keyboard.u ^ old_keyboard.u){
+        render_push_buttons(t);
+        led_array_draw(t);   
+    }
 }
