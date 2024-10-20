@@ -111,6 +111,7 @@
 
 void bus_read(teenyat *t, tny_uword addr, tny_word *data, uint16_t *delay);
 void bus_write(teenyat *t, tny_uword addr, tny_word data, uint16_t *delay);
+void port_change(teenyat *t, bool is_port_a, tny_word port);
 
 int main(int argc, char* argv[])
 {  
@@ -124,6 +125,7 @@ int main(int argc, char* argv[])
     FILE *bin_file = fopen(fileName.c_str(), "rb");
     if(bin_file != NULL) {
         tny_init_from_file(&t, bin_file, bus_read, bus_write);
+        tny_port_change(&t,port_change);
         fclose(bin_file);
     }else {
         std::cout << "Failed to init bin file (invalid path?)" << std::endl;
@@ -235,4 +237,9 @@ void bus_write(teenyat * /*t*/, tny_uword addr, tny_word data, uint16_t */*delay
         default:
             break;
     }
+
+}
+
+void port_change(teenyat *t, bool /*is_port_a*/, tny_word /*port*/){
+    led_array_draw(t);
 }
