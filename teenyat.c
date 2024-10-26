@@ -14,7 +14,7 @@
 
 #include "teenyat.h"
 
-uint16_t tny_pcg16(teenyat *t);
+tny_uword tny_random(teenyat *t);
 
 static void set_elg_flags(teenyat *t, tny_sword alu_result) {
 	t->flags.equals = (alu_result == 0);
@@ -136,7 +136,7 @@ bool tny_reset(teenyat *t) {
 	 * Set initial state and "put it in the past"
 	 */
 	t->random.state = seed + t->random.increment;
-	(void)tny_pcg16(t);
+	(void)tny_random(t);
 
 	t->delay_cycles = 0;
 	t->cycle_cnt = 0;
@@ -282,7 +282,7 @@ void tny_clock(teenyat *t) {
 				t->reg[reg1] = t->port_b_directions;
 				break;
 			case TNY_RANDOM_ADDRESS:
-				t->reg[reg1].u = tny_pcg16(t);
+				t->reg[reg1].u = tny_random(t);
 				break;
 			default:
 				if(addr >= TNY_PERIPHERAL_BASE_ADDRESS) {
@@ -595,7 +595,7 @@ void tny_clock(teenyat *t) {
 	return;
 }
 
-uint16_t tny_pcg16(teenyat *t) {
+tny_uword tny_random(teenyat *t) {
     uint64_t tmp = t->random.state;
 
     /*
@@ -618,10 +618,10 @@ uint16_t tny_pcg16(teenyat *t) {
     unsigned bitcnt_to_rotate = tmp >> 59;
 
     /* scramble the previous state and truncate to 16 bits */
-    uint16_t to_rotate = (tmp >> 26 ^ tmp) >> 11;
+    tny_uword to_rotate = (tmp >> 26 ^ tmp) >> 11;
 
     /* return the right-rotated the scrambled previous state */
-	uint16_t result = to_rotate >> bitcnt_to_rotate;
+	tny_uword result = to_rotate >> bitcnt_to_rotate;
 	/* the bitmask below ensures the left shift is fewer than 16 bits */
 	result |= (to_rotate << -bitcnt_to_rotate) & ~(~0U << 4);
 
