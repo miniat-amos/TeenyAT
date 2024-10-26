@@ -609,8 +609,8 @@ tny_uword tny_random(teenyat *t) {
 	/*
 	 * The code below involves some shifts of seemingly random amounts.
 	 * They determine the amounts of manioulation of 64 and 16 bit values.
-	 * 11 = 16 - 5
-	 * 26 = floor((64 - 11) / 2)
+	 * 27 = 32 - 5
+	 * 18 = floor((64 - 27) / 2)
 	 * 59 = 64 - 5
 	 */
 
@@ -618,12 +618,13 @@ tny_uword tny_random(teenyat *t) {
     unsigned bitcnt_to_rotate = tmp >> 59;
 
     /* scramble the previous state and truncate to 16 bits */
-    tny_uword to_rotate = (tmp >> 26 ^ tmp) >> 11;
+    uint32_t to_rotate = (tmp >> 18 ^ tmp) >> 27;
 
     /* return the right-rotated the scrambled previous state */
-	tny_uword result = to_rotate >> bitcnt_to_rotate;
-	/* the bitmask below ensures the left shift is fewer than 16 bits */
-	result |= (to_rotate << -bitcnt_to_rotate) & ~(~0U << 4);
+	uint32_t result = to_rotate >> bitcnt_to_rotate;
+	/* the bitmask below ensures the left shift is fewer than 32 bits */
+	result |= to_rotate << (-bitcnt_to_rotate & ~(~0U << 5));
 
-    return result;
+	/* truncate result and return as 16-bit tny_uword */
+    return (tny_uword)result;
 }

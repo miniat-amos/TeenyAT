@@ -233,7 +233,7 @@ struct teenyat {
 	/**
 	 * Each teenyat instance has a unique random number generator stream,
 	 * seeded at initialization.  These are using the PCG-XSH-RR with a 64-bit
-	 * state and 16-bit output based on the algorithm described at
+	 * state and 32-bit output based on the algorithm described at
 	 * https://en.wikipedia.org/wiki/Permuted_congruential_generator
 	 */
 	struct {
