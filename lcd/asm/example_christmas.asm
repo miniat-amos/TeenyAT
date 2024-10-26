@@ -1,6 +1,8 @@
 ;; This is a little christmas demo I made in a half hour. the codes not very clean ;;
 ;; but whatever.....MERRY CHRISTMAS................................................;;
 
+.const RAND 0x8010
+
 .const LIVESCREEN 0x9000
 .const UPDATESCREEN 0xA000
 .const X1 0xD000
@@ -10,7 +12,6 @@
 .const STROKE 0xD010
 .const FILL 0xD011
 .const DRAWSTROKE 0xD013
-.const RAND 0xD700
 .const UPDATE 0xE000
 .const RECT 0xE010
 .const POINT 0xE012
