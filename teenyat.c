@@ -592,8 +592,21 @@ void tny_clock(teenyat *t) {
 uint16_t pcg16(teenyat *t) {
     uint64_t tmp = t->random.state;
 
-    /* find the next state in the sequence */
+    /*
+	 * Find the next state in the sequence.  The weird large immediate value
+	 * is a special constant chosen by the world at large to do great
+	 * things for the random number. ... We don't really know about it,
+	 * but it seems to work ;-)
+	 */
     t->random.state = tmp * 6364136223846793005ULL + t->random.increment;
+
+	/*
+	 * The code below involves some shifts of seemingly random amounts.
+	 * They determine the amounts of manioulation of 64 and 16 bit values.
+	 * 11 = 16 - 5
+	 * 26 = floor((64 - 11) / 2)
+	 * 59 = 64 - 5
+	 */
 
     /* use top 5 bits of previous state to "randomly" rotate */
     unsigned bitcnt_to_rotate = tmp >> 59;
