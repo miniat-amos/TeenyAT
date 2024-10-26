@@ -1,4 +1,5 @@
 .const RAND 0x8010
+
 .const LIVESCREEN 0x9000
 .const UPDATESCREEN 0xA000
 .const X1 0xD000
