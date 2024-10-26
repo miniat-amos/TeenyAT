@@ -14,7 +14,7 @@
 
 #include "teenyat.h"
 
-uint16_t pcg16(teenyat *t);
+uint16_t tny_pcg16(teenyat *t);
 
 static void set_elg_flags(teenyat *t, tny_sword alu_result) {
 	t->flags.equals = (alu_result == 0);
@@ -136,7 +136,7 @@ bool tny_reset(teenyat *t) {
 	 * Set initial state and "put it in the past"
 	 */
 	t->random.state = seed + t->random.increment;
-	(void)pcg16(t);
+	(void)tny_pcg16(t);
 
 	t->delay_cycles = 0;
 	t->cycle_cnt = 0;
@@ -589,7 +589,7 @@ void tny_clock(teenyat *t) {
 	return;
 }
 
-uint16_t pcg16(teenyat *t) {
+uint16_t tny_pcg16(teenyat *t) {
     uint64_t tmp = t->random.state;
 
     /*
