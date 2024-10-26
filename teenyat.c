@@ -10,8 +10,11 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
+#include <time.h>
 
 #include "teenyat.h"
+
+uint16_t pcg16(teenyat *t);
 
 static void set_elg_flags(teenyat *t, tny_sword alu_result) {
 	t->flags.equals = (alu_result == 0);
@@ -103,6 +106,37 @@ bool tny_reset(teenyat *t) {
 	t->port_b_directions.u = 0;
 
 	t->port_change = NULL;
+
+	/*
+	 * Initialize each teenyat with a unique random number stream
+	 */
+	static uint64_t stream = 1;  // start at >=1 for increment constant to be unique
+
+	/*
+	 * find a random seed
+	 */
+	uint64_t seed = (intptr_t)&time << 32;
+	seed ^= (intptr_t)&printf;
+	seed ^= time(NULL);
+	/* make seed "more" random w/ /dev/urandom if there */
+	FILE *f = fopen("/dev/urandom", "rb");
+	if(f != NULL) {
+		uint64_t entropy_bits;
+		if(fread(&entropy_bits, sizeof(entropy_bits), 1, f) == sizeof(entropy_bits)) {
+			seed ^= entropy_bits;
+		}
+		fclose(f);
+	}
+
+	/* Set increment to arbitrary odd constant that goes up by stream */
+	t->random.increment = ((intptr_t)&tny_reset + stream) | 1ULL;
+	stream++;
+
+	/*
+	 * Set initial state and "put it in the past"
+	 */
+	t->random.state = seed + t->random.increment;
+	(void)pcg16(t);
 
 	t->delay_cycles = 0;
 	t->cycle_cnt = 0;
@@ -553,4 +587,24 @@ void tny_clock(teenyat *t) {
 	t->reg[TNY_REG_ZERO].u = 0;
 
 	return;
+}
+
+uint16_t pcg16(teenyat *t) {
+    uint64_t tmp = t->random.state;
+
+    /* find the next state in the sequence */
+    t->random.state = tmp * 6364136223846793005ULL + t->random.increment;
+
+    /* use top 5 bits of previous state to "randomly" rotate */
+    unsigned bitcnt_to_rotate = tmp >> 59;
+
+    /* scramble the previous state and truncate to 16 bits */
+    uint16_t to_rotate = (tmp >> 26 ^ tmp) >> 11;
+
+    /* return the right-rotated the scrambled previous state */
+	uint16_t result = to_rotate >> bitcnt_to_rotate;
+	/* the bitmask below ensures the left shift is fewer than 16 bits */
+	result |= (to_rotate << -bitcnt_to_rotate) & ~(~0U << 4);
+
+    return result;
 }
