@@ -281,6 +281,9 @@ void tny_clock(teenyat *t) {
 			case TNY_PORTB_DIR_ADDRESS:
 				t->reg[reg1] = t->port_b_directions;
 				break;
+			case TNY_RANDOM_ADDRESS:
+				t->reg[reg1].u = tny_pcg16(t);
+				break;
 			default:
 				if(addr >= TNY_PERIPHERAL_BASE_ADDRESS) {
 					/* read from peripheral address */
@@ -325,6 +328,9 @@ void tny_clock(teenyat *t) {
 				break;
 			case TNY_PORTB_DIR_ADDRESS:
 				t->port_b_directions = t->reg[reg2];
+				break;
+			case TNY_RANDOM_ADDRESS:
+				/* Do nothing */
 				break;
 			default:
 				if(addr >= TNY_PERIPHERAL_BASE_ADDRESS) {
