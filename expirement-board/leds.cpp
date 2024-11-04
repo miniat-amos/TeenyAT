@@ -29,7 +29,7 @@ void led_array_draw(teenyat *t){
             for(int x = 0; x < LED_COLUMNS; x++){
                     /* The led is either on or off */
                     src_x = led_sprite_width * (port_a.u & ( 1 << index )) >> index;
-                    tigrBlit(window, leds_img, dest_x, dest_y, src_x , src_y, led_sprite_width, led_sprite_height);
+                    tigrBlitAlpha(window, leds_img, dest_x, dest_y, src_x , src_y, led_sprite_width, led_sprite_height,BLIT_ALPHA);
                     dest_x += led_sprite_width;
                     index--;
 

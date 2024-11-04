@@ -7,7 +7,7 @@
 #define LCD_ROWS 4
 #define LCD_COLUMNS 20
 #define LCD_SPRITE_SHEET_SIZE 16
-#define BLIT_ALPHA 0.70
+
 
 extern tny_word lcd_cursor;
 extern tny_word lcd_cursor_x_y;

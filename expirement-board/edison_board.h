@@ -5,6 +5,7 @@
 
 #define BUTTONS_ROWS 2
 #define BUTTONS_COLS 4
+#define BLIT_ALPHA 0.70
 
 extern Tigr* window;
 extern Tigr* background_img;

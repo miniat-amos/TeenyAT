@@ -145,12 +145,12 @@ int main(int argc, char* argv[])
     while(!tigrClosed(window) && !tigrKeyDown(window, TK_ESCAPE)) {
         process_keyboard(&t);
         tny_clock(&t);
-
         auto now = std::chrono::steady_clock::now();
         auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(now - last_update_time);
         
         /* 20 Hz === 50 ms */
         if(duration.count() >= 50) {
+            led_array_draw(&t); // This is here because I like the way it looks better
             last_update_time = now;
             tigrUpdate(window);
         }
