@@ -13,11 +13,19 @@ extern Tigr* lcd_font_img;
 extern Tigr* leds_img;
 
 extern tny_word inp_keyboard;
+extern int mouse_x;
+extern int mouse_y;
+extern int mouse_button;
+extern int old_mouse_button;
+
     
 int initialize_board();
 void reset_board();
 void kill_board();
 void process_keyboard(teenyat*);
 void render_push_buttons(tny_word*);
+void process_mouse();
+void mouse_pressed();
+void mouse_down();
 
 #endif  /*   __EDISON_BOARD_H__    */

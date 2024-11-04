@@ -13,6 +13,10 @@ Tigr* lcd_font_img;
 Tigr* leds_img;
 Tigr* push_buttons_img;
 tny_word inp_keyboard;
+int mouse_x;
+int mouse_y;
+int mouse_button;
+int old_mouse_button;
 
 /* Loads images along with window width and height */
 int initialize_board(){
@@ -123,4 +127,22 @@ void process_keyboard(teenyat* t){
     }
 
     old_keyboard.u = inp_keyboard.u;
+}
+
+void process_mouse(){
+    tigrMouse(window, &mouse_x, &mouse_y, &mouse_button);
+    if(mouse_button != 0 && old_mouse_button == 0){
+        mouse_pressed();
+    }else if(mouse_button != 0 && old_mouse_button != 0){
+        mouse_down();
+    }
+    old_mouse_button = mouse_button;
+}
+
+void mouse_pressed(){
+
+}
+
+void mouse_down(){
+    //std::cout << "Mouse DOWN" << std::endl;
 }

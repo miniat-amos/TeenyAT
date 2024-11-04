@@ -143,6 +143,7 @@ int main(int argc, char* argv[])
 
     auto last_update_time = std::chrono::steady_clock::now();
     while(!tigrClosed(window) && !tigrKeyDown(window, TK_ESCAPE)) {
+        process_mouse();
         process_keyboard(&t);
         tny_clock(&t);
         auto now = std::chrono::steady_clock::now();
