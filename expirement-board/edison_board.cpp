@@ -12,6 +12,7 @@ Tigr* background_img;
 Tigr* lcd_font_img;
 Tigr* leds_img;
 Tigr* push_buttons_img;
+tny_word inp_keyboard;
 
 /* Loads images along with window width and height */
 int initialize_board(){
@@ -53,6 +54,7 @@ void reset_board(){
     tigrBlit(window, background_img, 0, 0, 0, 0, background_img->w, background_img->h);
     lcd_cursor.u = 0;
     lcd_cursor_x_y.u = 0;
+    inp_keyboard.u = 0;
     lcd_clear_screen();
     led_array_draw(NULL);
     render_push_buttons(NULL);
@@ -67,7 +69,7 @@ void kill_board(){
     tigrFree(push_buttons_img);
 }
 
-void render_push_buttons(teenyat* t){
+void render_push_buttons(tny_word *t){
 
     int dest_x = LOC_BUTTONS_PORTA_TL[0];
     int dest_y = LOC_BUTTONS_PORTA_TL[1];
@@ -78,7 +80,7 @@ void render_push_buttons(teenyat* t){
 
     tny_word port_a;
     port_a.u = 0;
-    if(t) tny_get_ports(t,&port_a,NULL);
+    if(t) port_a.u = t->u;
     int index = 15;
     for(int i = 0; i < BUTTONS_ROWS; i++){
         for(int j = 0; j < BUTTONS_COLS; j++){
@@ -95,8 +97,6 @@ void render_push_buttons(teenyat* t){
 void process_keyboard(teenyat* t){
     
     /* Handels button presses related to port_A */
-    tny_word inp_keyboard;
-    tny_get_ports(t,&inp_keyboard,NULL);
     tny_word old_keyboard = inp_keyboard;
 
     inp_keyboard.bits.bit11 = tigrKeyHeld(window, 'A');
@@ -118,7 +118,9 @@ void process_keyboard(teenyat* t){
 
     /* Render displays on port change */
     if(inp_keyboard.u ^ old_keyboard.u){
-        render_push_buttons(t);
+        render_push_buttons(&inp_keyboard);
         led_array_draw(t);   
     }
+
+    old_keyboard.u = inp_keyboard.u;
 }
