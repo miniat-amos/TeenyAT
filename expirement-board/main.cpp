@@ -145,7 +145,7 @@ int main(int argc, char* argv[])
     while(!tigrClosed(window) && !tigrKeyDown(window, TK_ESCAPE)) {
         process_mouse();
         process_keyboard(&t);
-        tny_clock(&t);
+        if(!CLOCK_PAUSED) tny_clock(&t);
         auto now = std::chrono::steady_clock::now();
         auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(now - last_update_time);
         
@@ -153,6 +153,7 @@ int main(int argc, char* argv[])
         if(duration.count() >= 50) {
     
             /* Pause button  handled here due to update */
+            if(tigrKeyDown(window, 'P'))  CLOCK_PAUSED = !CLOCK_PAUSED;
 
             /* Render all components so aplhas fill out  */
             lcd_render_full_screen();

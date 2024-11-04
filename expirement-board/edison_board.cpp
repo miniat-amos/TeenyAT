@@ -19,6 +19,7 @@ int mouse_x;
 int mouse_y;
 int mouse_button;
 int old_mouse_button;
+bool CLOCK_PAUSED = false;
 
 /* Loads images along with window width and height */
 int initialize_board(){

@@ -19,6 +19,7 @@ extern int mouse_x;
 extern int mouse_y;
 extern int mouse_button;
 extern int old_mouse_button;
+extern bool CLOCK_PAUSED;
 
     
 int initialize_board();
