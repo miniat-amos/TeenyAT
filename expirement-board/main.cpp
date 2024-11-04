@@ -1,4 +1,7 @@
 #include <iostream>
+#include <chrono>
+#include <thread>
+
 #include "teenyat.h"
 #include "tigr.h"
 #include "edison_board.h"
@@ -137,15 +140,18 @@ int main(int argc, char* argv[])
         std::cout << "Failed to initialize board" << std::endl;
         return EXIT_FAILURE;
     }
-    
+
+    auto last_update_time = std::chrono::steady_clock::now();
     while(!tigrClosed(window) && !tigrKeyDown(window, TK_ESCAPE)) {
         process_keyboard(&t);
         tny_clock(&t);
 
-        /* Prevents window from crashing on stagnant programs */
-        watchdog_timer--;
-        if(watchdog_timer<0){
-            watchdog_timer = WATCHDOG_TIMER_START;
+        auto now = std::chrono::steady_clock::now();
+        auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(now - last_update_time);
+        
+        /* 20 Hz === 50 ms */
+        if(duration.count() >= 50) {
+            last_update_time = now;
             tigrUpdate(window);
         }
     }
@@ -201,15 +207,12 @@ void bus_read(teenyat * /*t*/, tny_uword addr, tny_word *data, uint16_t */*delay
 
 void bus_write(teenyat * /*t*/, tny_uword addr, tny_word data, uint16_t */*delay*/)
 {
-    bool invalidated = false;
     switch(addr){
         case LCD_CURSOR:
             lcd_draw_character(data);
-            invalidated = true;
             break;
         case LCD_CLEAR_SCREEN:
             lcd_clear_screen();
-            invalidated = true;
             break; 
         case LCD_MOVE_LEFT:
             lcd_move_cursor_x_y(-data.u,false,false,false);
@@ -246,11 +249,6 @@ void bus_write(teenyat * /*t*/, tny_uword addr, tny_word data, uint16_t */*delay
             break;
         default:
             break;
-    }
-
-    if(invalidated) {
-        watchdog_timer = 1000;
-        tigrUpdate(window);
     }
 }
 
