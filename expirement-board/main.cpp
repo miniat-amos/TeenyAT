@@ -151,9 +151,14 @@ int main(int argc, char* argv[])
         
         /* 20 Hz === 50 ms */
         if(duration.count() >= 50) {
-            led_array_draw(&t); // This is here because I like the way it looks better
+    
+            /* Pause button  handled here due to update */
+
+            /* Render all components so aplhas fill out  */
+            lcd_render_full_screen();
+            led_array_draw(&t); 
             last_update_time = now;
-            tigrUpdate(window);
+            tigrUpdate(window); 
         }
     }
 

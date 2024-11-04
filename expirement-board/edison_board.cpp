@@ -14,6 +14,7 @@ Tigr* leds_img;
 Tigr* push_buttons_img;
 Tigr* dip_button_img;
 tny_word inp_keyboard;
+tny_word push_button_state;
 int mouse_x;
 int mouse_y;
 int mouse_button;
@@ -66,6 +67,7 @@ void reset_board(){
     lcd_cursor.u = 0;
     lcd_cursor_x_y.u = 0;
     inp_keyboard.u = 0;
+    push_button_state.u = 0;
     lcd_clear_screen();
     led_array_draw(NULL);
     render_push_buttons(NULL);
@@ -145,6 +147,8 @@ void process_keyboard(teenyat* t){
     inp_keyboard.bits.bit2 = tigrKeyHeld(window, TK_RIGHT);
     inp_keyboard.bits.bit3 = tigrKeyHeld(window, TK_DOWN);
     
+    /* Mask in push_button_state */
+    inp_keyboard.u |= push_button_state.u;
     tny_set_ports(t,&inp_keyboard,NULL);
 
     /* Render displays on port change */
@@ -163,6 +167,8 @@ void process_mouse(){
         mouse_pressed();
     }else if(mouse_button != 0 && old_mouse_button != 0){
         mouse_down();
+    }else if(mouse_button == 0 && old_mouse_button != 0){
+        mouse_released();
     }
     old_mouse_button = mouse_button;
 }
@@ -172,23 +178,44 @@ void mouse_pressed(){
     /* Check collisions with port A dips */
     int dest_x = LOC_DIPS_PORTA_TL[0];
     int dest_y = LOC_DIPS_PORTA_TL[1];
-    int dip_width = (dip_button_img->w / 2);
-    int dip_height = dip_button_img->h;
+    int width = (dip_button_img->w / 2);
+    int height = dip_button_img->h;
     int index = 7;
 
     for(int i = 0; i < PORTA_DIPS; i++){
-        if(point_rect(mouse_x,mouse_y,dest_x,dest_y,dip_width,dip_height)){
+        if(point_rect(mouse_x,mouse_y,dest_x,dest_y,width,height)){
             /* mask in our dip switch values here */
             inp_keyboard.u ^= (1<<index);
             render_dip_switches();
             return;
         }
-        dest_x += dip_width;   
+        dest_x += width;   
         index--;
     }
-
 }
 
 void mouse_down(){
-    //std::cout << "Mouse DOWN" << std::endl;
+    /* Check collisions with Port A push buttons */
+    int dest_x = LOC_BUTTONS_PORTA_TL[0];
+    int dest_y = LOC_BUTTONS_PORTA_TL[1];
+    int width = push_buttons_img->w / 2;
+    int height = push_buttons_img->h;
+    int index = 15;
+    push_button_state.u = 0;
+    for(int i = 0; i < BUTTONS_ROWS; i++){
+        for(int j = 0; j < BUTTONS_COLS; j++){
+                if(point_rect(mouse_x,mouse_y,dest_x,dest_y,width,height)){
+                    push_button_state.u |= (1<<index);
+                    return;
+                }
+                dest_x += width;
+                index--;
+        } 
+        dest_x = LOC_BUTTONS_PORTA_TL[0];
+        dest_y += height;
+    }
+}
+
+void mouse_released(){
+    push_button_state.u = 0;
 }

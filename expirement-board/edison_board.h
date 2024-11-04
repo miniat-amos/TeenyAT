@@ -30,5 +30,6 @@ void render_dip_switches();
 void process_mouse();
 void mouse_pressed();
 void mouse_down();
+void mouse_released();
 
 #endif  /*   __EDISON_BOARD_H__    */
