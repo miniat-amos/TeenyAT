@@ -59,3 +59,16 @@ Tigr* img_rotate_180(Tigr* image) {
 int abs_mod(int a,int b){
     return (a+b) % b;
 }
+
+/* Taken from jefferythompson.org */
+bool point_rect(float px, float py, float rx, float ry, float rw, float rh) {
+
+  // is the point inside the rectangle's bounds?
+  if (px >= rx &&        // right of the left edge AND
+      px <= rx + rw &&   // left of the right edge AND
+      py >= ry &&        // below the top AND
+      py <= ry + rh) {   // above the bottom
+        return true;
+  }
+  return false;
+}

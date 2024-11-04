@@ -12,6 +12,7 @@ Tigr* background_img;
 Tigr* lcd_font_img;
 Tigr* leds_img;
 Tigr* push_buttons_img;
+Tigr* dip_button_img;
 tny_word inp_keyboard;
 int mouse_x;
 int mouse_y;
@@ -44,6 +45,12 @@ int initialize_board(){
         printf("Failed to load image <buttons.png> .\n");
         return EXIT_FAILURE;
     }
+
+    dip_button_img = tigrLoadImage("exp_board_images/dips.png");
+    if (!dip_button_img ) {
+        printf("Failed to load image <dips.png> .\n");
+        return EXIT_FAILURE;
+    }
     
     window = tigrWindow(background_img->w, background_img->h, "Edison Board", TIGR_FIXED);
     
@@ -62,6 +69,7 @@ void reset_board(){
     lcd_clear_screen();
     led_array_draw(NULL);
     render_push_buttons(NULL);
+    render_dip_switches();
 }
 
 /* Free all memory */
@@ -71,6 +79,25 @@ void kill_board(){
     tigrFree(lcd_font_img);
     tigrFree(leds_img);
     tigrFree(push_buttons_img);
+    tigrFree(dip_button_img);
+}
+
+void render_dip_switches(){
+    int dest_x = LOC_DIPS_PORTA_TL[0];
+    int dest_y = LOC_DIPS_PORTA_TL[1];
+    int src_x = 0;
+    int src_y = 0;
+    int dip_width = (dip_button_img->w / 2);
+    int dip_height = dip_button_img->h;
+    int index = 7;
+
+    for(int i = 0; i < PORTA_DIPS; i++){
+        src_x = dip_width * (inp_keyboard.u & (1<<index)) >> index;
+        if(i == 3) dip_width-=1;  // The sprite is just a tiny too big and will cover stuff :(
+        tigrBlit(window, dip_button_img, dest_x, dest_y, src_x, src_y, dip_width, dip_height);
+        dest_x += dip_width;   
+        index--;
+    }
 }
 
 void render_push_buttons(tny_word *t){
@@ -122,6 +149,7 @@ void process_keyboard(teenyat* t){
 
     /* Render displays on port change */
     if(inp_keyboard.u ^ old_keyboard.u){
+        render_dip_switches();
         render_push_buttons(&inp_keyboard);
         led_array_draw(t);   
     }
@@ -140,6 +168,24 @@ void process_mouse(){
 }
 
 void mouse_pressed(){
+
+    /* Check collisions with port A dips */
+    int dest_x = LOC_DIPS_PORTA_TL[0];
+    int dest_y = LOC_DIPS_PORTA_TL[1];
+    int dip_width = (dip_button_img->w / 2);
+    int dip_height = dip_button_img->h;
+    int index = 7;
+
+    for(int i = 0; i < PORTA_DIPS; i++){
+        if(point_rect(mouse_x,mouse_y,dest_x,dest_y,dip_width,dip_height)){
+            /* mask in our dip switch values here */
+            inp_keyboard.u ^= (1<<index);
+            render_dip_switches();
+            return;
+        }
+        dest_x += dip_width;   
+        index--;
+    }
 
 }
 

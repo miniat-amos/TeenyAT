@@ -12,5 +12,6 @@ Tigr* img_flip_horizontal(Tigr*);
 Tigr* img_flip_vertical(Tigr*);
 Tigr* img_rotate_180(Tigr*);
 int abs_mod(int,int);
+bool point_rect(float,float,float,float,float,float);
 
 #endif  /* __UTILS_H__ */ 
