@@ -106,6 +106,8 @@ typedef void(*TNY_PORT_CHANGE_FNPTR)(teenyat *t, bool is_port_a, tny_word port);
 #define TNY_PORTA_ADDRESS 0x8002
 #define TNY_PORTB_ADDRESS 0x8003
 
+#define TNY_RANDOM_ADDRESS 0x8010
+
 #define TNY_PERIPHERAL_BASE_ADDRESS 0x9000
 
 #define TNY_BUS_DELAY 3
@@ -228,6 +230,16 @@ struct teenyat {
 	 * System callback for whenever output port pins have changed
 	 */
 	TNY_PORT_CHANGE_FNPTR port_change;
+	/**
+	 * Each teenyat instance has a unique random number generator stream,
+	 * seeded at initialization.  These are using the PCG-XSH-RR with a 64-bit
+	 * state and 32-bit output based on the algorithm described at
+	 * https://en.wikipedia.org/wiki/Permuted_congruential_generator
+	 */
+	struct {
+		uint64_t state;
+    	uint64_t increment;
+	} random;
 	/**
 	 * The number of cycles this instance has been running since initialization
 	 * or reset.

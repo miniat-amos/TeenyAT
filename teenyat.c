@@ -10,8 +10,11 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
+#include <time.h>
 
 #include "teenyat.h"
+
+tny_uword tny_random(teenyat *t);
 
 static void set_elg_flags(teenyat *t, tny_sword alu_result) {
 	t->flags.equals = (alu_result == 0);
@@ -103,6 +106,37 @@ bool tny_reset(teenyat *t) {
 	t->port_b_directions.u = 0;
 
 	t->port_change = NULL;
+
+	/*
+	 * Initialize each teenyat with a unique random number stream
+	 */
+	static uint64_t stream = 1;  // start at >=1 for increment constant to be unique
+
+	/*
+	 * find a random seed
+	 */
+	uint64_t seed = (intptr_t)&time << 32;
+	seed ^= (intptr_t)&printf;
+	seed ^= time(NULL);
+	/* make seed "more" random w/ /dev/urandom if there */
+	FILE *f = fopen("/dev/urandom", "rb");
+	if(f != NULL) {
+		uint64_t entropy_bits;
+		if(fread(&entropy_bits, sizeof(entropy_bits), 1, f) == sizeof(entropy_bits)) {
+			seed ^= entropy_bits;
+		}
+		fclose(f);
+	}
+
+	/* Set increment to arbitrary odd constant that goes up by stream */
+	t->random.increment = ((intptr_t)&tny_reset + stream) | 1ULL;
+	stream++;
+
+	/*
+	 * Set initial state and "put it in the past"
+	 */
+	t->random.state = seed + t->random.increment;
+	(void)tny_random(t);
 
 	t->delay_cycles = 0;
 	t->cycle_cnt = 0;
@@ -247,6 +281,9 @@ void tny_clock(teenyat *t) {
 			case TNY_PORTB_DIR_ADDRESS:
 				t->reg[reg1] = t->port_b_directions;
 				break;
+			case TNY_RANDOM_ADDRESS:
+				t->reg[reg1].u = tny_random(t);
+				break;
 			default:
 				if(addr >= TNY_PERIPHERAL_BASE_ADDRESS) {
 					/* read from peripheral address */
@@ -291,6 +328,9 @@ void tny_clock(teenyat *t) {
 				break;
 			case TNY_PORTB_DIR_ADDRESS:
 				t->port_b_directions = t->reg[reg2];
+				break;
+			case TNY_RANDOM_ADDRESS:
+				/* Do nothing */
 				break;
 			default:
 				if(addr >= TNY_PERIPHERAL_BASE_ADDRESS) {
@@ -553,4 +593,38 @@ void tny_clock(teenyat *t) {
 	t->reg[TNY_REG_ZERO].u = 0;
 
 	return;
+}
+
+tny_uword tny_random(teenyat *t) {
+    uint64_t tmp = t->random.state;
+
+    /*
+	 * Find the next state in the sequence.  The weird large immediate value
+	 * is a special constant chosen by the world at large to do great
+	 * things for the random number. ... We don't really know about it,
+	 * but it seems to work ;-)
+	 */
+    t->random.state = tmp * 6364136223846793005ULL + t->random.increment;
+
+	/*
+	 * The code below involves some shifts of seemingly random amounts.
+	 * They determine the amounts of manioulation of 64 and 16 bit values.
+	 * 27 = 32 - 5
+	 * 18 = floor((64 - 27) / 2)
+	 * 59 = 64 - 5
+	 */
+
+    /* use top 5 bits of previous state to "randomly" rotate */
+    unsigned bitcnt_to_rotate = tmp >> 59;
+
+    /* scramble the previous state and truncate to 16 bits */
+    uint32_t to_rotate = (tmp >> 18 ^ tmp) >> 27;
+
+    /* return the right-rotated the scrambled previous state */
+	uint32_t result = to_rotate >> bitcnt_to_rotate;
+	/* the bitmask below ensures the left shift is fewer than 32 bits */
+	result |= to_rotate << (-bitcnt_to_rotate & ~(~0U << 5));
+
+	/* truncate result and return as 16-bit tny_uword */
+    return (tny_uword)result;
 }
