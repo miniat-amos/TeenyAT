@@ -177,10 +177,10 @@ void lcd_render_cursor_panel(tny_word val){
         if(rotate_180){
             sprite_sheet = img_rotate_180(sprite_sheet);
         }
-        tigrBlit(window, sprite_sheet, dest_x, dest_y, 0 , 0, lcd_sprite_width, lcd_sprite_height);
+        tigrBlitAlpha(window, sprite_sheet, dest_x, dest_y, 0 , 0, lcd_sprite_width, lcd_sprite_height,BLIT_ALPHA);
     }else{
 
-        tigrBlit(window, lcd_font_img, dest_x, dest_y, font_x , font_y, lcd_sprite_width, lcd_sprite_height);
+        tigrBlitAlpha(window, lcd_font_img, dest_x, dest_y, font_x , font_y, lcd_sprite_width, lcd_sprite_height,BLIT_ALPHA);
     }
 }
 
