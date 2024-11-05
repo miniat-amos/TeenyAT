@@ -8,6 +8,7 @@
 #include "lcd_screen.h"
 #include "leds.h"
 #include "utils.h"
+#include "edison_sprite_locations.h"
 
 /*
  *  These are the start of the address ranges or the addresses themselves: 
@@ -96,6 +97,16 @@
  *      - on write sets cursors xy to value (values wraps around) 
  *      - on read returns current cursor xy position
  *      - byte1 = x byte0 = y
+ * 
+ *  FADER_LEFT:
+ *      - 0xA020
+ *      - read only 
+ *      - returns value between 0-100 based on left fader's position (bottom = 0)
+ * 
+ *  FADER_RIGHT:
+ *      - 0xA021
+ *      - read only 
+ *      - returns value between 0-100 based on right fader's position (bottom = 0)
 */
 
 #define LCD_CURSOR 0xA000 
@@ -111,6 +122,8 @@
 #define LCD_CURSOR_X 0xA00A
 #define LCD_CURSOR_Y 0xA00B
 #define LCD_CURSOR_XY 0xA00C
+#define FADER_LEFT 0xA020
+#define FADER_RIGHT 0xA021
 
 void bus_read(teenyat *t, tny_uword addr, tny_word *data, uint16_t *delay);
 void bus_write(teenyat *t, tny_uword addr, tny_word data, uint16_t *delay);
@@ -154,6 +167,7 @@ int main(int argc, char* argv[])
             /* Render all components so aplhas fill out  */
             lcd_render_full_screen();
             led_array_draw(&t); 
+            linear_fader_render();
             last_update_time = now;
             tigrUpdate(window); 
         }
@@ -202,6 +216,14 @@ void bus_read(teenyat * /*t*/, tny_uword addr, tny_word *data, uint16_t */*delay
         case LCD_CURSOR_XY: 
             data->u = lcd_cursor_x_y.u;
             break; 
+        case FADER_LEFT:
+            /* Calculate reverse percentage for left fader */
+            data->u = 100 - (((float)(fader_values[0] - LOC_FADER_LEFT_TL_BR[0][1]) / (LOC_FADER_LEFT_TL_BR[1][1] - LOC_FADER_LEFT_TL_BR[0][1])) * 100);
+            break;
+        case FADER_RIGHT:
+            /* Calculate reverse percentage for right fader */
+            data->u = 100 - (((float)(fader_values[1] - LOC_FADER_RIGHT_TL_BR[0][1]) / (LOC_FADER_RIGHT_TL_BR[1][1] - LOC_FADER_RIGHT_TL_BR[0][1])) * 100);
+            break;
         default:
             break;
     }

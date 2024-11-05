@@ -30,10 +30,10 @@ const int LOC_7SEG_DIPS_PORTA_TL[2] = {247, 350};
 const int LOC_7SEG_DIPS_PORTB_TL[2] = {247, 412};
 
 /* Left Fader, top-left and bottom-right: just 1 fader */
-const int LOC_FADER_LEFT_TL_BR[2][2] = {{556, 397}, {576, 576}};
+const int LOC_FADER_LEFT_TL_BR[2][2] = {{556, 397}, {576, 533}};
 
 /* Rightt Fader, top-left and bottom-right: just 1 fader */
-const int LOC_FADER_RIGHT_TL_BR[2][2] = {{604, 397}, {624, 576}};
+const int LOC_FADER_RIGHT_TL_BR[2][2] = {{604, 397}, {624, 533}};
 
 /* Pause button estimate location top-left */
 const int LOC_BUTTONS_PAUSE[2] = {743, 411};

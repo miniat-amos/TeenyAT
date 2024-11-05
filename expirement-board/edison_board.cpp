@@ -13,6 +13,8 @@ Tigr* lcd_font_img;
 Tigr* leds_img;
 Tigr* push_buttons_img;
 Tigr* dip_button_img;
+Tigr* fader_slot_img;
+Tigr* fader_img;
 tny_word inp_keyboard;
 tny_word push_button_state;
 int mouse_x;
@@ -21,6 +23,7 @@ int mouse_button;
 int old_mouse_button;
 int set_paused = false;
 bool CLOCK_PAUSED = false;
+int fader_values[2] = {LOC_FADER_LEFT_TL_BR[1][1],LOC_FADER_RIGHT_TL_BR[1][1]};
 
 /* Loads images along with window width and height */
 int initialize_board(){
@@ -55,6 +58,18 @@ int initialize_board(){
         return EXIT_FAILURE;
     }
     
+    fader_slot_img = tigrLoadImage("exp_board_images/fader_slot.png");
+    if (!fader_slot_img ) {
+        printf("Failed to load image <fader_slot.png.png> .\n");
+        return EXIT_FAILURE;
+    }
+    
+    fader_img = tigrLoadImage("exp_board_images/fader.png");
+    if (!fader_img ) {
+        printf("Failed to load image <fader.png.png> .\n");
+        return EXIT_FAILURE;
+    }
+
     window = tigrWindow(background_img->w, background_img->h, "Edison Board", TIGR_FIXED);
     
     reset_board();
@@ -83,6 +98,8 @@ void kill_board(){
     tigrFree(leds_img);
     tigrFree(push_buttons_img);
     tigrFree(dip_button_img);
+    tigrFree(fader_slot_img);
+    tigrFree(fader_img);
 }
 
 void render_dip_switches(){
@@ -126,6 +143,26 @@ void render_push_buttons(tny_word *t){
         dest_x = LOC_BUTTONS_PORTA_TL[0];
         dest_y += button_height;
     }
+}
+
+void linear_fader_render(){
+    
+    /* Draw left fader-slot */
+    int dest_x = LOC_FADER_LEFT_TL_BR[0][0];
+    int dest_y = LOC_FADER_LEFT_TL_BR[0][1];
+    tigrBlit(window, fader_slot_img, dest_x, dest_y, 0, 0, fader_slot_img->w, fader_slot_img->h);
+    
+    dest_y = fader_values[0];
+    tigrBlit(window, fader_img, dest_x, dest_y, 0, 0, fader_img->w, fader_img->h);
+
+    /* Draw right fader-slot */
+    dest_x = LOC_FADER_RIGHT_TL_BR[0][0];
+    dest_y = LOC_FADER_RIGHT_TL_BR[0][1];
+    tigrBlit(window, fader_slot_img, dest_x, dest_y, 0, 0, fader_slot_img->w, fader_slot_img->h);
+    
+
+    dest_y = fader_values[1];
+    tigrBlit(window, fader_img, dest_x, dest_y, 0, 0, fader_img->w, fader_img->h);
 }
 
 void process_keyboard(teenyat* t){
@@ -239,6 +276,37 @@ void mouse_down(){
         set_paused = 1;
         return;
     }
+
+    /* Check collision with left fader */
+    dest_x = LOC_FADER_LEFT_TL_BR[0][0];
+    dest_y = fader_values[0];
+    width = fader_img->w;
+    height = fader_img->h;
+    if(point_rect(mouse_x,mouse_y,dest_x,dest_y,width,height)){
+            fader_values[0] = (mouse_y - 10); // magic number that allows fader's to be slid easily
+            if(fader_values[0] < LOC_FADER_LEFT_TL_BR[0][1]){
+                    fader_values[0] = LOC_FADER_LEFT_TL_BR[0][1];
+            }else if(fader_values[0] > LOC_FADER_LEFT_TL_BR[1][1]){
+                    fader_values[0] = LOC_FADER_LEFT_TL_BR[1][1];
+            }
+            return;
+    }
+
+    /* Check collision with right fader */
+    dest_x = LOC_FADER_RIGHT_TL_BR[0][0];
+    dest_y = fader_values[1];
+    width = fader_img->w;
+    height = fader_img->h;
+    if(point_rect(mouse_x,mouse_y,dest_x,dest_y,width,height)){
+            fader_values[1] = (mouse_y - 10); // magic number that allows fader's to be slid easily
+            if(fader_values[1] < LOC_FADER_RIGHT_TL_BR[0][1]){
+                    fader_values[1] = LOC_FADER_RIGHT_TL_BR[0][1];
+            }else if(fader_values[1] > LOC_FADER_RIGHT_TL_BR[1][1]){
+                    fader_values[1] = LOC_FADER_RIGHT_TL_BR[1][1];
+            }
+            return;
+    }
+
 }
 
 void mouse_released(){
