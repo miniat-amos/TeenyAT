@@ -19,6 +19,7 @@ int mouse_x;
 int mouse_y;
 int mouse_button;
 int old_mouse_button;
+int set_paused = false;
 bool CLOCK_PAUSED = false;
 
 /* Loads images along with window width and height */
@@ -130,6 +131,9 @@ void render_push_buttons(tny_word *t){
 
 void process_keyboard(teenyat* t){
     
+    /* Handle pause button */
+    CLOCK_PAUSED = tigrKeyHeld(window, 'P') | set_paused;
+
     /* Handels button presses related to port_A */
     tny_word old_keyboard = inp_keyboard;
 
@@ -215,8 +219,19 @@ void mouse_down(){
         dest_x = LOC_BUTTONS_PORTA_TL[0];
         dest_y += height;
     }
+
+    /* Check collision with PAUSE push button */
+    dest_x = LOC_BUTTONS_PAUSE[0];
+    dest_y = LOC_BUTTONS_PAUSE[1];
+    width = push_buttons_img->w / 2;
+    height = push_buttons_img->h;
+    if(point_rect(mouse_x,mouse_y,dest_x,dest_y,width,height)){
+        set_paused = 1;
+        return;
+    }
 }
 
 void mouse_released(){
     push_button_state.u = 0;
+    set_paused = 0;
 }
