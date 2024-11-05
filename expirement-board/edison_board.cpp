@@ -68,7 +68,6 @@ void reset_board(){
     tigrBlit(window, background_img, 0, 0, 0, 0, background_img->w, background_img->h);
     lcd_cursor.u = 0;
     lcd_cursor_x_y.u = 0;
-    inp_keyboard.u = 0;
     push_button_state.u = 0;
     lcd_clear_screen();
     led_array_draw(NULL);
@@ -166,10 +165,10 @@ void process_keyboard(teenyat* t){
     old_keyboard.u = inp_keyboard.u;
 }
 
-void process_mouse(){
+void process_mouse(teenyat* t){
     tigrMouse(window, &mouse_x, &mouse_y, &mouse_button);
     if(mouse_button != 0 && old_mouse_button == 0){
-        mouse_pressed();
+        mouse_pressed(t);
     }else if(mouse_button != 0 && old_mouse_button != 0){
         mouse_down();
     }else if(mouse_button == 0 && old_mouse_button != 0){
@@ -178,13 +177,24 @@ void process_mouse(){
     old_mouse_button = mouse_button;
 }
 
-void mouse_pressed(){
-
+void mouse_pressed(teenyat* t){
+    
+    /* Check collision with RESET push button */
+    int dest_x = LOC_BUTTONS_RESET[0];
+    int dest_y = LOC_BUTTONS_RESET[1];
+    int width = push_buttons_img->w / 2;
+    int height = push_buttons_img->h;
+    if(point_rect(mouse_x,mouse_y,dest_x,dest_y,width,height)){
+        tny_reset(t);
+        reset_board();
+        return;
+    }
+    
     /* Check collisions with port A dips */
-    int dest_x = LOC_DIPS_PORTA_TL[0];
-    int dest_y = LOC_DIPS_PORTA_TL[1];
-    int width = (dip_button_img->w / 2);
-    int height = dip_button_img->h;
+    dest_x = LOC_DIPS_PORTA_TL[0];
+    dest_y = LOC_DIPS_PORTA_TL[1];
+    width = (dip_button_img->w / 2);
+    height = dip_button_img->h;
     int index = 7;
 
     for(int i = 0; i < PORTA_DIPS; i++){

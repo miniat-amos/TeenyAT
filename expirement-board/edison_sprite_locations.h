@@ -38,5 +38,9 @@ const int LOC_FADER_RIGHT_TL_BR[2][2] = {{604, 397}, {624, 576}};
 /* Pause button estimate location top-left */
 const int LOC_BUTTONS_PAUSE[2] = {743, 411};
 
+/* Reset button estimate location top-left */
+const int LOC_BUTTONS_RESET[2] = {679, 411};
+
+
 
 #endif /* __EDISON_SPRITE_LOCATIONS_H__ */

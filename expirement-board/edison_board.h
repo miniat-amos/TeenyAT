@@ -28,8 +28,8 @@ void kill_board();
 void process_keyboard(teenyat*);
 void render_push_buttons(tny_word*);
 void render_dip_switches();
-void process_mouse();
-void mouse_pressed();
+void process_mouse(teenyat*);
+void mouse_pressed(teenyat*);
 void mouse_down();
 void mouse_released();
 
