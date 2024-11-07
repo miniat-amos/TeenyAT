@@ -208,10 +208,10 @@ void bus_read(teenyat * /*t*/, tny_uword addr, tny_word *data, uint16_t */*delay
             data->u = lcd_move_cursor_x_y(1,true,true,true).u;
             break;  
         case LCD_CURSOR_X: 
-            data->u = lcd_cursor_x_y.bytes.byte0;
+            data->u = lcd_cursor_x_y.bytes.byte1;
             break;
         case LCD_CURSOR_Y: 
-            data->u = lcd_cursor_x_y.bytes.byte1;
+            data->u = lcd_cursor_x_y.bytes.byte0;
             break;
         case LCD_CURSOR_XY: 
             data->u = lcd_cursor_x_y.u;
