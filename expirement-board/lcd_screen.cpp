@@ -36,11 +36,11 @@ void lcd_shift_lines(){
     lcd_render_full_screen();
 }
 
-void lcd_increment_variable(int *var,int amt,int wrap){
+void lcd_increment_variable(int *var,int amt,int wrap,int ctrl){
     int increment = amt >= 0 ? 1: -1;
     for(int i = 0; i < abs(amt); i++){
         *var += increment;
-        if((*var<0 || *var >= LCD_COLUMNS) && !wrap){
+        if((*var<0 || (*var>=LCD_COLUMNS || (*var>=LCD_ROWS && ctrl))) && !wrap){
             *var -= increment;
             break;
         }
@@ -61,9 +61,9 @@ tny_word lcd_move_cursor_x_y(int amt, int wrap,int ctrl,int read){
     
     /* Bad solution to this problem I will figure out the math later */
     if(!ctrl){
-        lcd_increment_variable(&x,amt,wrap);
+        lcd_increment_variable(&x,amt,wrap,ctrl);
     }else{
-       lcd_increment_variable(&y,amt,wrap);
+       lcd_increment_variable(&y,amt,wrap,ctrl);
     }
    
     tny_word temp = lcd_cursor;
