@@ -168,7 +168,7 @@ void linear_fader_render(){
 
 void linear_fader_update(){
     if(fader_update>0){
-        fader_values[fader_update-1] = (mouse_y - 10); // magic number that allows fader's to be slid easily
+        fader_values[fader_update-1] = mouse_y;
         if(fader_values[fader_update-1] < LOC_FADER_LEFT_TL_BR[0][1]){
                     fader_values[fader_update-1] = LOC_FADER_LEFT_TL_BR[0][1];
         }else if(fader_values[fader_update-1] > LOC_FADER_LEFT_TL_BR[1][1]){
