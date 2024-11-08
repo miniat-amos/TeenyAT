@@ -42,10 +42,11 @@ void lcd_increment_variable(int *var,int amt,int wrap,int ctrl){
         *var += increment;
         if((*var<0 || (*var>=LCD_COLUMNS || (*var>=LCD_ROWS && ctrl))) && !wrap){
             *var -= increment;
-            break;
+            return;
         }
-        *var = abs_mod(*var,LCD_COLUMNS);
     }
+    if(ctrl) *var = abs_mod(*var,LCD_ROWS);
+    else *var = abs_mod(*var,LCD_COLUMNS);
 }
 
 tny_word lcd_move_cursor_x_y(int amt, int wrap,int ctrl,int read){
