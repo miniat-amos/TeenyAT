@@ -45,8 +45,8 @@ void lcd_increment_variable(int *var,int amt,int wrap,int ctrl){
             return;
         }
     }
-    if(ctrl) *var = abs_mod(*var,LCD_ROWS);
-    else *var = abs_mod(*var,LCD_COLUMNS);
+    int modulo_val = ctrl ? LCD_ROWS : LCD_COLUMNS;
+    *var = abs_mod(*var,modulo_val);
 }
 
 tny_word lcd_move_cursor_x_y(int amt, int wrap,int ctrl,int read){
