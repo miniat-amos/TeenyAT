@@ -24,6 +24,7 @@ int old_mouse_button;
 int set_paused = false;
 bool CLOCK_PAUSED = false;
 int fader_values[2] = {LOC_FADER_LEFT_TL_BR[1][1],LOC_FADER_RIGHT_TL_BR[1][1]};
+int fader_update = 0;
 
 /* Loads images along with window width and height */
 int initialize_board(){
@@ -165,6 +166,17 @@ void linear_fader_render(){
     tigrBlit(window, fader_img, dest_x, dest_y, 0, 0, fader_img->w, fader_img->h);
 }
 
+void linear_fader_update(){
+    if(fader_update>0){
+        fader_values[fader_update-1] = (mouse_y - 10); // magic number that allows fader's to be slid easily
+        if(fader_values[fader_update-1] < LOC_FADER_LEFT_TL_BR[0][1]){
+                    fader_values[fader_update-1] = LOC_FADER_LEFT_TL_BR[0][1];
+        }else if(fader_values[fader_update-1] > LOC_FADER_LEFT_TL_BR[1][1]){
+                    fader_values[fader_update-1] = LOC_FADER_LEFT_TL_BR[1][1];
+        }
+    }
+}
+
 void process_keyboard(teenyat* t){
     
     /* Handle pause button */
@@ -247,6 +259,7 @@ void mouse_pressed(teenyat* t){
 }
 
 void mouse_down(){
+    linear_fader_update();
     /* Check collisions with Port A push buttons */
     int dest_x = LOC_BUTTONS_PORTA_TL[0];
     int dest_y = LOC_BUTTONS_PORTA_TL[1];
@@ -283,12 +296,7 @@ void mouse_down(){
     width = fader_img->w;
     height = fader_img->h;
     if(point_rect(mouse_x,mouse_y,dest_x,dest_y,width,height)){
-            fader_values[0] = (mouse_y - 10); // magic number that allows fader's to be slid easily
-            if(fader_values[0] < LOC_FADER_LEFT_TL_BR[0][1]){
-                    fader_values[0] = LOC_FADER_LEFT_TL_BR[0][1];
-            }else if(fader_values[0] > LOC_FADER_LEFT_TL_BR[1][1]){
-                    fader_values[0] = LOC_FADER_LEFT_TL_BR[1][1];
-            }
+            fader_update = 1;
             return;
     }
 
@@ -298,12 +306,7 @@ void mouse_down(){
     width = fader_img->w;
     height = fader_img->h;
     if(point_rect(mouse_x,mouse_y,dest_x,dest_y,width,height)){
-            fader_values[1] = (mouse_y - 10); // magic number that allows fader's to be slid easily
-            if(fader_values[1] < LOC_FADER_RIGHT_TL_BR[0][1]){
-                    fader_values[1] = LOC_FADER_RIGHT_TL_BR[0][1];
-            }else if(fader_values[1] > LOC_FADER_RIGHT_TL_BR[1][1]){
-                    fader_values[1] = LOC_FADER_RIGHT_TL_BR[1][1];
-            }
+           fader_update = 2;
             return;
     }
 
@@ -312,4 +315,5 @@ void mouse_down(){
 void mouse_released(){
     push_button_state.u = 0;
     set_paused = 0;
+    fader_update = 0;
 }
