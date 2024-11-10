@@ -79,13 +79,7 @@
  *      - read/write
  *      - on write sets cursors x to value value wraps around
  *      - on read returns current cursor x position
- * 
- *  LCD_CURSOR_X: 
- *      - 0xA00A
- *      - read/write
- *      - on write sets cursors x to value (value wraps around)
- *      - on read returns current cursor x position
- * 
+ *  
  *  LCD_CURSOR_Y: 
  *      - 0xA00B
  *      - read/write
@@ -93,7 +87,7 @@
  *      - on read returns current cursor y position
  * 
  *  LCD_CURSOR_XY: 
- *      - 0xA00B
+ *      - 0xA00C
  *      - read/write
  *      - on write sets cursors xy to value (values wraps around) 
  *      - on read returns current cursor xy position
