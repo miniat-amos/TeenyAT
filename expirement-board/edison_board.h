@@ -5,6 +5,8 @@
 
 #define BUTTONS_ROWS 2
 #define BUTTONS_COLS 4
+#define DPAD_COLS 4
+#define DPAD_ROWS 2
 #define BLIT_ALPHA 0.40
 #define PORTA_DIPS 4
 
@@ -16,6 +18,7 @@ extern Tigr* dip_button_img;
 extern Tigr* seg_seven_img;
 extern Tigr* fader_slot_img;
 extern Tigr* fader_img;
+extern Tigr* dpad_img;
 
 extern tny_word inp_keyboard;
 extern tny_word segment_dips;

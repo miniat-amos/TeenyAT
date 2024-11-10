@@ -71,4 +71,7 @@ const int INDEX_7SEG_HEX[16][2] = {
     {7, 1}    /* F */
 };
 
+/* D-Pad button locations top-left for left, up, right, and down */
+const int LOC_DPAD_TL[4][2] = {{676, 517}, {711, 485}, {744, 517}, {711, 552}};
+
 #endif /* __EDISON_SPRITE_LOCATIONS_H__ */

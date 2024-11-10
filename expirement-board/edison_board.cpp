@@ -17,6 +17,7 @@ Tigr* dip_button_img;
 Tigr* seg_seven_img;
 Tigr* fader_slot_img;
 Tigr* fader_img;
+Tigr* dpad_img;
 tny_word inp_keyboard;
 tny_word push_button_state;
 tny_word segment_dips;
@@ -80,6 +81,12 @@ int initialize_board(){
         return EXIT_FAILURE;
     }
 
+    dpad_img = tigrLoadImage("exp_board_images/dpad.png");
+    if (!dpad_img) {
+        printf("Failed to load image <dpad.png> .\n");
+        return EXIT_FAILURE;
+    }
+
     window = tigrWindow(background_img->w, background_img->h, "Edison Board", TIGR_FIXED);
     
     reset_board();
@@ -111,6 +118,7 @@ void kill_board(){
     tigrFree(fader_slot_img);
     tigrFree(fader_img);
     tigrFree(seg_seven_img);
+    tigrFree(dpad_img);
 }
 
 /* This code currently has to manipulate the dip widths as the sprite is too big*/
@@ -153,6 +161,19 @@ void render_dip_switches(){
     }
 }
 
+void dpad_render(){
+    int width = dpad_img->w / DPAD_COLS;
+    int height = dpad_img->h / DPAD_ROWS;
+    /* 4 buttons on the dpad */
+    for(int index = 0; index < 4; index++){
+        int dest_x = LOC_DPAD_TL[index][0];
+        int dest_y = LOC_DPAD_TL[index][1];
+        int src_x = index * width;
+        int src_y = height * (inp_keyboard.u & (1<<index)) >> index;
+        tigrBlit(window, dpad_img, dest_x, dest_y, src_x, src_y, width, height);
+    }
+}
+
 void render_push_buttons(tny_word *t){
 
     int dest_x = LOC_BUTTONS_PORTA_TL[0];
@@ -176,6 +197,8 @@ void render_push_buttons(tny_word *t){
         dest_x = LOC_BUTTONS_PORTA_TL[0];
         dest_y += button_height;
     }
+
+    dpad_render();
 }
 
 void linear_fader_render(){
@@ -360,6 +383,19 @@ void mouse_down(){
     if(point_rect(mouse_x,mouse_y,dest_x,dest_y,width,height)){
            fader_update = 2;
             return;
+    }
+
+    /* Check collision with dpad */
+    width = dpad_img->w / DPAD_COLS;
+    height = dpad_img->h / DPAD_ROWS;
+    /* 4 buttons on the dpad */
+    for(int index = 0; index < 4; index++){
+        int dest_x = LOC_DPAD_TL[index][0];
+        int dest_y = LOC_DPAD_TL[index][1];
+        if(point_rect(mouse_x,mouse_y,dest_x,dest_y,width,height)){
+                push_button_state.u |= (1<<index);
+                return;
+        } 
     }
 
 }
