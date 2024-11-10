@@ -5,7 +5,7 @@
 
 #define BUTTONS_ROWS 2
 #define BUTTONS_COLS 4
-#define BLIT_ALPHA 0.70
+#define BLIT_ALPHA 0.40
 #define PORTA_DIPS 4
 
 extern Tigr* window;
@@ -13,10 +13,12 @@ extern Tigr* background_img;
 extern Tigr* lcd_font_img;
 extern Tigr* leds_img;
 extern Tigr* dip_button_img;
+extern Tigr* seg_seven_img;
 extern Tigr* fader_slot_img;
 extern Tigr* fader_img;
 
 extern tny_word inp_keyboard;
+extern tny_word segment_dips;
 extern int mouse_x;
 extern int mouse_y;
 extern int mouse_button;

@@ -5,6 +5,7 @@
 #include "edison_board.h"
 #include "lcd_screen.h"
 #include "leds.h"
+#include "segment.h"
 #include "edison_sprite_locations.h"
 
 Tigr* window;
@@ -13,10 +14,12 @@ Tigr* lcd_font_img;
 Tigr* leds_img;
 Tigr* push_buttons_img;
 Tigr* dip_button_img;
+Tigr* seg_seven_img;
 Tigr* fader_slot_img;
 Tigr* fader_img;
 tny_word inp_keyboard;
 tny_word push_button_state;
+tny_word segment_dips;
 int mouse_x;
 int mouse_y;
 int mouse_button;
@@ -56,6 +59,12 @@ int initialize_board(){
     dip_button_img = tigrLoadImage("exp_board_images/dips.png");
     if (!dip_button_img ) {
         printf("Failed to load image <dips.png> .\n");
+        return EXIT_FAILURE;
+    }
+    
+    seg_seven_img = tigrLoadImage("exp_board_images/seven_segment.png");
+    if (!seg_seven_img ) {
+        printf("Failed to load image <seven_segment.png> .\n");
         return EXIT_FAILURE;
     }
     
@@ -101,8 +110,10 @@ void kill_board(){
     tigrFree(dip_button_img);
     tigrFree(fader_slot_img);
     tigrFree(fader_img);
+    tigrFree(seg_seven_img);
 }
 
+/* This code currently has to manipulate the dip widths as the sprite is too big*/
 void render_dip_switches(){
     int dest_x = LOC_DIPS_PORTA_TL[0];
     int dest_y = LOC_DIPS_PORTA_TL[1];
@@ -118,6 +129,27 @@ void render_dip_switches(){
         tigrBlit(window, dip_button_img, dest_x, dest_y, src_x, src_y, dip_width, dip_height);
         dest_x += dip_width;   
         index--;
+    }
+    
+    dest_x = LOC_7SEG_DIPS_PORTB_TL[0];
+    dest_y = LOC_7SEG_DIPS_PORTB_TL[1];
+    src_x = 0;
+    src_y = 0;
+    dip_width++;
+    index = 9;
+    for(int y = 0; y < SEGMENT_ROWS; y++){
+        // 2 because its a 2 bit number
+        for(int x = 0; x < 2; x++){
+            src_x = dip_width * (segment_dips.u & (1<<index)) >> index;
+            if(x == 1) dip_width-=4;
+            tigrBlit(window, dip_button_img, dest_x, dest_y, src_x, src_y, dip_width, dip_height);
+            dest_x += dip_width; 
+            index--;  
+        }
+        index-=6; // hop over to next byte
+        dip_width += 4;
+        dest_x = LOC_7SEG_DIPS_PORTA_TL[0];
+        dest_y = LOC_7SEG_DIPS_PORTA_TL[1];
     }
 }
 
@@ -255,6 +287,26 @@ void mouse_pressed(teenyat* t){
         }
         dest_x += width;   
         index--;
+    }
+
+    /* Collision with segment dip switches */
+    dest_x = LOC_7SEG_DIPS_PORTB_TL[0];
+    dest_y = LOC_7SEG_DIPS_PORTB_TL[1];
+    index = 9;
+    for(int y = 0; y < SEGMENT_ROWS; y++){
+        for(int x = 0; x < 2; x++){
+            if(point_rect(mouse_x,mouse_y,dest_x,dest_y,width,height)){
+                /* mask in our dip switch values here */
+                segment_dips.u ^= (1<<index);
+                render_dip_switches();
+                return;
+            }
+            dest_x += width;
+            index--;
+        }
+        index -= 6; // hop over to next byte
+        dest_x = LOC_7SEG_DIPS_PORTA_TL[0];
+        dest_y = LOC_7SEG_DIPS_PORTA_TL[1];
     }
 }
 

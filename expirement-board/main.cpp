@@ -8,6 +8,7 @@
 #include "lcd_screen.h"
 #include "leds.h"
 #include "utils.h"
+#include "segment.h"
 #include "edison_sprite_locations.h"
 
 /*
@@ -167,6 +168,7 @@ int main(int argc, char* argv[])
             /* Render all components so aplhas fill out  */
             lcd_render_full_screen();
             led_array_draw(&t); 
+            segment_render_display(&t);
             linear_fader_render();
             last_update_time = now;
             tigrUpdate(window); 

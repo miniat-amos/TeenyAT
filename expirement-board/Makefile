@@ -19,10 +19,11 @@ all:
 	gcc -c ../teenyat.c -o teenyat.o $(CFLAGS) $(WFLAGS)
 	g++ -c utils.cpp -o utils.o $(CPPFLAGS) $(WFLAGS)
 	g++ -c lcd_screen.cpp -o lcd.o $(CPPFLAGS) $(WFLAGS)
+	g++ -c segment.cpp -o seg.o $(CPPFLAGS) $(WFLAGS)
 	g++ -c leds.cpp -o leds.o $(CPPFLAGS) $(WFLAGS)
 	g++ -c edison_board.cpp -o board.o $(CPPFLAGS) $(WFLAGS)
 	g++ -c main.cpp -o main.o $(CPPFLAGS) $(WFLAGS)
-	g++ tigr.o teenyat.o lcd.o leds.o utils.o board.o main.o -o edison $(LDFLAGS)
+	g++ tigr.o teenyat.o seg.o lcd.o leds.o utils.o board.o main.o -o edison $(LDFLAGS)
 
 clean:
 	$(RMCMD) edison *.o

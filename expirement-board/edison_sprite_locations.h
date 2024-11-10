@@ -41,6 +41,34 @@ const int LOC_BUTTONS_PAUSE[2] = {743, 411};
 /* Reset button estimate location top-left */
 const int LOC_BUTTONS_RESET[2] = {679, 411};
 
+/* 7-Seg Display (Port A) : 1 row of 4 */
+const int LOC_7SEG_PORTA_TL[4][2] = {{42, 353}, {92, 353}, {142,353}, {192,353}};
 
+/* 7-Seg Display (Port B) : 1 row of 4 */
+const int LOC_7SEG_PORTB_TL[4][2] = {{42, 416}, {92, 416}, {142,416}, {192,416}};
+
+/*
+ * 7-Seg hex (and thereby decimal) row:col pairs indexing
+ * into the positions of the seven segment sprite sheet.
+ * These are NOT the pixel offsets into the sprite sheet.
+ */
+const int INDEX_7SEG_HEX[16][2] = {
+    {3, 15},  /* 0 */
+    {0, 6},   /* 1 */
+    {5, 11},  /* 2 */
+    {4, 15},  /* 3 */
+    {6, 6},   /* 4 */
+    {6, 13},  /* 5 */
+    {7, 13},  /* 6 */
+    {0, 7},   /* 7 */
+    {7, 15},  /* 8 */
+    {6, 7},   /* 9 */
+    {7, 7},   /* A */
+    {7, 12},  /* B */
+    {3, 9},   /* C */
+    {5, 14},  /* D */
+    {7, 9},   /* E */
+    {7, 1}    /* F */
+};
 
 #endif /* __EDISON_SPRITE_LOCATIONS_H__ */
