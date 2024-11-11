@@ -3,10 +3,6 @@
 
 #include "tigr.h"
 
-#define WATCHDOG_TIMER_START 1000
-
-extern int watchdog_timer;
-
 Tigr* img_copy(Tigr*);
 Tigr* img_flip_horizontal(Tigr*);
 Tigr* img_flip_vertical(Tigr*);

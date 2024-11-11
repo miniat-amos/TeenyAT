@@ -18,6 +18,8 @@ Tigr* seg_seven_img;
 Tigr* fader_slot_img;
 Tigr* fader_img;
 Tigr* dpad_img;
+Tigr* buzzer_img;
+
 tny_word inp_keyboard;
 tny_word push_button_state;
 tny_word segment_dips;
@@ -29,6 +31,7 @@ int set_paused = false;
 bool CLOCK_PAUSED = false;
 int fader_values[2] = {LOC_FADER_LEFT_TL_BR[1][1],LOC_FADER_RIGHT_TL_BR[1][1]};
 int fader_update = 0;
+int buzzer_state[2] = {0};
 
 /* Loads images along with window width and height */
 int initialize_board(){
@@ -87,6 +90,12 @@ int initialize_board(){
         return EXIT_FAILURE;
     }
 
+    buzzer_img = tigrLoadImage("exp_board_images/buzzers.png");
+    if (!buzzer_img) {
+        printf("Failed to load image <buzzers.png> .\n");
+        return EXIT_FAILURE;
+    }
+
     window = tigrWindow(background_img->w, background_img->h, "Edison Board", TIGR_FIXED);
     
     reset_board();
@@ -119,6 +128,26 @@ void kill_board(){
     tigrFree(fader_img);
     tigrFree(seg_seven_img);
     tigrFree(dpad_img);
+    tigrFree(buzzer_img);
+}
+
+void render_buzzers(){
+    int dest_x = LOC_BUZZER_LEFT_TL[0];
+    int dest_y = LOC_BUZZER_LEFT_TL[1];
+    int width = (buzzer_img->w / 2);
+    int height = buzzer_img->h;
+    int src_x = buzzer_state[0] ? width : 0;
+
+    tigrBlit(window, buzzer_img, dest_x, dest_y, src_x, 0, width, height);
+
+    dest_x = LOC_BUZZER_RIGHT_TL[0];
+    dest_y = LOC_BUZZER_RIGHT_TL[1];
+    width = (buzzer_img->w / 2);
+    height = buzzer_img->h;
+    src_x = buzzer_state[1] ? width : 0;
+
+    tigrBlit(window, buzzer_img, dest_x, dest_y, src_x, 0, width, height);
+
 }
 
 /* This code currently has to manipulate the dip widths as the sprite is too big*/
@@ -133,7 +162,6 @@ void render_dip_switches(){
 
     for(int i = 0; i < PORTA_DIPS; i++){
         src_x = dip_width * (inp_keyboard.u & (1<<index)) >> index;
-        if(i == 3) dip_width-=1;  // The sprite is just a tiny too big and will cover stuff :(
         tigrBlit(window, dip_button_img, dest_x, dest_y, src_x, src_y, dip_width, dip_height);
         dest_x += dip_width;   
         index--;
@@ -143,19 +171,16 @@ void render_dip_switches(){
     dest_y = LOC_7SEG_DIPS_PORTB_TL[1];
     src_x = 0;
     src_y = 0;
-    dip_width++;
     index = 9;
     for(int y = 0; y < SEGMENT_ROWS; y++){
         // 2 because its a 2 bit number
         for(int x = 0; x < 2; x++){
             src_x = dip_width * (segment_dips.u & (1<<index)) >> index;
-            if(x == 1) dip_width-=4;
             tigrBlit(window, dip_button_img, dest_x, dest_y, src_x, src_y, dip_width, dip_height);
             dest_x += dip_width; 
             index--;  
         }
         index-=6; // hop over to next byte
-        dip_width += 4;
         dest_x = LOC_7SEG_DIPS_PORTA_TL[0];
         dest_y = LOC_7SEG_DIPS_PORTA_TL[1];
     }

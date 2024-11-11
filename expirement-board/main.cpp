@@ -1,3 +1,5 @@
+#define MINIAUDIO_IMPLEMENTATION
+#include "miniaudio.h"
 #include <iostream>
 #include <chrono>
 #include <thread>
@@ -8,6 +10,7 @@
 #include "lcd_screen.h"
 #include "leds.h"
 #include "utils.h"
+#include "audio.h"
 #include "segment.h"
 #include "edison_sprite_locations.h"
 
@@ -102,6 +105,21 @@
  *      - 0xA021
  *      - read only 
  *      - returns value between 0-100 based on right fader's position (bottom = 0)
+ *  
+ *  BUZZER_LEFT:
+ *      - 0xA010
+ *      - write only 
+ *      - plays sine/triangle wave at given frequency using bit 15 as control
+ *      - send zero to turn off (regardless of control bit being set)
+ *      - PLEASE NOTE buzzers are peripherals pressing pause will not stop them from playing
+ *
+ * 
+ *  BUZZER_RIGHT:
+ *      - 0xA011
+ *      - write only 
+ *      - plays sine/triangle wave at given frequency using bit 15 as control
+ *      - send zero to turn off (regardless of control bit being set)
+ *      - PLEASE NOTE buzzers are peripherals pressing pause will not stop them from playing
 */
 
 #define LCD_CURSOR 0xA000 
@@ -117,8 +135,11 @@
 #define LCD_CURSOR_X 0xA00A
 #define LCD_CURSOR_Y 0xA00B
 #define LCD_CURSOR_XY 0xA00C
+#define BUZZER_LEFT 0xA010
+#define BUZZER_RIGHT 0xA011
 #define FADER_LEFT 0xA020
 #define FADER_RIGHT 0xA021
+
 
 void bus_read(teenyat *t, tny_uword addr, tny_word *data, uint16_t *delay);
 void bus_write(teenyat *t, tny_uword addr, tny_word data, uint16_t *delay);
@@ -143,6 +164,12 @@ int main(int argc, char* argv[])
         return 0;
     }
 
+    int failed_audio_init = audio_device_init();
+    if(failed_audio_init){
+        std::cout << "Failed to initialize audio" << std::endl;
+        return EXIT_FAILURE;
+    }
+
     int failed_init = initialize_board();
     if(failed_init){
         std::cout << "Failed to initialize board" << std::endl;
@@ -164,12 +191,14 @@ int main(int argc, char* argv[])
             led_array_draw(&t); 
             segment_render_display(&t);
             linear_fader_render();
+            render_buzzers();
             last_update_time = now;
             tigrUpdate(window); 
         }
     }
 
     kill_board();
+    free_audio();
     return EXIT_SUCCESS;
 }
 
@@ -267,6 +296,14 @@ void bus_write(teenyat * /*t*/, tny_uword addr, tny_word data, uint16_t */*delay
             break;
         case LCD_CURSOR_XY: 
             lcd_set_cursor_x_y(data,false,true);
+            break;
+        case BUZZER_LEFT:
+            buzzer_state[0] = data.u & 0x7FFFF;
+            play_sound(data.u,0);
+            break;
+        case BUZZER_RIGHT:
+            buzzer_state[1] = data.u & 0x7FFF;
+            play_sound(data.u,1);
             break;
         default:
             break;
