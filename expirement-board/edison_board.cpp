@@ -7,6 +7,7 @@
 #include "leds.h"
 #include "segment.h"
 #include "edison_sprite_locations.h"
+#include "audio.h"
 
 Tigr* window;
 Tigr* background_img;
@@ -114,6 +115,12 @@ void reset_board(){
     led_array_draw(NULL);
     render_push_buttons(NULL);
     render_dip_switches();
+    /* kill volume on reset */
+    buzzer_state[0] = 0;
+    buzzer_state[1] = 0;
+    play_sound(0,0);
+    play_sound(0,1);
+    render_buzzers();
 }
 
 /* Free all memory */

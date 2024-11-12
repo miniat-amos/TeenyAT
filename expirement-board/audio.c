@@ -141,7 +141,13 @@ void play_sound(int frequency,int channel){
     /* Stop device on zero frequency */
     if(real_frequency == 0){
         *old_freq = real_frequency;
-        ma_device_stop(audio_device);
+        if(channel){
+            ma_device_stop(&tri_audio_device_1);
+            ma_device_stop(&sine_audio_device_1);
+        }else{
+            ma_device_stop(&tri_audio_device);
+            ma_device_stop(&sine_audio_device);
+        }
         return;
     } 
 
