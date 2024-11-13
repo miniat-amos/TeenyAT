@@ -7,7 +7,6 @@ extern "C" {
 
 #include "miniaudio.h"
 
-#define M_PI       3.14159265358979323846 
 #define SAMPLE_RATE 44100 // A4 note
 #define AMPLITUDE 0.5f
 
