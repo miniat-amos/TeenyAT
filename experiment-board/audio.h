@@ -15,9 +15,9 @@ typedef struct {
     float wave_increment;
 } playback_data;
 
-int audio_device_init();
+int audio_device_init(void);
 void play_sound(int,int);
-void free_audio();
+void free_audio(void);
 void sine_wave_callback(ma_device*, void*, const void*, ma_uint32 );
 void triangle_wave_callback(ma_device*, void*, const void*, ma_uint32);
 
