@@ -3,7 +3,12 @@ WFLAGS = -Wall -Wextra -Wpedantic
 CPPFLAGS += $(CFLAGS) --std=c++17
 ifeq ($(OS),Windows_NT)
 	LDFLAGS += -s -lopengl32 -lgdi32
-	RMCMD = del 
+	# Check if rm exists, otherwise use del
+	ifneq ($(shell where rm 2>nul.o),)
+		RMCMD = rm -f
+	else
+		RMCMD = del
+	endif
 else
 	RMCMD = rm -f
 	UNAME_S := $(shell uname -s)
