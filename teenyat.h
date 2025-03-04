@@ -112,6 +112,8 @@ typedef void(*TNY_PORT_CHANGE_FNPTR)(teenyat *t, bool is_port_a, tny_word port);
 
 #define TNY_BUS_DELAY 3
 
+#define TNY_DEFAULT_PACE_CNT 500
+
 union tny_word {
 	struct {
 		tny_sword immed4  : 4;
@@ -240,6 +242,28 @@ struct teenyat {
 		uint64_t state;
     	uint64_t increment;
 	} random;
+	 /**
+      * Each teenyat instance is inherently initialized with a fixed cycle rate
+      * 1 MHz. This is controlled through the clock_wait_time which is our amount of 
+      * time to busy wait in a for loop. To account for aggregate error, this variable 
+      * is adaptively updated once after every pace_cnt cycles, goes by ensuring we 
+      * stay in line with our cycle time 
+      */
+     struct{
+		uint64_t clock_wait_time;
+		int16_t pace_cnt;
+		/* Our first registered clock cycle */
+		uint64_t clock_epoch;
+		/* Start time of the current pace stream */
+		uint64_t pace_start;
+		/* This affects how fast the simulated clock speed is 
+		*  a value of 1 results in 1MHz while a value of 2
+		*  results in 2MHz etc....
+		* */
+		uint16_t pace_divisor;
+		/* The initial pace count to start at effects how often we update */
+		int16_t initial_pace_cnt;
+	} clock_manager;
 	/**
 	 * The number of cycles this instance has been running since initialization
 	 * or reset.
@@ -288,7 +312,8 @@ struct teenyat {
 
 /**
  * @brief
- *   Initialize a TeenyAT instance and buffer the file for future resets.
+ *   Initialize a 1MHz instance of the TeenyAT and 
+ *   buffer the file for future resets.
  *
  * @param t
  *   The TeenyAT instance to initialize
@@ -312,6 +337,90 @@ struct teenyat {
 bool tny_init_from_file(teenyat *t, FILE *bin_file,
                         TNY_READ_FROM_BUS_FNPTR bus_read,
                         TNY_WRITE_TO_BUS_FNPTR bus_write);
+/**
+  * @brief
+  *   Initialize a clock instance of TeenyAT with a given MHz clock rate.
+  * 
+  * @param t
+  *   The TeenyAT instance to initialize
+  *
+  * @param bin_file
+  *   The pre-assembled .bin file to load and execute
+  *
+  * @param bus_read
+  *   Callback function for handling read requests
+  *
+  * @param bus_write
+  *   Callback function for handling write requests
+  * 
+  * @param MHz
+  *   The simulated clock speed in MHz 
+  *
+  * @return
+  *   True on success, flase otherwise.
+  *
+  * @note
+  *   Upon failed initialization, the t->initialized member can be assumed false,
+  *   but the state of all other members is undefined.
+  * 
+  * @note
+  *   During testing it was found that most host machines can run 1MHz effectively
+  * 	 so that was chosen as the standard clock rate.
+  * 
+  *  
+  */ 
+ bool tny_init_clocked(teenyat *t, FILE *bin_file,
+					   TNY_READ_FROM_BUS_FNPTR bus_read,
+					   TNY_WRITE_TO_BUS_FNPTR bus_write,
+					   uint16_t MHz);
+/**
+* @brief
+*   Initialize an unclock instance of TeenyAT.
+* 
+* @param t
+*   The TeenyAT instance to initialize
+*
+* @param bin_file
+*   The pre-assembled .bin file to load and execute
+*
+* @param bus_read
+*   Callback function for handling read requests
+*
+* @param bus_write
+*   Callback function for handling write requests
+* 
+* @return
+*   True on success, flase otherwise.
+*
+* @note
+*   Upon failed initialization, the t->initialized member can be assumed false,
+*   but the state of all other members is undefined.
+* 
+*/ 
+bool tny_init_unclocked(teenyat *t, FILE *bin_file,
+						TNY_READ_FROM_BUS_FNPTR bus_read,
+						TNY_WRITE_TO_BUS_FNPTR bus_write);
+
+/**
+* @brief
+*   Helper function for setting the initial pace
+*   count of a clocked instance of the TeenyAT
+* 
+* 
+* @param t
+*   The TeenyAT instance to set pace count of 
+* 
+* @param pace_cnt
+*   The pace count to be set
+* 
+* @return
+*   True on success, false otherwise.
+*   Attempting to reset an unitialized TeenyAT will always return false.
+* 
+* @note
+* 	This function also sets the current pace count 
+*/				  
+bool tny_set_initial_pace_cnt(teenyat *t,int16_t pace_cnt);
 
 /**
  * @brief
