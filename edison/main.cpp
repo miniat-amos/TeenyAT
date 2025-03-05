@@ -1,5 +1,3 @@
-#define MINIAUDIO_IMPLEMENTATION
-#include "miniaudio.h"
 #include <iostream>
 #include <chrono>
 #include <thread>
