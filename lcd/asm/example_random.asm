@@ -31,7 +31,7 @@
     MOD rA, 64
     LOD rB, [RAND_POSITIVE]
     MOD rB, 64
-    ; get random color valye
+    ; get random color value
     LOD rC, [RAND]
     STR [STROKE], rC
 
