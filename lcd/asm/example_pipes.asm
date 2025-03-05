@@ -1,5 +1,5 @@
 .const RAND 0x8010
-.const RAND_POSITIVE 0x8011
+.const RAND_BITS 0x8011
 
 .const LIVESCREEN 0x9000
 .const UPDATESCREEN 0xA000
@@ -83,7 +83,7 @@
 ;--------------------
 
 !rand_rA_-10...+10
-    LOD rA, [RAND_POSITIVE]
+    LOD rA, [RAND]
     MOD rA, 21
     sub rA, 10
     RET
