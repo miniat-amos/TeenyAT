@@ -356,6 +356,9 @@ void tny_clock(teenyat *t) {
 				case TNY_RANDOM_ADDRESS:
 					t->reg[reg1].u = tny_random(t);
 					break;
+				case TNY_RANDOM_POSITIVE_ADDRESS:
+					t->reg[reg1].u = tny_random(t) & ((1 << 15) - 1);
+					break;
 				default:
 					if(addr >= TNY_PERIPHERAL_BASE_ADDRESS) {
 						/* read from peripheral address */
