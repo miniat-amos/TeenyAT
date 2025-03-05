@@ -111,7 +111,12 @@ typedef void(*TNY_PORT_CHANGE_FNPTR)(teenyat *t, bool is_port_a, tny_word port);
 
 #define TNY_PERIPHERAL_BASE_ADDRESS 0x9000
 
-#define TNY_BUS_DELAY 3
+/*
+* To promote student use of registers, all bus operations,
+* including RAM access comes with an extra penalty.
+*/
+#define TNY_BUS_DELAY 1
+#define TNY_BUS_EXTERNAL_DELAY_ADJUST 2
 
 #define TNY_DEFAULT_PACE_CNT 500
 
