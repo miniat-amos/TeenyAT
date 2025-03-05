@@ -9,6 +9,7 @@
 ; out its integer value from the output on the terminal.
 
 .const RAND 0x8010
+.const RAND_POSITIVE 0x8011
 
 .const LIVESCREEN 0x9000
 .const UPDATESCREEN 0xA000
