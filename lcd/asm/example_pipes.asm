@@ -1,4 +1,5 @@
 .const RAND 0x8010
+.const RAND_POSITIVE 0x8011
 
 .const LIVESCREEN 0x9000
 .const UPDATESCREEN 0xA000
@@ -82,8 +83,7 @@
 ;--------------------
 
 !rand_rA_-10...+10
-    LOD rA, [RAND]
-    AND rA, 0x7FFF   ; turn off sign bit (make positive)
+    LOD rA, [RAND_POSITIVE]
     MOD rA, 21
     sub rA, 10
     RET

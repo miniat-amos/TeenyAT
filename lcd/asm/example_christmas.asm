@@ -2,6 +2,7 @@
 ;; but whatever.....MERRY CHRISTMAS................................................;;
 
 .const RAND 0x8010
+.const RAND_POSITIVE 0x8011
 
 .const LIVESCREEN 0x9000
 .const UPDATESCREEN 0xA000
@@ -37,7 +38,7 @@ CAL !draw_trunk
 
 !gen_snow
     SET rA, 0
-    LOD rA, [RAND]
+    LOD rA, [RAND_POSITIVE]
     MOD rA, 65
     SET rB, WHITE
     STR [STROKE], rB
@@ -88,7 +89,7 @@ CAL !draw_trunk
 
 !snow_shimmy_random
         SET rE, 0
-        LOD rE, [RAND]
+        LOD rE, [RAND_POSITIVE]
         MOD rE, 2
 
         CMP rE, 0
@@ -179,7 +180,7 @@ CAL !draw_trunk
             JE !slide_end
 
             SET rE, 0
-            LOD rE, [RAND]
+            LOD rE, [RAND_POSITIVE]
             MOD rE, 4
 
             CMP rE, 0

@@ -1,4 +1,5 @@
 .const RAND 0x8010
+.const RAND_POSITIVE 0x8011
 
 .const LIVESCREEN 0x9000
 .const UPDATESCREEN 0xA000
@@ -26,11 +27,11 @@
     STR [UPDATE], rZ
 !loop
     ; get random x and y values
-    LOD rA, [RAND]
+    LOD rA, [RAND_POSITIVE]
     MOD rA, 64
-    LOD rB, [RAND]
+    LOD rB, [RAND_POSITIVE]
     MOD rB, 64
-    ; get random color valye
+    ; get random color value
     LOD rC, [RAND]
     STR [STROKE], rC
 

@@ -1,4 +1,5 @@
 .const RAND 0x8010
+.const RAND_POSITIVE 0x8011
 
 .const LIVESCREEN 0x9000
 .const UPDATESCREEN 0xA000
@@ -20,7 +21,7 @@
 .const KEY 0xFFFE
 
 .const AMT 65
-.const SLOWDOWN 4000
+.const SLOWDOWN 750
 
 !main
     SET rA, 63
