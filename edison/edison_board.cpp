@@ -143,7 +143,8 @@ void render_buzzers(){
     int dest_y = LOC_BUZZER_LEFT_TL[1];
     int width = (buzzer_img->w / 2);
     int height = buzzer_img->h;
-    int src_x = buzzer_state[0] ? width : 0;
+    /* Mask out the control bit of the buzzers value */
+    int src_x = (buzzer_state[0] & 0x7FFF) ? width : 0;
 
     tigrBlit(window, buzzer_img, dest_x, dest_y, src_x, 0, width, height);
 
@@ -151,7 +152,8 @@ void render_buzzers(){
     dest_y = LOC_BUZZER_RIGHT_TL[1];
     width = (buzzer_img->w / 2);
     height = buzzer_img->h;
-    src_x = buzzer_state[1] ? width : 0;
+    /* Mask out the control bit of the buzzers value */
+    src_x = (buzzer_state[1] & 0x7FFF) ? width : 0;
 
     tigrBlit(window, buzzer_img, dest_x, dest_y, src_x, 0, width, height);
 
