@@ -1,10 +1,12 @@
 CFLAGS += -I.. -I./include -Os 
 WFLAGS = -Wall -Wextra -Wpedantic
 CPPFLAGS += $(CFLAGS) --std=c++17
+EXE_EXT :=
 ifeq ($(OS),Windows_NT)
+	EXE_EXT := .exe
 	LDFLAGS += -s -lopengl32 -lgdi32
 	# Check if rm exists, otherwise use del
-	ifneq ($(shell where rm 2>nul.o),)
+	ifneq ($(shell where rm 2>tigr.o),)
 		RMCMD = rm -f
 	else
 		RMCMD = del
@@ -22,7 +24,7 @@ endif
 all:
 	gcc -c tigr.c -o tigr.o $(CFLAGS) 
 	gcc -c ../teenyat.c -o teenyat.o $(CFLAGS) $(WFLAGS)
-	gcc -c audio.c -o audio.o $(CFLAGS) $(WFLAGS) -Wno-unused-result 
+	gcc -c audio.c -o audio.o $(CFLAGS) $(WFLAGS) -Wunused-result 
 	g++ -c utils.cpp -o utils.o $(CPPFLAGS) $(WFLAGS)
 	g++ -c lcd_screen.cpp -o lcd.o $(CPPFLAGS) $(WFLAGS)
 	g++ -c segment.cpp -o seg.o $(CPPFLAGS) $(WFLAGS)
@@ -32,4 +34,4 @@ all:
 	g++ tigr.o teenyat.o seg.o lcd.o audio.o leds.o utils.o board.o main.o -o edison $(LDFLAGS)
 
 clean:
-	$(RMCMD) edison *.o
+	$(RMCMD) edison$(EXE_EXT) *.o
