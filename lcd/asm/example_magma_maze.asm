@@ -1,5 +1,5 @@
 .const RAND 0x8010
-.const RAND_POSITIVE 0x8011
+.const RAND_BITS 0x8011
 
 .const LIVESCREEN 0x9000
 .const UPDATESCREEN 0xA000
@@ -182,7 +182,7 @@
     JE  !done_magma_to_glisten
 
     ; shift magma color a little
-    LOD rD, [RAND_POSITIVE]
+    LOD rD, [RAND_BITS]
     MOD rD, 16
     ADD rC, rD
     STR [rB], rC
@@ -199,7 +199,7 @@
     SET rA, rC - 1
     ADD rA, UPDATESCREEN
 
-    LOD rB, [RAND]
+    LOD rB, [RAND_BITS]
     AND rB, 0x07FF
 ;if_create_rand_magma
     CMP rB, rZ

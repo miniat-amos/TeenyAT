@@ -356,10 +356,10 @@ void tny_clock(teenyat *t) {
 					t->reg[reg1] = t->port_b_directions;
 					break;
 				case TNY_RANDOM_ADDRESS:
-					t->reg[reg1].u = tny_random(t);
-					break;
-				case TNY_RANDOM_POSITIVE_ADDRESS:
 					t->reg[reg1].u = tny_random(t) & ((1 << 15) - 1);
+					break;
+				case TNY_RANDOM_BITS_ADDRESS:
+					t->reg[reg1].u = tny_random(t);
 					break;
 				default:
 					if(addr >= TNY_PERIPHERAL_BASE_ADDRESS) {
@@ -407,6 +407,9 @@ void tny_clock(teenyat *t) {
 					t->port_b_directions = t->reg[reg2];
 					break;
 				case TNY_RANDOM_ADDRESS:
+					/* Do nothing */
+					break;
+				case TNY_RANDOM_BITS_ADDRESS:
 					/* Do nothing */
 					break;
 				default:

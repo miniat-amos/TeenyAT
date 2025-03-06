@@ -2,7 +2,7 @@
 ; Hit key S to mutate mosaic
 
 .const RAND 0x8010
-.const RAND_POSITIVE 0x8011
+.const RAND_BITS 0x8011
 
 .const LIVESCREEN 0x9000
 .const UPDATESCREEN 0xA000
@@ -41,9 +41,9 @@ jmp !loop
     JMP !main
 !loop
     ; get random x1 and y1 values
-    LOD rA, [RAND_POSITIVE]
+    LOD rA, [RAND_BITS]
     MOD rA, 64
-    LOD rB, [RAND_POSITIVE]
+    LOD rB, [RAND_BITS]
     MOD rB, 64
     ; get random color valye
     LOD rC, [RAND]
@@ -54,9 +54,9 @@ jmp !loop
     STR [Y1], rB
 
      ; get random x1 and y1 values
-    LOD rA, [RAND_POSITIVE]
+    LOD rA, [RAND_BITS]
     MOD rA, 64
-    LOD rB, [RAND_POSITIVE]
+    LOD rB, [RAND_BITS]
     MOD rB, 64
     ; get random color valye
     LOD rC, [RAND]

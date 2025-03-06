@@ -106,8 +106,8 @@ typedef void(*TNY_PORT_CHANGE_FNPTR)(teenyat *t, bool is_port_a, tny_word port);
 #define TNY_PORTA_ADDRESS 0x8002
 #define TNY_PORTB_ADDRESS 0x8003
 
-#define TNY_RANDOM_ADDRESS 0x8010
-#define TNY_RANDOM_POSITIVE_ADDRESS 0x8011
+#define TNY_RANDOM_ADDRESS 0x8010  /* positive random values */
+#define TNY_RANDOM_BITS_ADDRESS 0x8011  /* random 16-bit pattern */
 
 #define TNY_PERIPHERAL_BASE_ADDRESS 0x9000
 
