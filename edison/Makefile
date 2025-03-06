@@ -24,7 +24,7 @@ endif
 all:
 	gcc -c tigr.c -o tigr.o $(CFLAGS) 
 	gcc -c ../teenyat.c -o teenyat.o $(CFLAGS) $(WFLAGS)
-	gcc -c audio.c -o audio.o $(CFLAGS) $(WFLAGS) -Wunused-result 
+	gcc -c audio.c -o audio.o $(CFLAGS) $(WFLAGS) -Wno-unused-result
 	g++ -c utils.cpp -o utils.o $(CPPFLAGS) $(WFLAGS)
 	g++ -c lcd_screen.cpp -o lcd.o $(CPPFLAGS) $(WFLAGS)
 	g++ -c segment.cpp -o seg.o $(CPPFLAGS) $(WFLAGS)
