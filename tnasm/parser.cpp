@@ -1,4 +1,5 @@
 #include <iostream>
+#include <iomanip>
 #include <memory>
 #include <map>
 
@@ -313,10 +314,14 @@ shared_ptr <token> p_label_line() {
             if(!label_exists) {
                 /* New label found */
                 labels[label->token_str] = tny_word{.u = address};
+                val = label;
             }
             else {
                 cerr << "ERROR, Line " << label->line_no << ": ";
-                cerr << "Constant " << label->token_str << " already defined" << endl;
+                cerr << "Label " << label->token_str << " already defined at 0x";
+                cerr << hex << setw(4) << setfill('0');
+                cerr << labels[label->token_str].u;
+                cerr << dec << setw(0) << endl;
             }
         }
         else if(pass > 1) {
@@ -328,9 +333,9 @@ shared_ptr <token> p_label_line() {
                 labels[label->token_str] = tny_word{.u = address};
                 labels_updated_this_pass = true;
             }
+    
+            val = label;
         }
-
-        val = label;
     }
     return val;
 }
