@@ -95,7 +95,7 @@ TeenyAT uses a 4-bit immediate field for flags:
 |--------|---------------------------|
 |        | Immed_16 / Addr_16        |
 
-### See the *[extensive instruction set](./teenyat_instruction_set.md)* for more information.
+### See the *[extensive instruction set](docs/teenyat_instruction_set.md)* for more information.
 
 ## Systems Built Around TeenyAT
 
