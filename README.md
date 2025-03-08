@@ -1,4 +1,6 @@
-# TeenyAT Architecture
+# TeenyAT Virtual Architecture 
+
+![Devious looking jellyfish](docs/.leroy.gif)
 
 The **TeenyAT** *( /ˈtē·nē·'āt/ )* is a 16-bit virtual embedded microcontroller delivered as a C library so systems can be simulated around it with ease. System designers create an instance (or more) of the TeenyAT, providing a binary image to load and execute and registering callbacks for any attempted reads or writes to the bus by the running program.
 
