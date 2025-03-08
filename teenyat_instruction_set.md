@@ -1,6 +1,6 @@
 # **TeenyAT Instruction Set Architecture**
 
-## Elements
+## Core Elements
     16 bit words (each memory address points to a 16 bit value)
 
     32K words of RAM from 0x0000 through 0x7FFF
@@ -20,6 +20,36 @@
             * if teeny == 0, the instruction is 32 bits and requires an additional cycle
         * Fetches to RAM greater than 0x7FFF will result in the PC being set to 0
 
+## Opcode Table
+ Instruction Opcodes
+
+***Table:** Quick Referece for all the Opcodes and Flags set by Each Instruction*
+|       Instructions             |   Opcode     |
+|--------------------------------|:------------:|
+|      SET                       |     0        |
+|      LOD                       |     1        |
+|      STR                       |     2        |
+|      PSH                       |     3        |
+|      POP                       |     4        |
+|      BTS                       |     5        |
+|      BTC                       |     6        |
+|      BTF                       |     7        |
+|      CAL                       |     8        |
+|      ADD                       |     9        |
+|      SUB                       |     10       |
+|      MPY                       |     11       |
+|      DIV                       |     12       |
+|      MOD                       |     13       |
+|      AND                       |     14       |
+|      OR                        |     15       |
+|      XOR                       |     16       |
+|      SHF                       |     17       |
+|      ROT                       |     18       |
+|      NEG                       |     19       |
+|      CMP                       |     20       |
+|      JMP                       |     21       |
+|      DLY                       |     22       |
+|      LUP                       |     23       |
 
 ## Encodings
 
@@ -45,7 +75,288 @@
      -------------------------------------------------------------------------------------
 ```
 
-## Instructions
+## Instruction Overview
+Instruction Set
+### 4.1 SET
+- Opcode: 0
+- Desc: Sets a register to a value
+- Flags: N/A
+- Usage: 
+    - SET register1, register2 + immed
+    - SET register1, register2
+    - SET register1, immed
+### 4.2 LOD
+- Opcode: 1
+- Desc: Loads a value from an address into register1
+     -    If value is greater then 0x7FFF will read from bus
+- Flags: N/A
+- Usage: 
+    - LOD register1, [register2 + immed]
+    - LOD register1, [register2]
+    - LOD register1, [immed]
+### 4.3 STR
+- Opcode: 2
+- Desc: Stores a value from an address into a register2
+     -    If value is greater then 0x7FFF will write to bus
+- Flags: N/A
+- Usage: 
+    - STR [register1 + immed], register2
+    - STR [register1], register2
+    - STR [immed], register2
+### 4.4 PSH
+- Opcode: 3
+- Desc: Sets SP to a value then Decrements the SP
+- Flags: N/A
+- Usage: 
+    - PSH register2 + immed
+    - PSH register2 
+    - PSH immed
+### 4.5 POP
+- Opcode: 4
+- Desc: Increments SP and puts the value into register1
+- Flags: N/A
+- Usage: 
+    - POP register1 
+### 4.6 BTS
+- Opcode: 5
+- Desc: Sets a bit in register1 to 1 based on the value if within range (0-15)
+- Flags: Eqls,Less,Grtr
+- On attempts to set an invalid bit acts as a nop.
+- Usage: 
+    - BTS register1, register2 + immed
+    - BTS register1, register2
+    - BTS register1, immed
+### 4.7 BTC
+- Opcode: 6
+- Desc: Sets a bit in register1 to 0 based on the value if within range (0-15)
+- Flags: Eqls,Less,Grtr
+- On attempts to clear an invalid bit acts as a nop.
+- Usage: 
+    - BTC register1, register2 + immed
+    - BTC register1, register2
+    - BTC register1, immed
+### 4.8 BTF
+- Opcode: 7
+- Desc: Toggles a bit in register1 based on the value if within range (0-15)
+- Flags: Eqls,Less,Grtr
+- On attempts to flip an invalid bit acts as a nop.
+- Usage: 
+    - BTF register1, register2 + immed
+    - BTF register1, register2
+    - BTF register1, immed
+### 4.9 CAL
+- Opcode: 8
+- Desc: Sets SP to PC then Decrements SP and sets PC to an address
+     - mainly used to set the pc to a label and then return from it later
+- Flags: N/A
+- Usage: 
+    - CAL register2 + immed
+    - CAL register2 
+    - CAL immed 
+### 4.10 ADD
+- Opcode: 9
+- Desc: Adds a value to register1
+- Flags: Eqls,Less,Grtr
+- Usage: 
+    - ADD register1, register2 + immed
+    - ADD register1, register2
+    - ADD register1, immed
+### 4.11 SUB
+- Opcode: 10
+- Desc: Subtracts a value from register1
+- Flags: Eqls,Less,Grtr
+- Usage: 
+    - SUB register1, register2 + immed
+    - SUB register1, register2
+    - SUB register1, immed
+### 4.12 MPY
+- Opcode: 11
+- Desc: Multiplies register1 by a value
+- Flags: Eqls,Less,Grtr
+- Usage: 
+    - MPY register1, register2 + immed
+    - MPY register1, register2
+    - MPY register1, immed
+### 4.13 DIV
+- Opcode: 12
+- Desc: Divides register1 by a value
+- Flags: Eqls,Less,Grtr
+- Usage: 
+    - DIV register1, register2 + immed
+    - DIV register1, register2
+    - DIV register1, immed
+### 4.14 MOD
+- Opcode: 13
+- Desc: Modulo register1 by a value
+- Flags: Eqls,Less,Grtr
+- Usage: 
+    - MOD register1, register2 + immed
+    - MOD register1, register2
+    - MOD register1, immed
+### 4.15 AND
+- Opcode: 14
+- Desc: Bitwise AND register1 by a value
+- Flags: Eqls,Less,Grtr
+- Usage: 
+    - AND register1, register2 + immed
+    - AND register1, register2
+    - AND register1, immed
+### 4.16 OR
+- Opcode: 15
+- Desc: Bitwise OR register1 by a value
+- Flags: Eqls,Less,Grtr
+- Usage: 
+    - OR register1, register2 + immed
+    - OR register1, register2
+    - OR register1, immed
+### 4.17 XOR
+- Opcode: 16
+- Desc: Bitwise EXCLUSIVE OR register1 by a value
+- Flags: Eqls,Less,Grtr
+- Usage: 
+    - XOR register1, register2 + immed
+    - XOR register1, register2
+    - XOR register1, immed
+### 4.18 SHF
+- Opcode: 17
+- Desc: Bitwise SHIFT register1 by a value
+     - If value is positive it will shift right (>>)
+     - If value is negative it will shift left  (<<)
+- Flags: Eqls,Less,Grtr
+- Usage: 
+    - SHF register1, register2 + immed
+    - SHF register1, register2
+    - SHF register1, immed
+### 4.19 ROT
+- Opcode: 18
+- Desc: Bitwise ROTATE register1 by a value
+     - If value is positive it will rotate right 
+     - If value is negative it will rotate left  
+- Flags: Eqls,Less,Grtr
+- Usage: 
+    - ROT register1, register2 + immed
+    - ROT register1, register2
+    - ROT register1, immed
+### 4.20 NEG
+- Opcode: 19
+- Desc: Negates the value of register1 (0-register1)
+- Flags: Eqls,Less,Grtr
+- Usage: 
+    - NEG register1
+### 4.21 CMP
+- Opcode: 20
+- Desc: Compares register1 againts a value (does not store in register1)  
+- Flags: Eqls,Less,Grtr
+- Usage: 
+    - CMP register1, register2 + immed
+    - CMP register1, register2
+    - CMP register1, immed
+### 4.22 JMP
+- Opcode: 21
+- Desc: Sets PC to an address
+     - The instance flags are set as: 
+          - Equal = 0, Less = 0, Greater = 0 
+- Flags: N/A
+- Usage: 
+    - JMP register1 + immed
+    - JMP register1
+    - JMP immed
+### 4.23 DLY
+- Opcode: 22
+- Desc: Delays for a certain amount of clock cycles
+- Flags: N/A
+- Usage: 
+    - DLY register2 + immed
+    - DLY register2 
+    - DLY immed
+### 4.24 LUP
+- Opcode: 23
+- Desc: The "Loop" instruction.  Decrements register1 and jumps to the calculated target address if the register is non-zero
+- Flags: N/A
+- Usage: 
+    - LUP register1, register2 + immed
+    - LUP register1, register2 
+    - LUP register1, immed
+
+##***\*Pseudo instructions:** These instructions can be synthesized with a single different instruction. Reference the opcode for this.*
+### 4.25 INC
+- Opcode: 9
+- Desc: Increments register1 
+- Usage: 
+    - INC register1
+### 4.26 DEC
+- Opcode: 10
+- Desc: Decrements register1 
+- Usage: 
+    - DEC register1  
+### 4.27 RET
+- Opcode: 4
+- Desc: Returns from a previous CAL instruction
+- Usage: 
+    - RET 
+
+### 4.28 JE
+- Opcode: 21
+- Desc: Sets PC to address if EQUAL
+     - The instance flags are set as: 
+          - Equal = 1, Less = 0, Greater = 0 
+- Flags: N/A
+- Usage: 
+    - JE register1 + immed
+    - JE register1
+    - JE immed   
+### 4.29 JNE
+- Opcode: 21
+- Desc: Sets PC to address if NOT EQUAL
+     - The instance flags are set as: 
+          - Equal = 0, Less = 1, Greater = 1 
+- Flags: N/A
+- Usage: 
+    - JNE register1 + immed
+    - JNE register1
+    - JNE immed    
+### 4.30 JL
+- Opcode: 21
+- Desc: Sets PC to address if LESS
+     - The instance flags are set as: 
+          - Equal = 0, Less = 1, Greater = 0 
+- Flags: N/A
+- Usage: 
+    - JL register1 + immed
+    - JL register1
+    - JL immed     
+### 4.31 JLE
+- Opcode: 21
+- Desc: Sets PC to address if LESS OR EQUAL
+     - The instance flags are set as: 
+          - Equal = 1, Less = 1, Greater = 0 
+- Flags: N/A
+- Usage: 
+    - JLE register1 + immed
+    - JLE register1
+    - JLE immed    
+### 4.32 JG
+- Opcode: 21
+- Desc: Sets PC to address if GREATER
+     - The instance flags are set as: 
+          - Equal = 1, Less = 0, Greater = 1 
+- Flags: N/A
+- Usage: 
+    - JG register1 + immed
+    - JG register1
+    - JG immed     
+### 4.33 JGE
+- Opcode: 21
+- Desc: Sets PC to address if GREATER OR EQUAL
+     - The instance flags are set as: 
+          - Equal = 0, Less = 0, Greater = 1 
+- Flags: N/A
+- Usage: 
+    - JGE register1 + immed
+    - JGE register1
+    - JGE immed
+
+## Instruction Details
 ```
      ------------------------------------------------------------------------------------------------------------------------------------------
     |   ATRasm Instruction   |          Description           |                     Encoding                    | Teeny/Pseudo | Grammar Style |
