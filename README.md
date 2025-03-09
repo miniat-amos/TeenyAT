@@ -13,7 +13,7 @@ The **TeenyAT** project comes with a custom instruction set and a complete assem
 - **RAM:** 32K words, addresses `0x0000` - `0x7FFF`
 - **Reserved Space:** 1k words, addresses `0x8000` - `0x8FFF`
   - Two bidirectional ports, Port A/B.
-  - Positive/Negative Random Number Generators
+  - Random Positive/Negative Number Generator
 - **Hardware Access:** addresses, `0x9000` - `0xFFFF`
 
 ### Registers
@@ -26,13 +26,6 @@ The **TeenyAT** project comes with a custom instruction set and a complete assem
 Instructions may be encoded in either one or two 16-bit words:
 - **Teeny bit = 1:** Instruction is 16 bits 
 - **Teeny bit = 0:** Instruction is 32 bits
-
-### Flags
-TeenyAT uses a 4-bit immediate field for flags:
-- **Equal:** Set if the last comparison was equal
-- **Less:** Set if register1 < register2 in the last comparison
-- **Greater:** Set if register1 > register2 in the last comparison
-- **Carry:** Reserved for future arithmetic operations
 
 ## Assembler Syntax Basics
 
@@ -91,7 +84,7 @@ TeenyAT uses a 4-bit immediate field for flags:
 
 ### Second Word
 
-| Bit(s) | 15-0                      |
+| Bits   | 15-0                      |
 |--------|---------------------------|
 |        | Immed_16 / Addr_16        |
 
@@ -105,20 +98,10 @@ The **TeenyAT** architecture is a platform suitable for various embedded and edu
 
  See *[main.c](main.c)* for reference
 ```c
-#include <stdio.h>
-#include <stdlib.h>
 #include "teenyat.h"
 
-void bus_read(teenyat *t, tny_uword addr, tny_word *data, uint16_t *delay);
-void bus_write(teenyat *t, tny_uword addr, tny_word data, uint16_t *delay);
-
 int main(int argc, char *argv[]) {
-	if(argc != 2) {
-		fprintf(stderr, "usage:  %s <bin_file>\n", argv[0]);
-		exit(EXIT_FAILURE);
-	}
-
-	FILE *bin_file = fopen(argv[1], "rb");
+	FILE *bin_file = fopen("example.asm", "rb");
 	teenyat t;
 	tny_init_from_file(&t, bin_file, bus_read, bus_write);
 
@@ -136,7 +119,6 @@ void bus_read(teenyat *t, tny_uword addr, tny_word *data, uint16_t *delay) {
 }
 
 void bus_write(teenyat *t, tny_uword addr, tny_word data, uint16_t *delay) {
-	// No operation for bus writes
 	*delay = 7; // Simulate delay for writes
 }
 ```
