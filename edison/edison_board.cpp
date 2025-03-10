@@ -283,6 +283,14 @@ void process_keyboard(teenyat* t){
     inp_keyboard.bits.bit14 = tigrKeyHeld(window, 'W');
     inp_keyboard.bits.bit13 = tigrKeyHeld(window, 'E');
     inp_keyboard.bits.bit12 = tigrKeyHeld(window, 'R');
+    
+    tny_word toggle_switches;
+    toggle_switches.bits.bit4 = tigrKeyDown(window, 'L');
+    toggle_switches.bits.bit5 = tigrKeyDown(window, 'K');
+    toggle_switches.bits.bit6 = tigrKeyDown(window, 'J');
+    toggle_switches.bits.bit7 = tigrKeyDown(window, 'H');
+
+    if(toggle_switches.u) inp_keyboard.u ^= toggle_switches.u;
 
     inp_keyboard.bits.bit0 = tigrKeyHeld(window, TK_LEFT);
     inp_keyboard.bits.bit1 = tigrKeyHeld(window, TK_UP);
