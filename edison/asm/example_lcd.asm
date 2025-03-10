@@ -1,3 +1,10 @@
+.const PORT_A_DIR 0x8000
+.const PORT_B_DIR 0x8001
+.const PORT_A 0x8002
+.const PORT_B 0x8003
+.const RAND 0x8010
+.const RAND_BITS 0x8011
+
 .const LCD_CURSOR 0xA000 
 .const LCD_CLEAR_SCREEN 0xA001
 .const LCD_MOVE_LEFT 0xA002  
@@ -19,29 +26,27 @@
 .const FIRST_CHARACTER 33
 .const LAST_CHARACTER 247
 
+; EDISON BOARD LCD PERIPHERAL
+;
+; The Edison board lcd can display all standard ASCII characters 
+;                                 domain: 0 -->  127
+;
+; The Edison lcd also supports custom characters for display
+;                                 domain: 128 --> 247
+;
+; The 3 msb of the value stored to the lcd affect its display
+;       
+;        Bit15  --> rotate 180 degrees
+;        Bit14  --> flip horizontal
+;        Bit13  --> flip vertical
+;
+; Either none or any combination of them can be toggled at a time       
+
 !reset
-SET rB, '\r'
-SET rA, FIRST_CHARACTER
-
-!loop
-
-CMP rA, LAST_CHARACTER
-JG !reset
-STR [LCD_CURSOR], rA
-inc rA
-
-; inc rC
-; MOD rC, 18
-; CMP rC, 
-;JE !return
-;CMP rC, 4 
-; JGE !return
-
-JMP !loop
-
-!return
-    STR [LCD_CURSOR], rB
-    JMP !loop
-
-!kill_loop
-    JMP !kill_loop
+set rA, FIRST_CHARACTER
+!main
+    cmp rA, LAST_CHARACTER
+    jg !reset
+    str [LCD_CURSOR], rA
+    inc rA
+    jmp !main

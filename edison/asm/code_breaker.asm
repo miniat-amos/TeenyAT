@@ -1,18 +1,45 @@
-; CodeBreaker !!!!
-; The source code is not meant to be deciphered
-jmp !init
+; _________  ________  ________  ___________ _______________________________   _____   ____  __._____________________ 
+; \_   ___ \ \_____  \ \______ \ \_   _____/ \______   \______   \_   _____/  /  _  \ |    |/ _|\_   _____/\______   \
+; /    \  \/  /   |   \ |    |  \ |    __)_   |    |  _/|       _/|    __)_  /  /_\  \|      <   |    __)_  |       _/
+; \     \____/    |    \|    `   \|        \  |    |   \|    |   \|        \/    |    \    |  \  |        \ |    |   \
+;  \______  /\_______  /_______  /_______  /  |______  /|____|_  /_______  /\____|__  /____|__ \/_______  / |____|_  /
+;         \/         \/        \/        \/          \/        \/        \/         \/        \/        \/         \/ 
+; 
+; Author: Noah Breedy
+;  
+; Description: Use your code breaking skills to guess the sequence
+;              and prevent the bomb from exploding and destroying
+;              the edison board forever!
+;
+; Controls:    Just press the arrow keys if easy mode
+;              And the port A buttons as well if hard mode
+;
+
+
 .const PORT_A_DIR 0x8000
+.const PORT_B_DIR 0x8001
 .const PORT_A 0x8002
 .const PORT_B 0x8003
-.const TNY_RANDOM_ADDRESS 0x8010
-.const BUZZER_LEFT 0xA010
-.const BUZZER_RIGHT 0xA011
-.const LCD_CURSOR 0xA000
+.const RAND 0x8010
+.const RAND_BITS 0x8011
+
+.const LCD_CURSOR 0xA000 
 .const LCD_CLEAR_SCREEN 0xA001
+.const LCD_MOVE_LEFT 0xA002  
 .const LCD_MOVE_RIGHT 0xA003
+.const LCD_MOVE_UP 0xA004
+.const LCD_MOVE_DOWN 0xA005
+.const LCD_MOVE_LEFT_WRAP 0xA006  
+.const LCD_MOVE_RIGHT_WRAP 0xA007
+.const LCD_MOVE_UP_WRAP 0xA008
+.const LCD_MOVE_DOWN_WRAP 0xA009
 .const LCD_CURSOR_X 0xA00A
 .const LCD_CURSOR_Y 0xA00B
 .const LCD_CURSOR_XY 0xA00C
+.const BUZZER_LEFT 0xA010
+.const BUZZER_RIGHT 0xA011
+.const FADER_LEFT 0xA020
+.const FADER_RIGHT 0xA021
 
 .const SOUND_F5 0x02BA
 .const SOUND_G5 0x030F 
@@ -54,11 +81,13 @@ jmp !init
 .const CHECK_SPRITE 494
 .const WRONG_SPRITE 495
 
+jmp !init
+
 .var ARROW_LOCATION 1
 .var CURRENT_GUESS 0
 .var BUFFER_TIMER_THRESHOLD 0x800 ; How long it takes for arrow to move
-.var RESORCEFUL_WAIT_TIMER 2      ; I hate this
-.var SECRET_CODE_RANGE 5 ; easy mode -> 5   ; hard mode -> 13
+.var RESORCEFUL_WAIT_TIMER 2      ; I hate this (need to implement interrupts)
+.var SECRET_CODE_RANGE 5          ; easy mode -> 5   ; hard mode -> 13
 .var PLAYER_SCORE 0 
 ;---------------- SPLASH SCREEN  ----------------
 
@@ -157,7 +186,7 @@ set rE, rZ   ; Timer Buffer Index  (DONT TOUCH)
 
     set rC, 500
     !explosion_loop
-        lod rA, [TNY_RANDOM_ADDRESS]
+        lod rA, [RAND]
         str [LCD_CURSOR_XY], rA
         mod rA, 10
         cmp rA, 5
@@ -494,8 +523,9 @@ set rE, rZ   ; Timer Buffer Index  (DONT TOUCH)
     psh rB
     psh rC
 
+    ; This is how we increase the speed of the timer
     lod rB, [BUFFER_TIMER_THRESHOLD]
-    cmp rB, 148
+    cmp rB, 148 ; This value was calulated using python reaches max speed around score of 10
     jle !skip_arrow_subtraction
     sub rB, 100
     str [BUFFER_TIMER_THRESHOLD], rB
@@ -540,8 +570,7 @@ set rE, rZ   ; Timer Buffer Index  (DONT TOUCH)
     set rA, rZ
     !generate_new_secret_code_loop
 
-        lod rB, [TNY_RANDOM_ADDRESS]
-        and rB, 0x7FFF ; mask out negative bit (so terrible)
+        lod rB, [RAND]
         lod rC, [SECRET_CODE_RANGE]
         mod rB, rC 
         cmp rB, rZ
