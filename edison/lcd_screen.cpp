@@ -80,12 +80,17 @@ tny_word lcd_move_cursor_x_y(int amt, int wrap,int ctrl,int read){
 
 void lcd_set_cursor_x_y(tny_word value, int ctrl,int combined){
         
+        int modulo = ctrl ? LCD_ROWS : LCD_COLUMNS;
+        
+        /* Keep negative values in range sort of like a number line */
+        if(value.s < 0) value.s = modulo + (value.s % modulo);
+
         int x = lcd_cursor.u % LCD_COLUMNS;
         int y = lcd_cursor.u / LCD_COLUMNS;
 
-        if(!ctrl) x = (value.u % LCD_COLUMNS);
+        if(!ctrl) x = (value.s % modulo);
 
-        if(ctrl) y = (value.u % LCD_ROWS);
+        if(ctrl) y = (value.s % modulo);
 
         if(combined){
             x = value.bytes.byte1 % LCD_COLUMNS;
@@ -119,7 +124,9 @@ void lcd_return_line(){
     lcd_set_cursor_x_y(zero, 0,0);
 }
 
-/* Writes given char to lcd and updates cursor position*/
+/* Writes given char to lcd and updates cursor position 
+*  all draws to the cursor are in a positive location
+*/
 void lcd_draw_character(tny_word value){
 
     /* On write to final screen position make a new line and return cursor */
