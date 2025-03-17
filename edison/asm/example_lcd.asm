@@ -31,7 +31,7 @@
 ; The Edison board lcd can display all standard ASCII characters 
 ;                                 domain: 0 -->  127
 ;
-; The Edison lcd also supports custom characters for display
+; The Edison lcd also supports characters custom to Edison for display
 ;                                 domain: 128 --> 247
 ;
 ; The 3 msb of the value stored to the lcd affect its display
