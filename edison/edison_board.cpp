@@ -24,6 +24,7 @@ Tigr* buzzer_img;
 tny_word inp_keyboard;
 tny_word push_button_state;
 tny_word segment_dips;
+tny_word old_toggle_state;
 int mouse_x;
 int mouse_y;
 int mouse_button;
@@ -290,7 +291,10 @@ void process_keyboard(teenyat* t){
     toggle_switches.bits.bit6 = tigrKeyDown(window, 'J');
     toggle_switches.bits.bit7 = tigrKeyDown(window, 'H');
 
-    if(toggle_switches.u) inp_keyboard.u ^= toggle_switches.u;
+    if(toggle_switches.u && old_toggle_state.u != toggle_switches.u) {
+        inp_keyboard.u ^= toggle_switches.u;
+    }
+    old_toggle_state.u = toggle_switches.u;
 
     inp_keyboard.bits.bit0 = tigrKeyHeld(window, TK_LEFT);
     inp_keyboard.bits.bit1 = tigrKeyHeld(window, TK_UP);
