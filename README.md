@@ -77,9 +77,9 @@ Instructions may be encoded in either one or two 16-bit words:
 
 ### First Word
 
-| Bit(s) | 15-11       | 10 | 9-8   | 7-6   | 5-4 | 3     | 2    | 1    | 0    |
-|--------|-------------|----|-------|-------|-----|-------|------|------|------|
-|        | Opcode      | T  | Reg_1 | Reg_2 | Rsv | Eqls  | Less | Grtr |      |
+| Bit(s) | 15-11       | 10 | 9-7   | 6-4   | 3   | 2     | 1    | 0    |
+|--------|-------------|----|-------|-------|-----|-------|------|------|
+|        | Opcode      | T  | Reg_1 | Reg_2 | Rsv | Eqls  | Less | Grtr |
 |        | Opcode      | T  | Reg_1| Reg_2 | Rsv | Immed_4 / Addr_4   | <=> |  <=> | <==> |
 
 ### Second Word
