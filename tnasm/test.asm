@@ -74,6 +74,12 @@
     ROL rz, -1
     roR pc, -2
 
+    ShL rB, 3
+    ShR rA, 2
+    ShL rz, -1
+    ShR pc, -2
+
+
     INV rA                  ;2
 
     JNE rZ + !more
