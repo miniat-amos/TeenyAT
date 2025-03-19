@@ -674,7 +674,7 @@ bool p_code_5_line() {
             f.instruction.immed4 = 1;
         }
         else if(oper->id == T_INV) {
-            f.instruction.immed4 = -1;
+            f.instruction.immed4 = ~0;
         } 
 
         if(pass > 1) {
