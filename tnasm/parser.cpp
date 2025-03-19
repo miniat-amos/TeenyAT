@@ -600,6 +600,12 @@ bool p_code_3_line() {
         f.instruction.immed4 = 0;
 
         inst.second.s = immed->s;
+        if(oper->id == T_ROL) {
+            inst.second.s = -inst.second.s;
+        }
+        /* NOTE: do NOT use "immed" after this as it's sign
+         *  may not be modified by the above condition 
+         */
 
         bool make_teeny = is_teeny(inst.second.s);
         if(make_teeny) {
@@ -1119,6 +1125,8 @@ tny_uword token_to_opcode(int id) {
     case T_XOR:   result = TNY_OPCODE_XOR;   break;
     case T_SHF:   result = TNY_OPCODE_SHF;   break;
     case T_ROT:   result = TNY_OPCODE_ROT;   break;
+    case T_ROL:   result = TNY_OPCODE_ROT;   break;
+    case T_ROR:   result = TNY_OPCODE_ROT;   break;
     case T_NEG:   result = TNY_OPCODE_NEG;   break;
     case T_CMP:   result = TNY_OPCODE_CMP;   break;
     case T_DLY:   result = TNY_OPCODE_DLY;   break;
@@ -1268,6 +1276,8 @@ shared_ptr <token> p_code_2_mem_inst() {
  * code_3_inst ::= XOR.
  * code_3_inst ::= SHF.
  * code_3_inst ::= ROT.
+ * code_3_inst ::= ROL.
+ * code_3_inst ::= ROR.
  * code_3_inst ::= SET.
  * code_3_inst ::= LOD.
  * code_3_inst ::= BTS.
@@ -1290,6 +1300,8 @@ shared_ptr <token> p_code_3_inst() {
     (tnext = save, result = term(T_XOR)) ||
     (tnext = save, result = term(T_SHF)) ||
     (tnext = save, result = term(T_ROT)) ||
+    (tnext = save, result = term(T_ROL)) ||
+    (tnext = save, result = term(T_ROR)) ||
     (tnext = save, result = term(T_SET)) ||
     (tnext = save, result = term(T_LOD)) ||
     (tnext = save, result = term(T_BTS)) ||

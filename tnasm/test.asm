@@ -69,6 +69,11 @@
     lod r5, [r1 - amos]
     lod PC, aero
 
+    RoL rB, 3
+    ror rA, 2
+    ROL rz, -1
+    roR pc, -2
+
     INV rA                  ;2
 
     JNE rZ + !more
