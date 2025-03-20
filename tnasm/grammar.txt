@@ -27,14 +27,17 @@ constant_line ::= CONSTANT IDENTIFIER immediate.
 raw_line ::= raw_line raw_value.
 raw_line ::= raw_value.
 ;----------
-; We can't make a raw_value resolve to STRING because immediates resolve to
-; raw_value and immediates cannot be STRINGs.
+; We can't make a raw_value resolve to string because immediates resolve to
+; raw_value and immediates cannot be strings.
 ;----------
-raw_line ::= raw_line STRING.
-raw_line ::= STRING.
+raw_line ::= raw_line string.
+raw_line ::= string.
 
 raw_value ::= number.
 raw_value ::= CHARACTER.
+
+string ::= STRING.
+string ::= PACKED_STRING.
 
 label_line ::= LABEL.
 

@@ -184,6 +184,7 @@ void initialize_lexical_regex(vector <token_regex> &patterns) {
 	patterns.push_back(regex_token("'.'", T_CHARACTER, handle_character));
 	patterns.push_back(regex_token("'\\\\[ntvfr]'", T_CHARACTER, handle_escaped_character));
 	patterns.push_back(regex_token("\\\"[^\\\"\\n\\r]+\\\"", T_STRING, nullptr));
+	patterns.push_back(regex_token("'[^'\\\n\\r]{2,}'", T_PACKED_STRING, nullptr));
 	patterns.push_back(regex_token(",", T_COMMA, nullptr));
 	patterns.push_back(regex_token("\\[", T_LBRACKET, nullptr));
 	patterns.push_back(regex_token("\\]", T_RBRACKET, nullptr));

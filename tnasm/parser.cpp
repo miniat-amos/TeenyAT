@@ -35,7 +35,7 @@ shared_ptr <token> p_variable_line();
 shared_ptr <token> p_constant_line();
 bool p_raw_line();
 shared_ptr <token> p_label_line();
-
+shared_ptr <token> p_string();
 shared_ptr <tny_word> p_raw_value();
 
 shared_ptr <tny_word> p_immediate();
@@ -267,7 +267,7 @@ shared_ptr <token> p_constant_line() {
 }
 
 /*
- * raw_line ::= raw_value+.
+ * raw_line ::= (raw_value | string)+.
  * We'll implement the "one-or-more" NUMBER check manually rather than via the
  * recursive descent approach.
  */
@@ -288,6 +288,29 @@ bool p_raw_line() {
                 tny_word tmp;
                 tmp.u = val->token_str[i];
                 shared_ptr <tny_word> v = shared_ptr<tny_word>(new tny_word(tmp));
+                data.push_back(v);
+            }
+        }
+        else if(tnext = save, (val = term(T_PACKED_STRING))) {
+            /* Copy the string's characters, excluding bounding quotes */
+            size_t i = 1;
+            size_t last_char_pos = val->token_str.length() - 2;
+            while(i <= last_char_pos) {
+                tny_word tmp;
+                
+                /* first character for this word */
+                tmp.u = val->token_str[i];
+                shared_ptr <tny_word> v = shared_ptr<tny_word>(new tny_word(tmp));
+                i++;
+
+                /* second character, if needed */
+                if(i <= last_char_pos) {
+                    tmp.u = val->token_str[i];
+                    tmp.u <<= 8;  /* Shift this char to the high byte */
+                    v->u |= tmp.u; 
+                    i++;                
+                }
+
                 data.push_back(v);
             }
         }
