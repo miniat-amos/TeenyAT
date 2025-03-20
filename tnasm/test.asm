@@ -84,3 +84,6 @@
 
     JNE rZ + !more
 ; and that's all
+
+!my_string
+    "Leroy" 0  ; a null terminated string

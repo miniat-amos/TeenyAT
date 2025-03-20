@@ -272,15 +272,24 @@ shared_ptr <token> p_constant_line() {
  * recursive descent approach.
  */
 bool p_raw_line() {
-    bool all_good = true;
     vector <shared_ptr <tny_word> > data;
+    bool all_good = true;
 
     while(all_good) {
         int save = tnext;
         shared_ptr <tny_word> d;
-
+        shared_ptr <token> val = nullptr;
         if((d = p_raw_value())) {
             data.push_back(d);
+        }
+        else if(tnext = save, (val = term(T_STRING))) {
+            /* Copy the string's characters, excluding bounding quotes */
+            for(size_t i = 1; i < val->token_str.length() - 1; i++) {
+                tny_word tmp;
+                tmp.u = val->token_str[i];
+                shared_ptr <tny_word> v = shared_ptr<tny_word>(new tny_word(tmp));
+                data.push_back(v);
+            }
         }
         else if(tnext = save, (term(T_EOL) != nullptr)) {
             break;
