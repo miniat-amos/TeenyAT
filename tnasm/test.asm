@@ -69,7 +69,26 @@
     lod r5, [r1 - amos]
     lod PC, aero
 
+    RoL rB, 3
+    ror rA, 2
+    ROL rz, -1
+    roR pc, -2
+
+    ShL rB, 3
+    ShR rA, 2
+    ShL rz, -1
+    ShR pc, -2
+
+
     INV rA                  ;2
 
     JNE rZ + !more
 ; and that's all
+
+!my_string
+    "Leroy" 0  ; a null terminated string
+
+!a_packed_string  
+    'Aero jumps at midnight' 0  ; a null terminated packed string (2 chars per word)
+!another_packed_string
+    'Leroy jumps at midnight' 0
