@@ -86,9 +86,11 @@
 ; and that's all
 
 !my_string
-    "Leroy" 0  ; a null terminated string
+    "Leroy"  ; a null terminated string
 
+; packed strings have two characters per 16 bit word.  Here are 
+; two examples one byte apart in length.
 !a_packed_string  
-    'Aero jumps at midnight' 0  ; a null terminated packed string (2 chars per word)
+    'Aero jumps at midnight'
 !another_packed_string
-    'Leroy jumps at midnight' 0
+    'Leroy jumps at midnight'
