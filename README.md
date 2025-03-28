@@ -27,23 +27,6 @@ Instructions may be encoded in either one or two 16-bit words:
 - **Teeny bit = 1:** Instruction is 16 bits 
 - **Teeny bit = 0:** Instruction is 32 bits
 
-## Assembler Syntax Basics
-
-**Variables & Constants** 
-  ```asm
-  .const IDENTIFIER VALUE
-  .var IDENTIFIER VALUE
-  ```
-**Labels**
-  ```asm
-  !inf
-  jmp !inf
-  ```
-**Comments**
-  ```asm
-  ; This is a comment
-  ```
-
 ## Instruction Encoding
 
 ### First Word
@@ -70,14 +53,14 @@ int main(int argc, char *argv[]) {
 	tny_init_from_file(&t, bin_file, NULL, NULL);
 
 	tny_word port_a;
-	for ( int i=0; i <= 76; i++ ) {
+	for ( int i=0; i <= 77; i++ ) {
 		tny_clock(&t);
 		tny_get_ports(&t,&port_a, NULL);
 		
 		if(port_a.bits.bit0 == 0) {
-			printf("@"); // LED On
-		} else {
 			printf("."); // LED Off
+		} else {
+			printf("@"); // LED On
 		}
 	}
 	printf("\n");
@@ -87,7 +70,11 @@ int main(int argc, char *argv[]) {
 
 ### Assembly
 ```asm
+.var tbone 0
 .const PORT_A 0x8002
+
+set rA, tbone
+
 !main
     str [PORT_A], rA
     inv rA
