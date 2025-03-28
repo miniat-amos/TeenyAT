@@ -75,13 +75,20 @@ static inline void dec_pc(teenyat *t) {
 	return;
 }
 
+static void default_bus_read(teenyat *t, tny_uword addr, tny_word *data, uint16_t *delay) {
+	return;
+}
+
+static void default_bus_write(teenyat *t, tny_uword addr, tny_word data, uint16_t *delay) {
+	return;
+}
+
 bool tny_init_from_file(teenyat *t, FILE *bin_file,
                         TNY_READ_FROM_BUS_FNPTR bus_read,
                         TNY_WRITE_TO_BUS_FNPTR bus_write) {
 	if(!t) return false;
 	t->initialized = false;
 	if(!bin_file) return false;
-	if(!bus_read || !bus_write) return false;
 
 	/* Clear the entire instance */
 	memset(t, 0, sizeof(teenyat));
@@ -91,8 +98,8 @@ bool tny_init_from_file(teenyat *t, FILE *bin_file,
 	if((words_read <= 0) || ferror(bin_file)) return false;
 
 	/* store bus callbacks */
-	t->bus_read = bus_read;
-	t->bus_write = bus_write;
+	t->bus_read = bus_read ? bus_read : default_bus_read;
+	t->bus_write = bus_write ? bus_write : default_bus_write;
     
 	t->clock_manager.initial_pace_cnt = TNY_DEFAULT_PACE_CNT;
     t->clock_manager.clock_wait_time = tny_calibrate_1_MHZ();

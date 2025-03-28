@@ -284,20 +284,26 @@ bool p_raw_line() {
         }
         else if(tnext = save, (val = term(T_STRING))) {
             /* Copy the string's characters, excluding bounding quotes */
+            tny_word tmp;
             for(size_t i = 1; i < val->token_str.length() - 1; i++) {
-                tny_word tmp;
                 tmp.u = val->token_str[i];
                 shared_ptr <tny_word> v = shared_ptr<tny_word>(new tny_word(tmp));
                 data.push_back(v);
             }
+            /* null-terminate the string */
+            tmp.u = 0;
+            shared_ptr <tny_word> v = shared_ptr<tny_word>(new tny_word(tmp));
+            data.push_back(v);
         }
         else if(tnext = save, (val = term(T_PACKED_STRING))) {
             /* Copy the string's characters, excluding bounding quotes */
             size_t i = 1;
             size_t last_char_pos = val->token_str.length() - 2;
+            tny_word tmp;
+            bool filled_word_last_time;
             while(i <= last_char_pos) {
-                tny_word tmp;
-                
+                filled_word_last_time = false;
+
                 /* first character for this word */
                 tmp.u = val->token_str[i];
                 shared_ptr <tny_word> v = shared_ptr<tny_word>(new tny_word(tmp));
@@ -305,12 +311,20 @@ bool p_raw_line() {
 
                 /* second character, if needed */
                 if(i <= last_char_pos) {
+                    filled_word_last_time = true;
                     tmp.u = val->token_str[i];
                     tmp.u <<= 8;  /* Shift this char to the high byte */
                     v->u |= tmp.u; 
                     i++;                
                 }
 
+                data.push_back(v);
+            }
+
+            if(filled_word_last_time) {
+                /* null-terminate the string because last word is all data */
+                tmp.u = 0;
+                shared_ptr <tny_word> v = shared_ptr<tny_word>(new tny_word(tmp));
                 data.push_back(v);
             }
         }
