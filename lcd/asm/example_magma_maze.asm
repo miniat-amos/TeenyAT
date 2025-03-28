@@ -183,7 +183,7 @@
 
     ; shift magma color a little
     LOD rD, [RAND_BITS]
-    MOD rD, 16
+    MOD rD, 48
     ADD rC, rD
     STR [rB], rC
 

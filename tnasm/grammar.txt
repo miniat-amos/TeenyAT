@@ -26,9 +26,18 @@ constant_line ::= CONSTANT IDENTIFIER immediate.
 
 raw_line ::= raw_line raw_value.
 raw_line ::= raw_value.
+;----------
+; We can't make a raw_value resolve to string because immediates resolve to
+; raw_value and immediates cannot be strings.
+;----------
+raw_line ::= raw_line string.
+raw_line ::= string.
 
 raw_value ::= number.
 raw_value ::= CHARACTER.
+
+string ::= STRING.
+string ::= PACKED_STRING.
 
 label_line ::= LABEL.
 
@@ -109,7 +118,11 @@ code_3_inst ::= AND.
 code_3_inst ::= OR.
 code_3_inst ::= XOR.
 code_3_inst ::= SHF.
+code_3_inst ::= SHL.
+code_3_inst ::= SHR.
 code_3_inst ::= ROT.
+code_3_inst ::= ROL.
+code_3_inst ::= ROR.
 code_3_inst ::= SET.
 code_3_inst ::= BTF.
 code_3_inst ::= CMP.

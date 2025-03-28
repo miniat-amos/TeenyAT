@@ -155,7 +155,11 @@ void initialize_lexical_regex(vector <token_regex> &patterns) {
 	patterns.push_back(regex_token("or", T_OR, nullptr));
 	patterns.push_back(regex_token("xor", T_XOR, nullptr));
 	patterns.push_back(regex_token("shf", T_SHF, nullptr));
+	patterns.push_back(regex_token("shl", T_SHL, nullptr));
+	patterns.push_back(regex_token("shr", T_SHR, nullptr));
 	patterns.push_back(regex_token("rot", T_ROT, nullptr));
+	patterns.push_back(regex_token("rol", T_ROL, nullptr));
+	patterns.push_back(regex_token("ror", T_ROR, nullptr));
 	patterns.push_back(regex_token("neg", T_NEG, nullptr));
 	patterns.push_back(regex_token("cmp", T_CMP, nullptr));
 	patterns.push_back(regex_token("dly", T_DLY, nullptr));
@@ -179,6 +183,8 @@ void initialize_lexical_regex(vector <token_regex> &patterns) {
 	patterns.push_back(regex_token("-", T_MINUS, nullptr));
 	patterns.push_back(regex_token("'.'", T_CHARACTER, handle_character));
 	patterns.push_back(regex_token("'\\\\[ntvfr]'", T_CHARACTER, handle_escaped_character));
+	patterns.push_back(regex_token("\\\"[^\\\"\\n\\r]+\\\"", T_STRING, nullptr));
+	patterns.push_back(regex_token("'[^'\\\n\\r]{2,}'", T_PACKED_STRING, nullptr));
 	patterns.push_back(regex_token(",", T_COMMA, nullptr));
 	patterns.push_back(regex_token("\\[", T_LBRACKET, nullptr));
 	patterns.push_back(regex_token("\\]", T_RBRACKET, nullptr));

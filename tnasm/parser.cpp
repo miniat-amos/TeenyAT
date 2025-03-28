@@ -35,7 +35,7 @@ shared_ptr <token> p_variable_line();
 shared_ptr <token> p_constant_line();
 bool p_raw_line();
 shared_ptr <token> p_label_line();
-
+shared_ptr <token> p_string();
 shared_ptr <tny_word> p_raw_value();
 
 shared_ptr <tny_word> p_immediate();
@@ -267,20 +267,66 @@ shared_ptr <token> p_constant_line() {
 }
 
 /*
- * raw_line ::= raw_value+.
+ * raw_line ::= (raw_value | string)+.
  * We'll implement the "one-or-more" NUMBER check manually rather than via the
  * recursive descent approach.
  */
 bool p_raw_line() {
-    bool all_good = true;
     vector <shared_ptr <tny_word> > data;
+    bool all_good = true;
 
     while(all_good) {
         int save = tnext;
         shared_ptr <tny_word> d;
-
+        shared_ptr <token> val = nullptr;
         if((d = p_raw_value())) {
             data.push_back(d);
+        }
+        else if(tnext = save, (val = term(T_STRING))) {
+            /* Copy the string's characters, excluding bounding quotes */
+            tny_word tmp;
+            for(size_t i = 1; i < val->token_str.length() - 1; i++) {
+                tmp.u = val->token_str[i];
+                shared_ptr <tny_word> v = shared_ptr<tny_word>(new tny_word(tmp));
+                data.push_back(v);
+            }
+            /* null-terminate the string */
+            tmp.u = 0;
+            shared_ptr <tny_word> v = shared_ptr<tny_word>(new tny_word(tmp));
+            data.push_back(v);
+        }
+        else if(tnext = save, (val = term(T_PACKED_STRING))) {
+            /* Copy the string's characters, excluding bounding quotes */
+            size_t i = 1;
+            size_t last_char_pos = val->token_str.length() - 2;
+            tny_word tmp;
+            bool filled_word_last_time;
+            while(i <= last_char_pos) {
+                filled_word_last_time = false;
+
+                /* first character for this word */
+                tmp.u = val->token_str[i];
+                shared_ptr <tny_word> v = shared_ptr<tny_word>(new tny_word(tmp));
+                i++;
+
+                /* second character, if needed */
+                if(i <= last_char_pos) {
+                    filled_word_last_time = true;
+                    tmp.u = val->token_str[i];
+                    tmp.u <<= 8;  /* Shift this char to the high byte */
+                    v->u |= tmp.u; 
+                    i++;                
+                }
+
+                data.push_back(v);
+            }
+
+            if(filled_word_last_time) {
+                /* null-terminate the string because last word is all data */
+                tmp.u = 0;
+                shared_ptr <tny_word> v = shared_ptr<tny_word>(new tny_word(tmp));
+                data.push_back(v);
+            }
         }
         else if(tnext = save, (term(T_EOL) != nullptr)) {
             break;
@@ -600,6 +646,12 @@ bool p_code_3_line() {
         f.instruction.immed4 = 0;
 
         inst.second.s = immed->s;
+        if(oper->id == T_ROL || oper->id == T_SHL) {
+            inst.second.s = -inst.second.s;
+        }
+        /* NOTE: do NOT use "immed" after this as it's sign
+         *  may not be modified by the above condition 
+         */
 
         bool make_teeny = is_teeny(inst.second.s);
         if(make_teeny) {
@@ -674,7 +726,7 @@ bool p_code_5_line() {
             f.instruction.immed4 = 1;
         }
         else if(oper->id == T_INV) {
-            f.instruction.immed4 = -1;
+            f.instruction.immed4 = ~0;
         } 
 
         if(pass > 1) {
@@ -1118,7 +1170,11 @@ tny_uword token_to_opcode(int id) {
     case T_OR:    result = TNY_OPCODE_OR;    break;
     case T_XOR:   result = TNY_OPCODE_XOR;   break;
     case T_SHF:   result = TNY_OPCODE_SHF;   break;
+    case T_SHL:   result = TNY_OPCODE_SHF;   break;
+    case T_SHR:   result = TNY_OPCODE_SHF;   break;
     case T_ROT:   result = TNY_OPCODE_ROT;   break;
+    case T_ROL:   result = TNY_OPCODE_ROT;   break;
+    case T_ROR:   result = TNY_OPCODE_ROT;   break;
     case T_NEG:   result = TNY_OPCODE_NEG;   break;
     case T_CMP:   result = TNY_OPCODE_CMP;   break;
     case T_DLY:   result = TNY_OPCODE_DLY;   break;
@@ -1267,7 +1323,11 @@ shared_ptr <token> p_code_2_mem_inst() {
  * code_3_inst ::= OR.
  * code_3_inst ::= XOR.
  * code_3_inst ::= SHF.
+ * code_3_inst ::= SHL.
+ * code_3_inst ::= SHR.
  * code_3_inst ::= ROT.
+ * code_3_inst ::= ROL.
+ * code_3_inst ::= ROR.
  * code_3_inst ::= SET.
  * code_3_inst ::= LOD.
  * code_3_inst ::= BTS.
@@ -1289,7 +1349,11 @@ shared_ptr <token> p_code_3_inst() {
     (tnext = save, result = term(T_OR))  ||
     (tnext = save, result = term(T_XOR)) ||
     (tnext = save, result = term(T_SHF)) ||
+    (tnext = save, result = term(T_SHL)) ||
+    (tnext = save, result = term(T_SHR)) ||
     (tnext = save, result = term(T_ROT)) ||
+    (tnext = save, result = term(T_ROL)) ||
+    (tnext = save, result = term(T_ROR)) ||
     (tnext = save, result = term(T_SET)) ||
     (tnext = save, result = term(T_LOD)) ||
     (tnext = save, result = term(T_BTS)) ||
