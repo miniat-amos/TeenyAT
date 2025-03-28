@@ -43,35 +43,6 @@ Instructions may be encoded in either one or two 16-bit words:
   ```asm
   ; This is a comment
   ```
-### Example
-```asm
-; 
-; This is an example from the readme
-;
-.const thirty_one 31
-.const secret_number 4 ; top secret 
-
-.var aero 0xBeeF
-
-!init
-     cal !main
-     jmp !inf
-
-!main
-    set rA, 10
-    set rB, thirty_one
-    
-    add rA, rB
-    mod rA, secret_number
-    or rA, 0x1
-
-    str [aero], rA
-    ret
-
-; ask amos to check his makefile
-!inf
-    jmp !inf
-```
 
 ## Instruction Encoding
 
@@ -79,45 +50,54 @@ Instructions may be encoded in either one or two 16-bit words:
 
 ### Second Word
 
-| Bits   | 15-0                      |
-|--------|---------------------------|
-|        | Immed_16 / Addr_16        |
 
-### See the *[extensive instruction set](docs/teenyat_instruction_set.md)* for more information.
+### See the *[instruction set](docs/teenyat_instruction_set.md)* for more information about particular instructions.
 
 ## Systems Built Around TeenyAT
 
 The **TeenyAT** architecture is a platform suitable for various embedded and educational applications. Writing systems is a key part in developing projects on the TeenyAT. Take a look at the provided **edison** and **[lcd](lcd)** systems.
 
-### Example Implementation in C
+### Example System in C
 
- See *[main.c](main.c)* for reference
 ```c
+#include <stdio.h>
+#include <stdlib.h>
 #include "teenyat.h"
 
 int main(int argc, char *argv[]) {
-	FILE *bin_file = fopen("example.asm", "rb");
+	FILE *bin_file = fopen("tbone.bin", "rb");
 	teenyat t;
-	tny_init_from_file(&t, bin_file, bus_read, bus_write);
+	tny_init_from_file(&t, bin_file, NULL, NULL);
 
-	for(int cycle = 0; cycle < 123456; cycle++) {
+	tny_word port_a;
+	for ( int i=0; i <= 76; i++ ) {
 		tny_clock(&t);
+		tny_get_ports(&t,&port_a, NULL);
+		
+		if(port_a.bits.bit0 == 0) {
+			printf("@"); // LED On
+		} else {
+			printf("."); // LED Off
+		}
 	}
-
-	fclose(bin_file);
+	printf("\n");
 	return EXIT_SUCCESS;
-}
-
-void bus_read(teenyat *t, tny_uword addr, tny_word *data, uint16_t *delay) {
-	data->s = 42; // Example response for all bus reads
-	*delay = 9;   // Simulate a 9-cycle delay
-}
-
-void bus_write(teenyat *t, tny_uword addr, tny_word data, uint16_t *delay) {
-	*delay = 7; // Simulate delay for writes
 }
 ```
 
+### Assembly
+```asm
+.const PORT_A 0x8002
+!main
+    str [PORT_A], rA
+    inv rA
+    jmp !main
+```
+
+### Results
+```
+@@@@@@@.......@@@@@@@.......@@@@@@@.......@@@@@@@.......@@@@@@@.......@@@@@@@
+```
 ---
   
 ## License
