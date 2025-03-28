@@ -77,8 +77,6 @@ Instructions may be encoded in either one or two 16-bit words:
 
 ### First Word
 
-![Devious looking jellyfish](docs/FirstWord.svg)
-
 ### Second Word
 
 | Bits   | 15-0                      |
