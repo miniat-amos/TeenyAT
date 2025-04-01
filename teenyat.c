@@ -76,10 +76,22 @@ static inline void dec_pc(teenyat *t) {
 }
 
 static void default_bus_read(teenyat *t, tny_uword addr, tny_word *data, uint16_t *delay) {
+	/* all parameters unused */
+	(void)t;
+	(void)addr;
+	(void)data;
+	(void)delay;
+
 	return;
 }
 
 static void default_bus_write(teenyat *t, tny_uword addr, tny_word data, uint16_t *delay) {
+	/* all parameters unused */
+	(void)t;
+	(void)addr;
+	(void)data;
+	(void)delay;
+
 	return;
 }
 
