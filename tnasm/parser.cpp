@@ -282,7 +282,7 @@ bool p_raw_line() {
         if((d = p_raw_value())) {
             data.push_back(d);
         }
-        else if(tnext = save, (val = term(T_STRING))) {
+        else if((tnext = save, (val = term(T_STRING)))) {
             /* Copy the string's characters, excluding bounding quotes */
             tny_word tmp;
             for(size_t i = 1; i < val->token_str.length() - 1; i++) {
@@ -295,7 +295,7 @@ bool p_raw_line() {
             shared_ptr <tny_word> v = shared_ptr<tny_word>(new tny_word(tmp));
             data.push_back(v);
         }
-        else if(tnext = save, (val = term(T_PACKED_STRING))) {
+        else if((tnext = save, (val = term(T_PACKED_STRING)))) {
             /* Copy the string's characters, excluding bounding quotes */
             size_t i = 1;
             size_t last_char_pos = val->token_str.length() - 2;
@@ -328,7 +328,7 @@ bool p_raw_line() {
                 data.push_back(v);
             }
         }
-        else if(tnext = save, (term(T_EOL) != nullptr)) {
+        else if((tnext = save, (term(T_EOL) != nullptr))) {
             break;
         }
         else {
@@ -489,7 +489,7 @@ shared_ptr <tny_word> p_number() {
     else if((tnext = save, num = term(T_NUMBER))) {
         val = shared_ptr <tny_word>(new tny_word(num->value));
     }
-    else if(tnext = save, (sign = p_plus_or_minus()) && (num = term(T_NUMBER))) {
+    else if((tnext = save, (sign = p_plus_or_minus()) && (num = term(T_NUMBER)))) {
         val = shared_ptr <tny_word>(new tny_word(num->value));
         if(sign->id == T_MINUS) {
             val->s *= -1;
