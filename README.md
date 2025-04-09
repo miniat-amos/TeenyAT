@@ -33,8 +33,7 @@ Instructions may be encoded in either one or two 16-bit words:
 
 ### Second Word
 
-
-### See the *[instruction set](docs/teenyat_instruction_set.md)* for more information about particular instructions.
+### See the *[instruction set](docs/README.md)* for more information about particular instructions.
 
 ## Systems Built Around TeenyAT
 
