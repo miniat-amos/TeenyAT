@@ -25,7 +25,7 @@ Each instruction follows a standard format:
 
 | Opcode  | Description                  | Example                  |
 |---------|------------------------------|--------------------------|
-| [`SET`](set.md)  | Set register to value | `set rA, 10`          |
+| [`SET`](./instructions/set.md)  | Set register to value | `set rA, 10`          |
 | [`LOD`](#lod) | Load from memory into register  | `lod rA, [0x1000]`     |
 | [`STR`](#str)  | Store to memory from register | `str [0x1000], rA`   |
 | [`PSH`](#psh)   | Push value to stack | `psh rA`       |
