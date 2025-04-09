@@ -70,10 +70,13 @@ Each instruction follows a standard format:
 | [`JG`](./instructions/jg.md)   | Set program counter if cmp was greater than  | `jg !who`  |
 | [`JGE`](./instructions/jge.md)   | Set program counter if cmp was greater than or equal | `jge !what` |
 
-###### note: Remember that labels are just textual replacements for memory addresses
+###### note: Remember that labels represent the memory address of the line of code below them
 ```assembly
 !my_label
     add rZ, rZ
 
 !my_other_label
     sub rZ, rZ
+```
+
+##### The value of !my_label is equal to 0 and the value of !my_other_label is equal 1
