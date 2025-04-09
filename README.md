@@ -1,10 +1,10 @@
 # TeenyAT Virtual Architecture 
 
-![Devious looking jellyfish](docs/leroy.gif)
+![Devious looking jellyfish](docs/img/leroy.gif)
 
 The **TeenyAT** *( /ˈtē·nē·'āt/ )* is a 16-bit virtual embedded microcontroller delivered as a C library so systems can be simulated around it with ease. System designers create an instance (or more) of the TeenyAT, providing a binary image to load and execute and registering callbacks for any attempted reads or writes to the bus by the running program.
 
-The **TeenyAT** project comes with a custom instruction set and a complete assembler. The *[tnasm](tnasm)* assembler can be compiled via the provided *[Makefile](tnasm/Makefile)*.
+The **TeenyAT** project comes with a custom instruction set and a complete assembler. The *[tnasm](tnasm)* assembler can be compiled via the provided *[Makefile](tnasm/Makefile)*. 
 
 ## Core Architectural Elements
 
@@ -33,7 +33,7 @@ Instructions may be encoded in either one or two 16-bit words:
 
 ### Second Word
 
-### See the *[instruction set](docs/README.md)* for more information about particular instructions.
+### See *[instruction set](docs/README.md)* for more information.
 
 ## Systems Built Around TeenyAT
 
