@@ -1,5 +1,5 @@
 ### `Set Instruction:`
-###### [↩ Back to Main Table](#opcode-table)
+###### [↩ Back to Main Table](README.md)
 
 |  Opcode  | Flags Set                 | Example Usage           |
 |--------- |---------------------------|-------------------------|
