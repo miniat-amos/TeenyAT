@@ -2,23 +2,26 @@
 
 ![Devious looking jellyfish](docs/img/leroy.gif)
 
-The **TeenyAT** *( /ˈtē·nē·'āt/ )* is a 16-bit virtual embedded microcontroller delivered as a C library so systems can be simulated around it with ease. System designers create an instance (or more) of the TeenyAT, providing a binary image to load and execute and registering callbacks for any attempted reads or writes to the bus by the running program.
+The **TeenyAT** *(pronounced Teeny-@)* is a 16-bit virtual embedded microcontroller delivered as a C library so systems can be simulated around it with ease. It's also good fun developing assembly programs to run on our premade systems! System designers create an instance (or more) of the TeenyAT, providing a binary image to load and execute, interacting with its TeenyAT instances through its peripheral bus and GPIO ports.
 
-The **TeenyAT** project comes with a custom instruction set and a complete assembler. The *[tnasm](tnasm)* assembler can be compiled via the provided *[Makefile](tnasm/Makefile)*. 
+The **TeenyAT** project has a unique instruction set and a complete assembler. The *[tnasm](tnasm)* assembler and each included system can be compiled using `make` with their respective `Makefile`s. 
 
 ## Core Architectural Elements
 
 ### Memory
 - **Word Size:** 16 bits
 - **RAM:** 32K words, addresses `0x0000` - `0x7FFF`
-- **Reserved Space:** 1k words, addresses `0x8000` - `0x8FFF`
-  - Two bidirectional ports, Port A/B.
-  - Random Positive/Negative Number Generator
-- **Hardware Access:** addresses, `0x9000` - `0xFFFF`
+- **On-Board Peripheral Space:** 1k words, addresses `0x8000` - `0x8FFF` including...
+  - Two general purpose I/O (GPIO) ports, Ports A & B
+  - Pseudo Random Number Generators that are streamable and unique to each TeenyAT instance
+- **External Peripheral Space:** addresses, `0x9000` - `0xFFFF`
+  - System designers use these when simulating their TeenyAT-accessible system hardware
 
 ### Registers
+
+All TeenyAT registers are essentially general purpose, meaning any can be read from or written to by any instruction that uses registers.  So... divide your Program Counter by 3 or set the Zero register to 42 for whatever reason (although it will still contain zero afterward... we're not set-shaming).
 - **PC (Program Counter):** Contains the address of the next instruction; initialized at `0x0000`
-- **SP (Stack Pointer):** Contains the address of the top element of the stack; initialized at `0x7FFF`. Stack grows downwards.
+- **SP (Stack Pointer):** Tracks the address just below the top of the stack; initialized at `0x7FFF`. Stack grows downwards.
 - **rZ (Zero Register):** Always contains `0`
 - **General-purpose Registers:** rA, rB, rC, rD, rE
 
@@ -30,18 +33,28 @@ Instructions may be encoded in either one or two 16-bit words:
 ## Instruction Encoding
 
 ### First Word
+
+The bottom 4 bits of this word can be used as an immediate or address for teeny (1-word) instructions, so long as the value fits in 4 bits.  These bits are are used to distinguish each of the conditional jumps, and when appropriately set, can provide the unconditional jump.
+
 ![Picture of first instruction register](docs/img/instruction_reg_first.png)
 
 ### Second Word
 ![Picture of second instruction register](docs/img/instruction_reg_second.png)
 
-### See *[instruction set](docs/README.md)* for more information.
+See *[the instruction set documentation](docs/README.md)* for more information about how they are encoded.
 
 ## Systems Built Around TeenyAT
 
-The **TeenyAT** architecture is a platform suitable for various embedded and educational applications. Writing systems is a key part in developing projects on the TeenyAT. Take a look at the provided **edison** and **[lcd](lcd)** systems.
+The **TeenyAT** architecture is a platform suitable for various embedded and educational applications. Writing systems is a key part in developing projects on the TeenyAT. Take a look at the provided **[Edison experiment board](edison)** and **[color lcd](lcd)** systems.
 
 ### Example System in C
+
+The TeenyAT is designed to make system development as simple as possible so you can get your ideas from your mind to running quickly.  The code below is all it takes to build a system emulating a single LED on pin-0 of GPIO port A.
+
+1. Load a binary file
+2. Create a TeenyAT with that binary
+3. Start giving that TeenyAT clock cycles and see what's on that port
+4. Draw an '@' to show the LED is on and a '.' when it's off
 
 ```c
 #include <stdio.h>
@@ -60,7 +73,8 @@ int main(int argc, char *argv[]) {
 		
 		if(port_a.bits.bit0 == 0) {
 			printf("."); // LED Off
-		} else {
+		}
+		else {
 			printf("@"); // LED On
 		}
 	}
@@ -70,6 +84,9 @@ int main(int argc, char *argv[]) {
 ```
 
 ### Assembly
+
+Here's a simple tnasm assembly program that "blinks" the LED.
+
 ```asm
 .var tbone 0
 .const PORT_A 0x8002
@@ -83,6 +100,9 @@ set rA, tbone
 ```
 
 ### Results
+
+Here in the output, you can trace how many cycles it takes for the assembly above the switch the LED's state.  It's like a simple custom osciliscope! 
+
 ```
 .........@@@@@@@.......@@@@@@@.......@@@@@@@.......@@@@@@@.......@@@@@@@......
 ```
