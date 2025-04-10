@@ -30,8 +30,10 @@ Instructions may be encoded in either one or two 16-bit words:
 ## Instruction Encoding
 
 ### First Word
+![Picture of first instruction register](docs/img/instruction_reg_first.png)
 
 ### Second Word
+![Picture of second instruction register](docs/img/instruction_reg_second.png)
 
 ### See *[instruction set](docs/README.md)* for more information.
 
