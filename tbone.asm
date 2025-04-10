@@ -1,5 +1,4 @@
 ; Name:     tbone.asm
-; Author:   John Pertell
 ;
 ; Desc:     Example tnasm assembly to showcase a  
 ;           simplified GPIO led system. Compile using
