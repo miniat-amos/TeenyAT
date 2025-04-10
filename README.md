@@ -83,6 +83,8 @@ int main(int argc, char *argv[]) {
 }
 ```
 
+##### Save this as `led.c` and compile using `gcc -o led led.c teenyat.c` 
+
 ### Assembly
 
 Here's a simple tnasm assembly program that "blinks" the LED.
@@ -98,6 +100,8 @@ set rA, tbone
     inv rA
     jmp !main
 ```
+##### Save this as `tbone.asm` and assemble using `tnasm tbone.asm` 
+##### This gives a `tbone.bin` file that can be run by your led system by executing `led tbone.bin`
 
 ### Results
 
