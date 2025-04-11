@@ -2,7 +2,7 @@
 
 ![Devious looking jellyfish](docs/img/leroy.gif)
 
-The **TeenyAT** *(pronounced Teeny-@)* is a 16-bit virtual embedded microcontroller delivered as a C library so systems can be simulated around it with ease. It's also good fun developing assembly programs to run on our premade systems! System designers create an instance (or more) of the TeenyAT, providing a binary image to load and execute, interacting with its TeenyAT instances through its peripheral bus and GPIO ports.
+The **TeenyAT** *(pronounced Teeny-@)* is a 16-bit virtual embedded microcontroller delivered as a C library (single header and single source) so systems can be simulated around it with ease. It's also good fun developing assembly programs to run on our premade systems! System designers create an instance (or more) of the TeenyAT, providing a binary image to load and execute, interacting with its TeenyAT instances through its peripheral bus and GPIO ports.
 
 The **TeenyAT** project has a unique instruction set and a complete assembler. The *[tnasm](tnasm)* assembler and each included system can be compiled using `make` with their respective `Makefile`s. 
 
@@ -90,18 +90,20 @@ int main(int argc, char *argv[]) {
 Here's a simple tnasm assembly program that "blinks" the LED.
 
 ```asm
-.var tbone 0
 .const PORT_A 0x8002
 
-set rA, tbone
+set rA, rZ
 
 !main
     str [PORT_A], rA
     inv rA
     jmp !main
 ```
-##### Save this as `tbone.asm` and assemble using `tnasm tbone.asm` 
-##### This gives a `tbone.bin` file that can be run by your led system by executing `led tbone.bin`
+Save this as `tbone.asm` and assemble using `tnasm tbone.asm` 
+
+This gives a `tbone.bin` file that can be run by your led system by executing `led tbone.bin`[^1]
+
+[^1]: "T-Bone" was a nickname given by students to my undergraduate assembly language faculty.
 
 ### Results
 
