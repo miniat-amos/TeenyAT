@@ -107,7 +107,7 @@ This gives a `tbone.bin` file that can be run by your led system by executing `l
 
 ### Results
 
-Here in the output, you can trace how many cycles it takes for the assembly above the switch the LED's state.  It's like a simple custom osciliscope! 
+Here in the output, you can trace how many cycles it takes for the assembly above to switch the LED's state.  It's like a simple custom osciliscope! 
 
 ```
 ........@@@@@@@.......@@@@@@@.......@@@@@@@.......@@@@@@@.......@@@@@@@.......
