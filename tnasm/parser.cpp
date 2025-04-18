@@ -215,12 +215,18 @@ bool p_loc() {
 }
 
 /*
- * variable_line ::= VARIABLE IDENTIFIER immediate.
+ * variable_line ::= VARIABLE IDENTIFIER immediate?.  ; optional immediate
  */
 shared_ptr <token> p_variable_line() {
     shared_ptr <token> val = nullptr, ident;
     shared_ptr <tny_word> immed;
-    if(term(T_VARIABLE) && (ident = term(T_IDENTIFIER)) && (immed = p_immediate()) && term(T_EOL)) {
+    int save = tnext;
+    if(term(T_VARIABLE) && (ident = term(T_IDENTIFIER)) && 
+        (save = tnext,   
+            (tnext = save, term(T_EOL)) ||
+            (tnext = save, (immed = p_immediate()) && term(T_EOL))
+        )
+    ){
         if(pass == 1) {
             bool constant_exists = (constants.count(ident->token_str) > 0);
             bool variable_exists = (variables.count(ident->token_str) > 0);
@@ -234,8 +240,13 @@ shared_ptr <token> p_variable_line() {
             }
         }
         else if(pass > 1) {
-            bin_words.push_back(*immed);
-        } // TODO: put the immediate in the binary at this address
+            if(immed) {
+                bin_words.push_back(*immed);
+            }
+            else {
+                bin_words.push_back({.u = 0});
+            }
+        }
         address++;
         val = ident;
     }

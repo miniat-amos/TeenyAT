@@ -6,6 +6,7 @@
 ; Don't change any of the lines in this boxed section. They are crafted to
 ; demonstrate multipass label resolution is working
 .variable amos 0x74A3 ;1
+.var leroy
 .variable aero 0xBeeF ;1
 
 !main
