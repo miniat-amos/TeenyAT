@@ -24,14 +24,11 @@ variable_line ::= VARIABLE IDENTIFIER immediate.
 
 constant_line ::= CONSTANT IDENTIFIER immediate.
 
-raw_line ::= raw_line raw_value.
-raw_line ::= raw_value.
 ;----------
 ; We can't make a raw_value resolve to string because immediates resolve to
 ; raw_value and immediates cannot be strings.
 ;----------
-raw_line ::= raw_line string.
-raw_line ::= string.
+raw_line ::= RAW (raw_value | string)+.
 
 raw_value ::= number.
 raw_value ::= CHARACTER.

@@ -82,7 +82,7 @@
 .const DELAY_FULL           3000    ; Duration of a full note
 
 !twinkle_str 
-"Twinkle Twinkle"
+.raw "Twinkle Twinkle"
 
 !main
     set rB, !twinkle_str

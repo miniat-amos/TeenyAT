@@ -601,25 +601,25 @@ set rE, rZ   ; Timer Buffer Index  (DONT TOUCH)
 
 ;------------- DATA SECTION ---------------------
 !SECRET_CODE
-2 4 2 4 2
+.raw 2 4 2 4 2
 
 !PLAYER_GUESSES
-0 0 0 0 0
+.raw 0 0 0 0 0
 
 !CHARACTER_CODES_INDEX
-0 LEFT_KEY UP_KEY RIGHT_KEY DOWN_KEY F_KEY D_KEY S_KEY A_KEY R_KEY E_KEY W_KEY Q_KEY 
+.raw 0 LEFT_KEY UP_KEY RIGHT_KEY DOWN_KEY F_KEY D_KEY S_KEY A_KEY R_KEY E_KEY W_KEY Q_KEY 
 
 !CHARACTER_CODES_MAP
-'?' 16793 8605 409 413 'F' 'D' 'S' 'A' 'R' 'E' 'W' 'Q'
+.raw '?' 16793 8605 409 413 'F' 'D' 'S' 'A' 'R' 'E' 'W' 'Q'
 
 !TIMER_BUFFER
-0 0 0 -1
+.raw 0 0 0 -1
 
 !CODE_BREAKER_str
-'C''O''D''E'' ''B''R''E''A''K''E''R' 0
+.raw 'C''O''D''E'' ''B''R''E''A''K''E''R' 0
 
 !Press_ANY_str
-'P''r''e''s''s'' ''A''N''Y' 0
+.raw 'P''r''e''s''s'' ''A''N''Y' 0
 
 !Game_Over_str
-'G''a''m''e'' ''O''v''e''r'' '':''(' 0
+.raw 'G''a''m''e'' ''O''v''e''r'' '':''(' 0

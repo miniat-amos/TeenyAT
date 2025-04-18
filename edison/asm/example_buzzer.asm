@@ -82,7 +82,7 @@
      ret
 ;------------- DATA SECTION ---------------------
 !use_faders_str
-'U' 's' 'e'  ' ' 'f' 'a' 'd' 'e' 'r' 's' 0
+.raw 'U' 's' 'e'  ' ' 'f' 'a' 'd' 'e' 'r' 's' 0
 
 !turn_sound_up_str
-'T' 'u' 'r' 'n' ' ' 's' 'o' 'u' 'n' 'd' ' ' 'u' 'p' '!' 0
+.raw 'T' 'u' 'r' 'n' ' ' 's' 'o' 'u' 'n' 'd' ' ' 'u' 'p' '!' 0

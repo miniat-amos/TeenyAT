@@ -67,7 +67,7 @@
 .const WAIT_LONG    3500
 
 !happy_birthday_str
-"Happy Birthday"
+.raw "Happy Birthday"
 
 !init
     set rB, !happy_birthday_str

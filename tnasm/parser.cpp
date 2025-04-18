@@ -267,13 +267,17 @@ shared_ptr <token> p_constant_line() {
 }
 
 /*
- * raw_line ::= (raw_value | string)+.
+ * raw_line ::= RAW (raw_value | string)+.
  * We'll implement the "one-or-more" NUMBER check manually rather than via the
  * recursive descent approach.
  */
 bool p_raw_line() {
     vector <shared_ptr <tny_word> > data;
     bool all_good = true;
+
+    if(term(T_RAW) == nullptr) {
+        all_good = false;
+    }
 
     while(all_good) {
         int save = tnext;

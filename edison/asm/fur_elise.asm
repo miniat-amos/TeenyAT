@@ -73,7 +73,7 @@
 .const WAIT_LONG    3500
 
 !fur_elise_str 
-"Fur Elise"
+.raw "Fur Elise"
 
 !main
     set rB, !fur_elise_str

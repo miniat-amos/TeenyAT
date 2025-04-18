@@ -34,7 +34,7 @@
     psh r3 + 14         ;2
     str [r4 + 3], r3      ;1
 
-    123 -15 thirty_one 0x12F_F 0b_110_00000_1011_00_10 ;5
+.raw 123 -15 thirty_one 0x12F_F 0b_110_00000_1011_00_10 ;5
 
     mpy r2, !more           ;2
     SHF rD, r2 - !middle    ;2
@@ -86,11 +86,11 @@
 ; and that's all
 
 !my_string
-    "Leroy"  ; a null terminated string
+.raw "Leroy"  ; a null terminated string
 
 ; packed strings have two characters per 16 bit word.  Here are 
 ; two examples one byte apart in length.
 !a_packed_string  
-    'Aero jumps at midnight'
+.raw 'Aero jumps at midnight'
 !another_packed_string
-    'Leroy jumps at midnight'
+.raw 'Leroy jumps at midnight'
