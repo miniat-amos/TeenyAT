@@ -267,7 +267,7 @@ shared_ptr <token> p_constant_line() {
 }
 
 /*
- * raw_line ::= RAW (raw_value | string)+.
+ * raw_line ::= RAW (immediate | string)+.
  * We'll implement the "one-or-more" NUMBER check manually rather than via the
  * recursive descent approach.
  */
@@ -283,7 +283,7 @@ bool p_raw_line() {
         int save = tnext;
         shared_ptr <tny_word> d;
         shared_ptr <token> val = nullptr;
-        if((d = p_raw_value())) {
+        if((d = p_immediate())) {
             data.push_back(d);
         }
         else if((tnext = save, (val = term(T_STRING)))) {
@@ -411,7 +411,7 @@ shared_ptr<tny_word> p_raw_value() {
 }
 
 /*
- * immediate ::= number.
+ * immediate ::= raw_value.
  * immediate ::= LABEL.
  * immediate ::= IDENTIFIER.
  */
