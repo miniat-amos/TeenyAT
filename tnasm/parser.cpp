@@ -163,10 +163,6 @@ bool parse(token_lines &parse_lines, vector <string> asm_lines) {
         }
     }
 
-    if(result) {
-        cerr << "All labels resolved after " << pass << " passes." << endl << endl;
-    }
-
     return result;
 }
 
@@ -416,10 +412,6 @@ shared_ptr <token> p_label_line() {
         }
         else if(pass > 1) {
             if(address != labels[label->token_str].u) {
-                cerr << label->token_str << " changed from ";
-                cerr << hex << labels[label->token_str].u << dec << " to ";
-                cerr << hex << address << " in pass " << dec << pass << endl;
-
                 labels[label->token_str] = tny_word{.u = address};
                 labels_updated_this_pass = true;
             }
