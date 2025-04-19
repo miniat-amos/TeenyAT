@@ -20,7 +20,11 @@ loc ::= code_13_line.
 loc ::= code_14_line.
 loc ::= code_15_line.
 
-variable_line ::= VARIABLE IDENTIFIER immediate?.  ;optional immediate
+variable_line ::= variable_line_empty.
+variable_line ::= variable_line_immediate.
+
+variable_line_empty ::= VARIABLE IDENTIFIER.
+variable_line_immediate ::= VARIABLE IDENTIFIER immediate.
 
 constant_line ::= CONSTANT IDENTIFIER immediate.
 
