@@ -7,6 +7,7 @@
 #include "token.h"
 #include "parser.h"
 #include "listing.h"
+#include "warnings.h"
 
 using namespace std;
 
@@ -250,6 +251,10 @@ shared_ptr <token> p_variable_line_empty() {
             if(!new_identifier(ident)) {
                 val = nullptr;
             }
+            
+            if(address == 0x0000) {
+                new_warning(ident->line_no, "A variable at address 0x0000 is unsafe.  It will be executed as code.");
+            }
         }
         else if(pass > 1) {
             bin_words.push_back({.u = 0});
@@ -270,6 +275,10 @@ shared_ptr <token> p_variable_line_immediate() {
         if(pass == 1) {
             if(!new_identifier(ident)) {
                 val = nullptr;
+            }
+            
+            if(address == 0x0000) {
+                new_warning(ident->line_no, "A variable at address 0x0000 is unsafe.  It will be executed as code.");
             }
         }
         else if(pass > 1) {

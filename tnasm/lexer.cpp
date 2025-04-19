@@ -12,6 +12,7 @@
 #include "token.h"
 #include "parser.h"
 #include "listing.h"
+#include "warnings.h"
 
 /*
  * Uncomment the definition below to trace the lexer
@@ -98,11 +99,11 @@ int main(int argc, char *argv[]) {
 		ofstream bin_file(bin_filename, ios::binary);
 		bin_file.write(reinterpret_cast<const char*>(bin_words.data()), bin_words.size() * sizeof(tny_word));
 		generate_listing();
+		print_warnings();
     }
     else {
         cerr << "There were errors.  No binary output." << endl;
     }
-
 
 	return EXIT_SUCCESS;
 }
