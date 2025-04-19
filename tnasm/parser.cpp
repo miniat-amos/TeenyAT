@@ -222,19 +222,21 @@ bool p_variable_line() {
            (tnext = save, p_variable_line_immediate());
 }
 
-void new_variable(shared_ptr <token> ident) {
+bool new_variable(shared_ptr <token> ident) {
+    bool is_new_variable = false;
     bool constant_exists = (constants.count(ident->token_str) > 0);
     bool variable_exists = (variables.count(ident->token_str) > 0);
     if(!constant_exists && !variable_exists) {
         /* New variable found */
         variables[ident->token_str] = tny_word{.u = address};
+        is_new_variable = true;
     }
     else {
         cerr << "ERROR, Line " << ident->line_no << ": ";
         cerr << (constant_exists ? "Constant" : "Variable") << " \""  << ident->token_str << "\" already defined" << endl;
     }
 
-    return;
+    return is_new_variable;
 }
 
 /*
@@ -243,14 +245,16 @@ void new_variable(shared_ptr <token> ident) {
 shared_ptr <token> p_variable_line_empty() {
     shared_ptr <token> val = nullptr, ident;
     if(term(T_VARIABLE) && (ident = term(T_IDENTIFIER)) && term(T_EOL)) {
+        val = ident;
         if(pass == 1) {
-            new_variable(ident);
+            if(!new_variable(ident)) {
+                val = nullptr;
+            }
         }
         else if(pass > 1) {
             bin_words.push_back({.u = 0});
         }
         address++;
-        val = ident;
     }
     return val;
 }
@@ -262,14 +266,16 @@ shared_ptr <token> p_variable_line_immediate() {
     shared_ptr <token> val = nullptr, ident;
     shared_ptr <tny_word> immed;
     if(term(T_VARIABLE) && (ident = term(T_IDENTIFIER)) && (immed = p_immediate()) && term(T_EOL)) {
+        val = ident;
         if(pass == 1) {
-            new_variable(ident);
+            if(!new_variable(ident)) {
+                val = nullptr;
+            }
         }
         else if(pass > 1) {
             bin_words.push_back(*immed);
         }
         address++;
-        val = ident;
     }
     return val;
 }
@@ -281,6 +287,7 @@ shared_ptr <token> p_constant_line() {
     shared_ptr <token> val = nullptr, ident;
     shared_ptr <tny_word> immed;
     if(term(T_CONSTANT) && (ident = term(T_IDENTIFIER)) && (immed = p_immediate()) && term(T_EOL)) {
+        val = ident;
         if(pass == 1) {
             bool constant_exists = (constants.count(ident->token_str) > 0);
             bool variable_exists = (variables.count(ident->token_str) > 0);
@@ -291,9 +298,9 @@ shared_ptr <token> p_constant_line() {
             else {
                 cerr << "ERROR, Line " << ident->line_no << ": ";
                 cerr << (constant_exists ? "Constant" : "Variable") << " \""  << ident->token_str << "\" already defined" << endl;
+                val = nullptr;
             }
         }
-        val = ident;
     }
     return val;
 }
