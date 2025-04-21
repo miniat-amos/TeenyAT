@@ -219,14 +219,19 @@ bool p_variable_line() {
            (tnext = save, p_variable_line_immediate());
 }
 
-bool new_identifier(shared_ptr <token> ident) {
+bool new_identifier(shared_ptr <token> ident, bool is_constant) {
     bool is_new_identifier = false;
     bool constant_exists = (constants.count(ident->token_str) > 0);
     bool variable_exists = (variables.count(ident->token_str) > 0);
     if(!constant_exists && !variable_exists) {
-        /* New variable found */
-        variables[ident->token_str] = tny_word{.u = address};
+        /* New identifier found */
         is_new_identifier = true;
+        if(is_constant) {
+            constants[ident->token_str] = tny_word{.u = address};
+        }
+        else {
+            variables[ident->token_str] = tny_word{.u = address};
+        }
     }
     else {
         cerr << "ERROR, Line " << ident->line_no << ": ";
@@ -234,6 +239,14 @@ bool new_identifier(shared_ptr <token> ident) {
     }
 
     return is_new_identifier;
+}
+
+bool new_constant(shared_ptr <token> ident) {
+    return new_identifier(ident, true);
+}
+
+bool new_variable(shared_ptr <token> ident) {
+    return new_identifier(ident, false);
 }
 
 /*
@@ -244,7 +257,7 @@ shared_ptr <token> p_variable_line_empty() {
     if(term(T_VARIABLE) && (ident = term(T_IDENTIFIER)) && term(T_EOL)) {
         val = ident;
         if(pass == 1) {
-            if(!new_identifier(ident)) {
+            if(!new_identifier(ident, false)) {
                 val = nullptr;
             }
             
@@ -269,7 +282,7 @@ shared_ptr <token> p_variable_line_immediate() {
     if(term(T_VARIABLE) && (ident = term(T_IDENTIFIER)) && (immed = p_immediate()) && term(T_EOL)) {
         val = ident;
         if(pass == 1) {
-            if(!new_identifier(ident)) {
+            if(!new_identifier(ident, false)) {
                 val = nullptr;
             }
             
@@ -294,7 +307,7 @@ shared_ptr <token> p_constant_line() {
     if(term(T_CONSTANT) && (ident = term(T_IDENTIFIER)) && (immed = p_immediate()) && term(T_EOL)) {
         val = ident;
         if(pass == 1) {
-            if(!new_identifier(ident)) {
+            if(!new_identifier(ident, true)) {
                 val = nullptr;
             }
         }
