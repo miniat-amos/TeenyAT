@@ -226,11 +226,14 @@ bool new_identifier(shared_ptr <token> ident, bool is_constant) {
     if(!constant_exists && !variable_exists) {
         /* New identifier found */
         is_new_identifier = true;
+        identifier_data tmp;
+        tmp.addr.u = address;
+        tmp.line_no = ident->line_no;
         if(is_constant) {
-            constants[ident->token_str] = identifier_data{.addr.u = address, .line_no = ident->line_no};
+            constants[ident->token_str] = tmp;
         }
         else {
-            variables[ident->token_str] = identifier_data{.addr.u = address, .line_no = ident->line_no};
+            variables[ident->token_str] = tmp;
         }
     }
     else {
