@@ -22,8 +22,8 @@ unsigned int tnext;  // index of the next token in the line to consider
 int pass;
 tny_uword address;
 
-map <string, tny_word> constants;
-map <string, tny_word> variables;
+map <string, identifier_data> constants;
+map <string, identifier_data> variables;
 
 map <string, tny_word> labels;
 bool labels_updated_this_pass;
@@ -113,7 +113,7 @@ bool parse(token_lines &parse_lines, vector <string> asm_lines) {
         parse_line = line;
         if(p_loc() == false) {
             result = false;
-            cerr << "Error, line(" << line_no << "): " << asm_lines[line_no - 1] << endl;
+            cerr << "ERROR, line " << line_no << ": " << asm_lines[line_no - 1] << endl;
         }
     }
 
@@ -227,15 +227,22 @@ bool new_identifier(shared_ptr <token> ident, bool is_constant) {
         /* New identifier found */
         is_new_identifier = true;
         if(is_constant) {
-            constants[ident->token_str] = tny_word{.u = address};
+            constants[ident->token_str] = identifier_data{.addr.u = address, .line_no = ident->line_no};
         }
         else {
-            variables[ident->token_str] = tny_word{.u = address};
+            variables[ident->token_str] = identifier_data{.addr.u = address, .line_no = ident->line_no};
         }
     }
     else {
-        cerr << "ERROR, Line " << ident->line_no << ": ";
-        cerr << (constant_exists ? "Constant" : "Variable") << " \""  << ident->token_str << "\" already defined" << endl;
+        cerr << "ERROR, line " << ident->line_no << ": ";
+        cerr << (constant_exists ? "Constant" : "Variable") << " \""
+             << ident->token_str << "\" already defined on line ";
+        if(constant_exists) {
+            cerr << constants[ident->token_str].line_no << endl;
+        }
+        else {
+            cerr << variables[ident->token_str].line_no << endl;
+        }
     }
 
     return is_new_identifier;
@@ -416,7 +423,7 @@ shared_ptr <token> p_label_line() {
                 val = label;
             }
             else {
-                cerr << "ERROR, Line " << label->line_no << ": ";
+                cerr << "ERROR, line " << label->line_no << ": ";
                 cerr << "Label " << label->token_str << " already defined at 0x";
                 cerr << hex << setw(4) << setfill('0');
                 cerr << labels[label->token_str].u;
@@ -483,7 +490,7 @@ shared_ptr <tny_word> p_immediate() {
                 val = shared_ptr <tny_word>(new tny_word(labels[label->token_str]));
             }
             else {
-                cerr << "Error, Line(" << label->line_no << "): ";
+                cerr << "ERROR, line " << label->line_no << ": ";
                 cerr << label->token_str << " is not defined" << endl;
             }
         }
@@ -492,13 +499,13 @@ shared_ptr <tny_word> p_immediate() {
         /* As an immediate, ensure the identifier is a constant. */
         if(pass > 1) {
             if(constants.count(ident->token_str) > 0) {
-                val = shared_ptr <tny_word>(new tny_word(constants[ident->token_str]));
+                val = shared_ptr <tny_word>(new tny_word(constants[ident->token_str].addr));
             }
             else if(variables.count(ident->token_str) > 0) {
-                val = shared_ptr <tny_word>(new tny_word(variables[ident->token_str]));
+                val = shared_ptr <tny_word>(new tny_word(variables[ident->token_str].addr));
             }
             else {
-                cerr << "Error, Line(" << ident->line_no << "): ";
+                cerr << "ERROR, line " << ident->line_no << ": ";
                 cerr << "\"" << ident->token_str << "\" is not a constant or identifier" << endl;
                 val = nullptr;
             }
@@ -524,13 +531,13 @@ shared_ptr <tny_word> p_number() {
         }
         else if(pass > 1) {
             if(constants.count(ident->token_str) > 0) {
-                val = shared_ptr <tny_word>(new tny_word(constants[ident->token_str]));
+                val = shared_ptr <tny_word>(new tny_word(constants[ident->token_str].addr));
             }
             else if(variables.count(ident->token_str) > 0) {
-                val = shared_ptr <tny_word>(new tny_word(variables[ident->token_str]));
+                val = shared_ptr <tny_word>(new tny_word(variables[ident->token_str].addr));
             }
             else {
-                cerr << "ERROR, Line " << ident->line_no << ": ";
+                cerr << "ERROR, line " << ident->line_no << ": ";
                 cerr << "Identifier \""  << ident->token_str << "\" is not defined" << endl;
             }
         }
@@ -1243,7 +1250,7 @@ tny_uword token_to_opcode(int id) {
     case T_INV:   result = TNY_OPCODE_XOR;   break;
     case T_RET:   result = TNY_OPCODE_POP;   break;
     default:
-        cerr << "Error, line(" << parse_line[0].line_no << "): ";
+        cerr << "ERROR, line " << parse_line[0].line_no << ": ";
         cerr << "token_to_opcode() has unknown id, " << id << endl;
         /*
          * TODO: We should cleanly terminiate the assembler here
