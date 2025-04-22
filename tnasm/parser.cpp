@@ -219,7 +219,7 @@ bool p_variable_line() {
            (tnext = save, p_variable_line_immediate());
 }
 
-bool new_identifier(shared_ptr <token> ident, bool is_constant) {
+bool new_identifier(shared_ptr <token> ident, tny_word val, bool is_constant) {
     bool is_new_identifier = false;
     bool constant_exists = (constants.count(ident->token_str) > 0);
     bool variable_exists = (variables.count(ident->token_str) > 0);
@@ -228,6 +228,7 @@ bool new_identifier(shared_ptr <token> ident, bool is_constant) {
         is_new_identifier = true;
         identifier_data tmp;
         tmp.addr.u = address;
+        tmp.val = val;
         tmp.line_no = ident->line_no;
         if(is_constant) {
             constants[ident->token_str] = tmp;
@@ -251,12 +252,12 @@ bool new_identifier(shared_ptr <token> ident, bool is_constant) {
     return is_new_identifier;
 }
 
-bool new_constant(shared_ptr <token> ident) {
-    return new_identifier(ident, true);
+bool new_constant(shared_ptr <token> ident, tny_word val) {
+    return new_identifier(ident, val, true);
 }
 
-bool new_variable(shared_ptr <token> ident) {
-    return new_identifier(ident, false);
+bool new_variable(shared_ptr <token> ident, tny_word val) {
+    return new_identifier(ident, val, false);
 }
 
 /*
@@ -267,7 +268,7 @@ shared_ptr <token> p_variable_line_empty() {
     if(term(T_VARIABLE) && (ident = term(T_IDENTIFIER)) && term(T_EOL)) {
         val = ident;
         if(pass == 1) {
-            if(!new_identifier(ident, false)) {
+            if(!new_variable(ident, tny_word{.u = 0})) {
                 val = nullptr;
             }
             
@@ -292,7 +293,7 @@ shared_ptr <token> p_variable_line_immediate() {
     if(term(T_VARIABLE) && (ident = term(T_IDENTIFIER)) && (immed = p_immediate()) && term(T_EOL)) {
         val = ident;
         if(pass == 1) {
-            if(!new_identifier(ident, false)) {
+            if(!new_variable(ident, *immed)) {
                 val = nullptr;
             }
             
@@ -317,7 +318,7 @@ shared_ptr <token> p_constant_line() {
     if(term(T_CONSTANT) && (ident = term(T_IDENTIFIER)) && (immed = p_immediate()) && term(T_EOL)) {
         val = ident;
         if(pass == 1) {
-            if(!new_identifier(ident, true)) {
+            if(!new_constant(ident, *immed)) {
                 val = nullptr;
             }
         }
@@ -502,7 +503,7 @@ shared_ptr <tny_word> p_immediate() {
         /* As an immediate, ensure the identifier is a constant. */
         if(pass > 1) {
             if(constants.count(ident->token_str) > 0) {
-                val = shared_ptr <tny_word>(new tny_word(constants[ident->token_str].addr));
+                val = shared_ptr <tny_word>(new tny_word(constants[ident->token_str].val));
             }
             else if(variables.count(ident->token_str) > 0) {
                 val = shared_ptr <tny_word>(new tny_word(variables[ident->token_str].addr));
@@ -534,7 +535,7 @@ shared_ptr <tny_word> p_number() {
         }
         else if(pass > 1) {
             if(constants.count(ident->token_str) > 0) {
-                val = shared_ptr <tny_word>(new tny_word(constants[ident->token_str].addr));
+                val = shared_ptr <tny_word>(new tny_word(constants[ident->token_str].val));
             }
             else if(variables.count(ident->token_str) > 0) {
                 val = shared_ptr <tny_word>(new tny_word(variables[ident->token_str].addr));

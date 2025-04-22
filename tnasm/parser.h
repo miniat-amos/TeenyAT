@@ -11,6 +11,7 @@ typedef struct identifier_data identifier_data;
 
 struct identifier_data {
     tny_word addr;
+    tny_word val;
     int line_no;
 };
 
