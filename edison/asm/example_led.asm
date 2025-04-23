@@ -23,16 +23,13 @@
 .const FADER_LEFT 0xA020
 .const FADER_RIGHT 0xA021
 
-set rA, 0xFFFF ; set port directions to output 
-str [PORT_A_DIR], rA
-
-
-str [PORT_B_DIR], rZ
-
-set rA, 0xFFFF
-set rB, 0x8000
-
 !main
+    set rA, 0xFFFF              ; set portA directions to input 
+    str [PORT_A_DIR], rA    
+    str [PORT_B_DIR], rZ        ; set portB directions to output
+    set rA, 0xFFFF
+    set rB, 0x8000
+!main_loop
     str [PORT_B], rA
     cal !blink_delay
 
@@ -40,18 +37,17 @@ set rB, 0x8000
     xor rC, rB
     str [PORT_B], rC
     rot rB, 1
+
     cal !blink_delay
 
-    jmp !main
+    jmp !main_loop
 
 ; wastes about 175000 cycles
 !blink_delay
     psh rC
     set rC, 175
-    
-    !blink_loop
-        dly 1000
-        lup rC, !blink_loop
-        
+!blink_loop
+    dly 1000
+    lup rC, !blink_loop   
     pop rC
     ret

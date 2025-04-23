@@ -183,61 +183,61 @@
     psh rB
     psh rA
 
-    !print_string_rB_loop
-        lod rA, [rB]
-        cmp rA, rZ
-        je !print_string_rB_terminated
+!print_string_rB_loop
+    lod rA, [rB]
+    cmp rA, rZ
+    je !print_string_rB_terminated
 
-        str [LCD_CURSOR], rA
-        inc rB
-        jmp !print_string_rB_loop
+    str [LCD_CURSOR], rA
+    inc rB
+    jmp !print_string_rB_loop
 
-    !print_string_rB_terminated
-        pop rA
-        pop rB
+!print_string_rB_terminated
+    pop rA
+    pop rB
 
-     ret
+    ret
 
 !delay_teeny
     set rD, DELAY_TEENY
     set rE, 0                       
-    !inner_delay_teeny
-        inc rE
-        dly rE
-        cmp rE, rD 
-        jl !inner_delay_teeny
+!inner_delay_teeny
+    inc rE
+    dly rE
+    cmp rE, rD 
+    jl !inner_delay_teeny
     set rE, 0
     ret
 
 !delay_short
     set rD, DELAY_SHORT
     set rE, 0                       
-    !inner_delay_short
-        inc rE
-        dly rE
-        cmp rE, rD 
-        jl !inner_delay_short
+!inner_delay_short
+    inc rE
+    dly rE
+    cmp rE, rD 
+    jl !inner_delay_short
     set rE, 0
     ret
 
 !delay_long
     set rD, DELAY_LONG
     set rE, 0                       
-    !inner_delay_long
-        inc rE
-        dly rE
-        cmp rE, rD 
-        jl !inner_delay_long
+!inner_delay_long
+    inc rE
+    dly rE
+    cmp rE, rD 
+    jl !inner_delay_long
     set rE, 0
     ret
 
 !wait_long
     set rD, WAIT_LONG
     set rE, 0                       
-    !inner_wait_long
-        inc rE
-        dly rE
-        cmp rE, rD 
-        jl !inner_wait_long
+!inner_wait_long
+    inc rE
+    dly rE
+    cmp rE, rD 
+    jl !inner_wait_long
     set rE, 0
     ret

@@ -46,17 +46,17 @@
 ; rE => temp
 
 !init_demo
-    ; Set port A to input mode
+; Set port A to input mode
     set rE, 0xFFFF 
     str [PORT_A_DIR], rE
 
-    ; Initialize the delay amount 
+; Initialize the delay amount 
     set rD, DELAY_AMT
 
-    ; Load initial character sprite
+; Load initial character sprite
     set rC, LEROY_1         
 
-    ; Zero out the initial coordinates
+; Zero out the initial coordinates
     set rA, 0                ; x-coordinate
     set rB, 0                ; y-coordinate
 
@@ -76,56 +76,56 @@
     str [PORT_A_DIR], rE
 
     lod rE, [PORT_A]         
-    and rE, 0xF    ; Bitmask to grab only d-pad buttons
+    and rE, 0xF                 ; Bitmask to grab only d-pad buttons
 
-    ; Down button
+; Down button
     cmp rE, 0x8        
     je !down_key_pressed
         
-    ; Right button
+; Right button
     cmp rE, 0x4             
     je !right_key_pressed
 
-    ; Up button
+; Up button
     cmp rE, 0x2             
     je !up_key_pressed
 
-    ; Left button
+; Left button
     cmp rE, 0x1             
     je !left_key_pressed
 
-    !key_pressed
+!key_pressed
     ret                      
 
 ; Draws Leroy according to the active x and y coords
 ; and then also alternates sprites.
 !draw_leroy
-    ; Set cursor position
-    str [LCD_CURSOR_X], rA     ; x-coordinate
-    str [LCD_CURSOR_Y], rB     ; y-coordinate
+; Set cursor position
+    str [LCD_CURSOR_X], rA      ; x-coordinate
+    str [LCD_CURSOR_Y], rB      ; y-coordinate
 
-    ; Toggle sprite between LEROY_1 and LEROY_2
+; Toggle sprite between LEROY_1 and LEROY_2
     cmp rC, LEROY_1      
     je !use_sprite_two
-    !use_sprite_one
-        set rC, LEROY_1 
-        jmp !char_sprite_selected
-    !use_sprite_two
-        set rC, LEROY_2  
-    !char_sprite_selected
+!use_sprite_one
+    set rC, LEROY_1 
+    jmp !char_sprite_selected
+!use_sprite_two
+    set rC, LEROY_2  
+!char_sprite_selected
 
-    ; Shall we flip the sprite?
+; Shall we flip the sprite?
     lod rE, [flipped_flag]
     cmp rE, 0             
     je !draw_normal
-    !draw_flipped
-        bts rC, 14        ; Set bit 14 to flip the sprite
-        str [LCD_CURSOR], rC
-        jmp !leroy_drawn
-    !draw_normal
-        str [LCD_CURSOR], rC
+!draw_flipped
+    bts rC, 14        ; Set bit 14 to flip the sprite
+    str [LCD_CURSOR], rC
+    jmp !leroy_drawn
+!draw_normal
+    str [LCD_CURSOR], rC
 
-    !leroy_drawn
+!leroy_drawn
     cal !delay
     ret
 
@@ -167,9 +167,9 @@
 ; Delay used to slow down the frames
 !delay
     set rE, 0                       
-    !inner_delay_loop
-        inc rE
-        dly rE
-        cmp rE, rD          
-        jl !inner_delay_loop
+!inner_delay_loop
+    inc rE
+    dly rE
+    cmp rE, rD          
+    jl !inner_delay_loop
     ret

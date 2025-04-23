@@ -92,8 +92,8 @@ jmp !init
 ;---------------- SPLASH SCREEN  ----------------
 
 !init
-set rA, 0xFF0F
-str [PORT_A_DIR], rA
+    set rA, 0xFF0F
+    str [PORT_A_DIR], rA
 !start_screen
 
     cal !start_screen_reset
@@ -113,18 +113,19 @@ str [PORT_A_DIR], rA
     set rC, WEIRD_OF_SQUIGGLES
     set rA, 20
     set rB, 1
-    !squiggle_loop
-        str [LCD_CURSOR], rC
-        lup rA, !squiggle_loop
+
+!squiggle_loop
+    str [LCD_CURSOR], rC
+    lup rA, !squiggle_loop
     
     cal !wait_for_button_push
 
     cal !game_screen_reset
 
 !code_breaker_game_init
-set rA, rZ   ; Index of Current Guess
-set rD, rZ   ; This is our timer variable (DONT TOUCH)
-set rE, rZ   ; Timer Buffer Index  (DONT TOUCH)
+    set rA, rZ   ; Index of Current Guess
+    set rD, rZ   ; This is our timer variable (DONT TOUCH)
+    set rE, rZ   ; Timer Buffer Index  (DONT TOUCH)
 !code_breaker_game_loop
 
     cal !render_current_guess
@@ -167,11 +168,11 @@ set rE, rZ   ; Timer Buffer Index  (DONT TOUCH)
     cal !render_current_guess
     cal !check_player_code
 
-    !lets_wait
+!lets_wait
     cal !resourceful_wait
    
 ;-------------------------------------------
-    !no_input
+!no_input
     jmp !buffered_timer  ; This is our scuffed timer code.....
 
 !game_over
@@ -185,25 +186,25 @@ set rE, rZ   ; Timer Buffer Index  (DONT TOUCH)
     cal !wait_rB
 
     set rC, 500
-    !explosion_loop
-        lod rA, [RAND]
-        str [LCD_CURSOR_XY], rA
-        mod rA, 10
-        cmp rA, 5
+!explosion_loop
+    lod rA, [RAND]
+    str [LCD_CURSOR_XY], rA
+    mod rA, 10
+    cmp rA, 5
         
-        jle !draw_0
-            set rB, '1'
-            jmp !draw_explosion
-        !draw_0
-            set rB, '0'
+    jle !draw_0
+    set rB, '1'
+    jmp !draw_explosion
+!draw_0
+    set rB, '0'
 
-        !draw_explosion
-            str [LCD_CURSOR], rB
+!draw_explosion
+    str [LCD_CURSOR], rB
 
-        set rB, 20
-        cal !wait_rB
+    set rB, 20
+    cal !wait_rB
 
-        lup rC, !explosion_loop
+    lup rC, !explosion_loop
 
     str [BUZZER_LEFT], rZ
     str [BUZZER_RIGHT], rZ
@@ -215,7 +216,7 @@ set rE, rZ   ; Timer Buffer Index  (DONT TOUCH)
     set rB, !Game_Over_str
     cal !print_string_rB
 
-    !game_over_loop
+!game_over_loop
     jmp !game_over_loop
 
 ;------------- UTILITY SECTION ------------------
@@ -227,18 +228,18 @@ set rE, rZ   ; Timer Buffer Index  (DONT TOUCH)
     set rB, GAME_SCREEN_TEXT_LOCATION_1
     str [LCD_CURSOR_XY], rB
 
-    !guess_rendering_loop
-        lod rB, [rC + !PLAYER_GUESSES]
-        lod rB, [rB + !CHARACTER_CODES_MAP]
-        str [LCD_CURSOR], rB
-        set rB, 1
-        str [LCD_MOVE_RIGHT], rB
-        inc rC
-        cmp rC, 4
-        jg !end_guess_rendering
-        jmp !guess_rendering_loop
+!guess_rendering_loop
+    lod rB, [rC + !PLAYER_GUESSES]
+    lod rB, [rB + !CHARACTER_CODES_MAP]
+    str [LCD_CURSOR], rB
+    set rB, 1
+    str [LCD_MOVE_RIGHT], rB
+    inc rC
+    cmp rC, 4
+    jg !end_guess_rendering
+    jmp !guess_rendering_loop
 
-    !end_guess_rendering
+!end_guess_rendering
     pop rB
     pop rC
     ret
@@ -254,20 +255,19 @@ set rE, rZ   ; Timer Buffer Index  (DONT TOUCH)
     psh rB
     psh rA
 
-    !print_string_rB_loop
-        lod rA, [rB]
-        cmp rA, rZ
-        je !print_string_rB_terminated
+!print_string_rB_loop
+    lod rA, [rB]
+    cmp rA, rZ
+    je !print_string_rB_terminated
 
-        str [LCD_CURSOR], rA
-        inc rB
-        jmp !print_string_rB_loop
+    str [LCD_CURSOR], rA
+    inc rB
+    jmp !print_string_rB_loop
 
-    !print_string_rB_terminated
-        pop rA
-        pop rB
-
-     ret
+!print_string_rB_terminated
+    pop rA
+    pop rB
+    ret
 
 !start_screen_reset
     psh rA
@@ -303,10 +303,10 @@ set rE, rZ   ; Timer Buffer Index  (DONT TOUCH)
     set rB, ARROW_END_SPRITE
     str [LCD_CURSOR], rB
     jmp !render_arrow_end_return
-    !not_base_arrow
+!not_base_arrow
     set rB, ARROW_TRAIL_SPRITE
     str [LCD_CURSOR], rB
-    !render_arrow_end_return
+!render_arrow_end_return
     inc rA
     cmp rA, 19
     jge !game_over
@@ -314,13 +314,13 @@ set rE, rZ   ; Timer Buffer Index  (DONT TOUCH)
     set rB, ARROW_HEAD_SPRITE
     str [LCD_CURSOR], rB
 
-    !blank_front
-        inc rA
-        cmp rA, 18
-        jg !done_blanking
-        str [LCD_CURSOR], rZ
-        jmp !blank_front
-    !done_blanking
+!blank_front
+    inc rA
+    cmp rA, 18
+    jg !done_blanking
+    str [LCD_CURSOR], rZ
+    jmp !blank_front
+!done_blanking
     pop rA
     pop rB
     ret
@@ -330,23 +330,23 @@ set rE, rZ   ; Timer Buffer Index  (DONT TOUCH)
     psh rA
     psh rB
     set rA, rZ
-    !resourceful_wait_loop
-        lod rB, [PORT_A]
-        cmp rB, rZ
-        je !end_resorceful_wait
-        inc rA
-        cmp rA, 0xFFE 
-        jge !check_values_resorceful_wait
-        jmp !resourceful_wait_loop
-    !check_values_resorceful_wait
-          lod rA, [ RESORCEFUL_WAIT_TIMER ]
-          cmp rA, 0x8  
-          jge !end_resorceful_wait
-          inc rA
-          str [RESORCEFUL_WAIT_TIMER], rA
-          set rA, rZ
-          jmp !resourceful_wait_loop
-    !end_resorceful_wait
+!resourceful_wait_loop
+    lod rB, [PORT_A]
+    cmp rB, rZ
+    je !end_resorceful_wait
+    inc rA
+    cmp rA, 0xFFE 
+    jge !check_values_resorceful_wait
+    jmp !resourceful_wait_loop
+!check_values_resorceful_wait
+    lod rA, [ RESORCEFUL_WAIT_TIMER ]
+    cmp rA, 0x8  
+    jge !end_resorceful_wait
+    inc rA
+    str [RESORCEFUL_WAIT_TIMER], rA
+    set rA, rZ
+    jmp !resourceful_wait_loop
+!end_resorceful_wait
     str [RESORCEFUL_WAIT_TIMER], rZ
     pop rA
     pop rB
@@ -354,37 +354,34 @@ set rE, rZ   ; Timer Buffer Index  (DONT TOUCH)
 
 !wait_rB
     psh rB
-    !wait_rB_loop
+!wait_rB_loop
     cal !kill_loop
     lup rB, !wait_rB_loop
     pop rB
     ret
 
 !kill_loop
- ;----- Edit this if your thing is tooo slowwww
-        psh rA
-        set rA, 0
-        !delay_loop
-            dly KILL_LOOP_DELAY_COUNT
-            inc rA
-            cmp rA, 10
-            jl !delay_loop
-        pop rA
-        ret
+;----- Edit this if your thing is tooo slowwww
+    psh rA
+    set rA, 0
+!delay_loop
+    dly KILL_LOOP_DELAY_COUNT
+    inc rA
+    cmp rA, 10
+    jl !delay_loop
+    pop rA
+    ret
 
 !wait_for_button_push
     psh rA
-
-    !wait_for_button_push_loop
-        lod rA, [PORT_A]
-        cmp rA, rZ
-        je !wait_for_button_push_loop
-
-    !wait_for_button_push_zero
-        lod rA, [PORT_A]
-        cmp rA, rZ
-        jne !wait_for_button_push_zero
-
+!wait_for_button_push_loop
+    lod rA, [PORT_A]
+    cmp rA, rZ
+    je !wait_for_button_push_loop
+!wait_for_button_push_zero
+    lod rA, [PORT_A]
+    cmp rA, rZ
+    jne !wait_for_button_push_zero
     pop rA
     ret
 ;----------------- RETURNS FIRST ONE IN PORT_A ---------------------------------
@@ -398,29 +395,27 @@ set rE, rZ   ; Timer Buffer Index  (DONT TOUCH)
     cmp rA, rZ
     je !get_single_button_push_return
     
-
-    !get_single_button_push_loop
-        set rB, rA
-        and rB, 1
-        jne  !get_single_button_push_calculate   ; was bit in value move on calculate value
-        shf rA, 1
-        inc rC
-        jmp !get_single_button_push_loop
-        
-    
-    !get_single_button_push_calculate
-        set rB, 1
-        neg rC
-        shf rB, rC
+!get_single_button_push_loop
+    set rB, rA
+    and rB, 1
+    jne  !get_single_button_push_calculate   ; was bit in value move on calculate value
+    shf rA, 1
+    inc rC
+    jmp !get_single_button_push_loop
+            
+!get_single_button_push_calculate
+    set rB, 1
+    neg rC
+    shf rB, rC
 ;--------------- NORMALIZE TO KEY MAP -------------------------------------
-    !get_single_button_push_return
+!get_single_button_push_return
     set rC, -1
-    !key_map_loop
-        inc rC
-        lod rA, [rC + !CHARACTER_CODES_INDEX]
-        cmp rA, rB
-        jne !key_map_loop
-        set rB, rC
+!key_map_loop
+    inc rC
+    lod rA, [rC + !CHARACTER_CODES_INDEX]
+    cmp rA, rB
+    jne !key_map_loop
+    set rB, rC
     pop rA
     pop rC
     ret
@@ -432,28 +427,28 @@ set rE, rZ   ; Timer Buffer Index  (DONT TOUCH)
     cmp rD, rA 
     pop rA
     jne !code_breaker_game_loop
-    !check_timer_value
-        lod rD, [rE + !TIMER_BUFFER]
-        cmp rD, -1
-        je !reset_timers_render_arrow
-        inc rD
-        cmp rD, 0xFFFF
-        jge !shift_timer_buffer
-        str [rE + !TIMER_BUFFER ], rD
-        set rD, rZ
-        jmp !code_breaker_game_loop
+!check_timer_value
+    lod rD, [rE + !TIMER_BUFFER]
+    cmp rD, -1
+    je !reset_timers_render_arrow
+    inc rD
+    cmp rD, 0xFFFF
+    jge !shift_timer_buffer
+    str [rE + !TIMER_BUFFER ], rD
+    set rD, rZ
+    jmp !code_breaker_game_loop
 
-    !shift_timer_buffer
-        str [rE + !TIMER_BUFFER], rZ
-        inc rE
-        set rD, rZ
-        jmp !code_breaker_game_loop
+!shift_timer_buffer
+    str [rE + !TIMER_BUFFER], rZ
+    inc rE
+    set rD, rZ
+    jmp !code_breaker_game_loop
 
-    !reset_timers_render_arrow
-        set rE, 0
-        set rD, rZ
-        cal !render_game_arrow
-        jmp !code_breaker_game_loop
+!reset_timers_render_arrow
+    set rE, 0
+    set rD, rZ
+    cal !render_game_arrow
+    jmp !code_breaker_game_loop
 ;------------------------------------------
 
 !check_player_code
@@ -466,39 +461,39 @@ set rE, rZ   ; Timer Buffer Index  (DONT TOUCH)
     str [LCD_CURSOR_Y], rA
     set rA, rZ
 
-    !check_player_code_loop
-        lod rB, [rA + !SECRET_CODE ]
-        lod rC, [rA + !PLAYER_GUESSES ]
+!check_player_code_loop
+    lod rB, [rA + !SECRET_CODE ]
+    lod rC, [rA + !PLAYER_GUESSES ]
 
-        cmp rB, rC
+    cmp rB, rC
 
-        jne !set_sprite_wrong
-        set rB, CHECK_SPRITE
-        inc rD
-        jmp !draw_result_sprite
+    jne !set_sprite_wrong
+    set rB, CHECK_SPRITE
+    inc rD
+    jmp !draw_result_sprite
 
-        !set_sprite_wrong
-            set rB, WRONG_SPRITE
-        !draw_result_sprite
-            set rC, rA
-            add rC, rC
-            add rC, 5
-            str [LCD_CURSOR_X], rC
-            str [LCD_CURSOR], rB
+!set_sprite_wrong
+    set rB, WRONG_SPRITE
+!draw_result_sprite
+    set rC, rA
+    add rC, rC
+    add rC, 5
+    str [LCD_CURSOR_X], rC
+    str [LCD_CURSOR], rB
 
-        inc rA
-        cmp rA, 5
-        je !end_player_check
-        jmp !check_player_code_loop
+    inc rA
+    cmp rA, 5
+    je !end_player_check
+    jmp !check_player_code_loop
 
-    !end_player_check
+!end_player_check
     cmp rD, 5
     jne !its_wrong
 
     cal !generate_new_secret_code
     jmp !return_from_check
 
-    !its_wrong
+!its_wrong
     set rB, 400
     bts rB, 15
     str [BUZZER_LEFT], rB
@@ -511,7 +506,8 @@ set rE, rZ   ; Timer Buffer Index  (DONT TOUCH)
     set rB, 2000
     cal !wait_rB
     str [BUZZER_LEFT], rZ
-    !return_from_check
+
+!return_from_check
     pop rD
     pop rA
     pop rB
@@ -523,14 +519,14 @@ set rE, rZ   ; Timer Buffer Index  (DONT TOUCH)
     psh rB
     psh rC
 
-    ; This is how we increase the speed of the timer
+; This is how we increase the speed of the timer
     lod rB, [BUFFER_TIMER_THRESHOLD]
     cmp rB, 148 ; This value was calulated using python reaches max speed around score of 10
     jle !skip_arrow_subtraction
     sub rB, 100
     str [BUFFER_TIMER_THRESHOLD], rB
     
-    !skip_arrow_subtraction
+!skip_arrow_subtraction
     set rB, SOUND_F5
     str [BUZZER_LEFT], rB
     set rB, 1000
@@ -559,35 +555,36 @@ set rE, rZ   ; Timer Buffer Index  (DONT TOUCH)
     str [LCD_CURSOR_Y], rA
     str [LCD_CURSOR_X], rA
     set rA, 16
-    !clear_3rd_row
-        str [LCD_CURSOR], rZ
-        lup rA, !clear_3rd_row
+
+!clear_3rd_row
+    str [LCD_CURSOR], rZ
+    lup rA, !clear_3rd_row
     
 
     set rA, 1
     str [ARROW_LOCATION], rA
 
     set rA, rZ
-    !generate_new_secret_code_loop
+!generate_new_secret_code_loop
 
-        lod rB, [RAND]
-        lod rC, [SECRET_CODE_RANGE]
-        mod rB, rC 
-        cmp rB, rZ
-        jg !K
-        set rB, 1
-        !K 
-        cmp rB, rC
-        jl !M
-        set rB, rC
-        dec rB
-        !M
-        str [rA + !PLAYER_GUESSES], rZ ; clear old guess
-        str [rA + !SECRET_CODE], rB    ; put new secret code
+    lod rB, [RAND]
+    lod rC, [SECRET_CODE_RANGE]
+    mod rB, rC 
+    cmp rB, rZ
+    jg !K
+    set rB, 1
+!K 
+    cmp rB, rC
+    jl !M
+    set rB, rC
+    dec rB
+!M
+    str [rA + !PLAYER_GUESSES], rZ ; clear old guess
+    str [rA + !SECRET_CODE], rB    ; put new secret code
 
-        inc rA
-        cmp rA, 5
-        jne !generate_new_secret_code_loop
+    inc rA
+    cmp rA, 5
+    jne !generate_new_secret_code_loop
     
     lod rA, [PLAYER_SCORE]
     inc rA

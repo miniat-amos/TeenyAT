@@ -1,6 +1,12 @@
-.const RAND 0x8010
-.const RAND_BITS 0x8011
+; TeenyAT Constants
+.const PORT_A_DIR   0x8000
+.const PORT_B_DIR   0x8001
+.const PORT_A       0x8002
+.const PORT_B       0x8003
+.const RAND         0x8010
+.const RAND_BITS    0x8011
 
+; LCD Peripherals
 .const LIVESCREEN 0x9000
 .const UPDATESCREEN 0xA000
 .const X1 0xD000
@@ -17,53 +23,55 @@
 .const POINT 0xE012
 .const MOUSEX 0xFFFC
 .const MOUSEY 0xFFFD
-.const MOUSEB 0xFFFB
 .const TERM 0xFFFF
 .const KEY 0xFFFE
 
+
 .const MOUSE_LEFT 1
 .const MOUSE_RIGHT 2
- 
+
 .const MUTATEAMT 50
 .const COLORAMT 50
-
-SET rD, 0
-!main
-    LOD rA, [MOUSEX]
-    LOD rB, [MOUSEY]
-    LOD rC, [MOUSEB]
-
-    CMP rC, MOUSE_LEFT ; left down
-    JE !changecolor_and_paint
-
-    CMP rC, MOUSE_RIGHT ; middle down
-    JE !mutate
-
-    JMP !main
     
+!main
+; load into registers the state of the mouse
+    lod rA, [MOUSEX]        
+    lod rB, [MOUSEY]
+    lod rC, [MOUSEB]
+
+    cmp rC, MOUSE_LEFT          ; left mouse button is down
+    je !changecolor_and_paint
+
+    cmp rC, MOUSE_RIGHT         ; middle mouse button is down
+    je !mutate
+
+    jmp !main
+;---------------------------------
+; change color of and draw it at the mouse   
 !changecolor_and_paint
-    ADD rD, COLORAMT
+    add rD, COLORAMT
     STR [X1], rA
     STR [Y1], rB
     STR [STROKE], rD
     STR [POINT], rZ
     STR [UPDATE], rZ
-    JMP !main
+    jmp !main
 
+
+; increment the color of all the pixles by MUTATEAMT 
 !mutate
-    SET rA, 0
-    !loop
-        LOD rC, [MOUSEB]
-        CMP rC, MOUSE_RIGHT 
-        JNE !main
-        
-        LOD rE, [rA + UPDATESCREEN]
-        ADD rE, MUTATEAMT
-        STR [rA + UPDATESCREEN], rE
-        INC rA
-        CMP rA, 0x1000
-        JG !end
-        JMP !loop
-    !end
-        STR [UPDATE],rZ
-        JMP !main
+    set rA, 0
+!loop
+    lod rC, [MOUSEB]
+    cmp rC, MOUSE_RIGHT 
+    jne !main    
+    lod rE, [rA + UPDATESCREEN]
+    add rE, MUTATEAMT
+    STR [rA + UPDATESCREEN], rE
+    INC rA
+    cmp rA, 0x1000
+    jg !end
+    jmp !loop
+!end
+    STR [UPDATE],rZ
+    jmp !main

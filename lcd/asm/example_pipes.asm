@@ -1,6 +1,12 @@
-.const RAND 0x8010
-.const RAND_BITS 0x8011
+; TeenyAT Constants
+.const PORT_A_DIR   0x8000
+.const PORT_B_DIR   0x8001
+.const PORT_A       0x8002
+.const PORT_B       0x8003
+.const RAND         0x8010
+.const RAND_BITS    0x8011
 
+; LCD Peripherals
 .const LIVESCREEN 0x9000
 .const UPDATESCREEN 0xA000
 .const X1 0xD000
@@ -23,67 +29,67 @@
 .const AMT 17
 
 !main
+; set the random end of a nonexistent previous line
+    cal !rand_rA_-10...+10
+    str [X2], rA
+    cal !rand_rA_-10...+10
+    str [Y2], rA
 
-    ;; Set the random end of a nonexistent previous line
-    CAL !rand_rA_-10...+10
-    STR [X2], rA
-    CAL !rand_rA_-10...+10
-    STR [Y2], rA
-
-    XOR rC, rC   ; start with color 0
+    xor rC, rC   ; start with color 0
 
 !next_line
-    ;; make the previous end of line the start of the next line
-    LOD rA, [X2]
-    STR [X1], rA
-    LOD rA, [Y2]
-    STR [Y1], rA
+; make the previous end of line the start of the next line
+    lod rA, [X2]
+    str [X1], rA
+    lod rA, [Y2]
+    str [Y1], rA
 
-    ;; new random end point
-    CAL !rand_rA_-10...+10
-    LOD rB, [X2]
-    ADD rA, rB
+; new random end point
+    cal !rand_rA_-10...+10
+    lod rB, [X2]
+    add rA, rB
 
-    CMP rA, 0
-    JGE !x>=0
-    SET rA, 0
+    cmp rA, 0
+    jge !x>=0
+    set rA, 0
+
 !x>=0
-
-    CMP rA, 63
-    JLE !x<=63
-    SET rA, 63
+    cmp rA, 63
+    jle !x<=63
+    set rA, 63
+    
 !x<=63
+    str [X2], rA
 
-    STR [X2], rA
+    cal !rand_rA_-10...+10
+    lod rB, [Y2]
+    add rA, rB
 
-    CAL !rand_rA_-10...+10
-    LOD rB, [Y2]
-    ADD rA, rB
+    cmp rA, 0
+    jge !y>=0
+    set rA, 0
 
-    CMP rA, 0
-    JGE !y>=0
-    SET rA, 0
 !y>=0
+    cmp rA, 63
+    jle !y<=63
+    set rA, 63
 
-    CMP rA, 63
-    JLE !y<=63
-    SET rA, 63
 !y<=63
+    str [Y2], rA
 
-    STR [Y2], rA
+; set color and draw the line
+    str [STROKE], rC
+    str [LINE], rZ
+    str [UPDATE], rZ
 
-    ;; set color and draw the line
-    STR [STROKE], rC
-    STR [LINE], rZ
-    STR [UPDATE], rZ
-
-    ADD rC, AMT   ; go to next color
-    JMP !next_line
+    add rC, AMT   ; go to next color
+    jmp !next_line
 
 ;--------------------
-
+; generates a random number between -10 and 10
+; stores the value in rA
 !rand_rA_-10...+10
-    LOD rA, [RAND]
-    MOD rA, 21
+    lod rA, [RAND]
+    mod rA, 21
     sub rA, 10
-    RET
+    ret

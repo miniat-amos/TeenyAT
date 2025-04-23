@@ -37,7 +37,7 @@
 !init
     str [PORT_A_DIR], rZ    ; set port A to output
     str [PORT_B_DIR], rZ    ; set port B to output 
-    ;  Print out info to lcd screen
+;  Print out info to lcd screen
     set rB, !use_faders_str  
     cal !print_string_rB
     set rB, 0x0001
@@ -66,20 +66,20 @@
     psh rB
     psh rA
 
-    !print_string_rB_loop
-        lod rA, [rB]
-        cmp rA, rZ
-        je !print_string_rB_terminated
+!print_string_rB_loop
+    lod rA, [rB]
+    cmp rA, rZ
+    je !print_string_rB_terminated
 
-        str [LCD_CURSOR], rA
-        inc rB
-        jmp !print_string_rB_loop
+    str [LCD_CURSOR], rA
+    inc rB
+    jmp !print_string_rB_loop
 
-    !print_string_rB_terminated
-        pop rA
-        pop rB
+!print_string_rB_terminated
+    pop rA
+    pop rB
 
-     ret
+    ret
 ;------------- DATA SECTION ---------------------
 !use_faders_str
 .raw 'U' 's' 'e'  ' ' 'f' 'a' 'd' 'e' 'r' 's' 0

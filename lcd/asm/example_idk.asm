@@ -1,6 +1,12 @@
-.const RAND 0x8010
-.const RAND_BITS 0x8011
+; TeenyAT Constants
+.const PORT_A_DIR   0x8000
+.const PORT_B_DIR   0x8001
+.const PORT_A       0x8002
+.const PORT_B       0x8003
+.const RAND         0x8010
+.const RAND_BITS    0x8011
 
+; LCD Peripherals
 .const LIVESCREEN 0x9000
 .const UPDATESCREEN 0xA000
 .const X1 0xD000
@@ -17,74 +23,73 @@
 .const POINT 0xE012
 .const MOUSEX 0xFFFC
 .const MOUSEY 0xFFFD
-.const MOUSEB 0xFFFB
 .const TERM 0xFFFF
 .const KEY 0xFFFE
 
 .const COLORAMT 50
 .const  MOVEAMT 1
 
-SET rE, 0
+
 !main
-   CAL !init
-   CAL !across
-   CAL !down
-   JMP !main
+   cal !init
+   cal !across
+   cal !down
+   jmp !main
 
 !init
-    SET rA, 0
-    SET rB, 0
-    SET rC, 63
-    SET rD, 63
-    STR [X1], rA
-    STR [Y1], rB
-    STR [X2], rC
-    STR [Y2], rD
-    STR [STROKE], rE
-    STR [LINE],rZ
-    STR [UPDATE], rZ
-    RET
+    set rA, 0
+    set rB, 0
+    set rC, 63
+    set rD, 63
+    str [X1], rA
+    str [Y1], rB
+    str [X2], rC
+    str [Y2], rD
+    str [STROKE], rE
+    str [LINE],rZ
+    str [UPDATE], rZ
+    ret
     
 !down 
-    ADD rB, MOVEAMT
+    add rB, MOVEAMT
     cmp rB, 64
-    JGE !return
+    jge !return
 
-    STR [X1], rA
-    STR [Y1], rB
+    str [X1], rA
+    str [Y1], rB
 
-    NEG rB
+    neg rB
     
-    STR [X2], rC
-    STR [Y2], rB
-    STR [LINE], rZ
-    STR [UPDATE], rZ
+    str [X2], rC
+    str [Y2], rB
+    str [LINE], rZ
+    str [UPDATE], rZ
 
-    NEG rB
+    neg rB
 
-    JMP !down
+    jmp !down
 
 
 !across
-    ADD rA, MOVEAMT
+    add rA, MOVEAMT
     cmp rA, 64
-    JGE !return
+    jge !return
 
-    STR [X1], rA
-    STR [Y1], rZ
+    str [X1], rA
+    str [Y1], rZ
 
-    NEG rA
+    neg rA
     
-    STR [X2], rA
-    STR [Y2], rD
-    STR [LINE], rZ
-    STR [UPDATE], rZ
+    str [X2], rA
+    str [Y2], rD
+    str [LINE], rZ
+    str [UPDATE], rZ
     
-    NEG rA
+    neg rA
 
-    JMP !across
+    jmp !across
 
 !return
-    ADD rE, COLORAMT
-    STR [STROKE], rE   
-    RET 
+    add rE, COLORAMT
+    str [STROKE], rE   
+    ret 

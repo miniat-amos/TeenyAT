@@ -1,6 +1,12 @@
-.const RAND 0x8010
-.const RAND_BITS 0x8011
+; TeenyAT Constants
+.const PORT_A_DIR   0x8000
+.const PORT_B_DIR   0x8001
+.const PORT_A       0x8002
+.const PORT_B       0x8003
+.const RAND         0x8010
+.const RAND_BITS    0x8011
 
+; LCD Peripherals
 .const LIVESCREEN 0x9000
 .const UPDATESCREEN 0xA000
 .const X1 0xD000
@@ -20,27 +26,31 @@
 .const TERM 0xFFFF
 .const KEY 0xFFFE
 
-.const AMT 100
+.const AMT 100          ; the amount of times we draw a random point
 
 !main
-    SET rD, rZ
-    STR [UPDATE], rZ
+    set rD, rZ          
+    str [UPDATE], rZ    ; swap lcd texture buffers
 !loop
-    ; get random x and y values
-    LOD rA, [RAND_BITS]
-    MOD rA, 64
-    LOD rB, [RAND_BITS]
-    MOD rB, 64
-    ; get random color value
-    LOD rC, [RAND]
-    STR [STROKE], rC
 
-    STR [X1], rA
-    STR [Y1], rB
-    STR [POINT], rZ
+    lod rA, [RAND_BITS] ; get random x value
+    mod rA, 64          ; modulus to keep in range
 
-    INC rD
-    CMP rD, AMT
-    JGE !main
-    JMP !loop
+    lod rB, [RAND_BITS] ; get random y value
+    mod rB, 64          ; modulus to keep in range
+
+    
+    lod rC, [RAND]      ; get random color value
+    str [STROKE], rC    ; store value to stroke address
+
+    str [X1], rA        ; store into random value into X1 address
+    str [Y1], rB        ; store into random value into Y1 address
+    str [POINT], rZ     ; blit our point to lcd screen
+
+    inc rD              ; increment our counter
+
+    cmp rD, AMT         ; jump to main if rD is greater than amount
+    jge !main
+
+    jmp !loop
     

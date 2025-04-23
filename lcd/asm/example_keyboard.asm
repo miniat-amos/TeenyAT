@@ -1,6 +1,12 @@
-.const RAND 0x8010
-.const RAND_BITS 0x8011
+; TeenyAT Constants
+.const PORT_A_DIR   0x8000
+.const PORT_B_DIR   0x8001
+.const PORT_A       0x8002
+.const PORT_B       0x8003
+.const RAND         0x8010
+.const RAND_BITS    0x8011
 
+; LCD Peripherals
 .const LIVESCREEN 0x9000
 .const UPDATESCREEN 0xA000
 .const X1 0xD000
@@ -17,7 +23,6 @@
 .const POINT 0xE012
 .const MOUSEX 0xFFFC
 .const MOUSEY 0xFFFD
-.const MOUSEB 0xFFFB
 .const TERM 0xFFFF
 .const KEY 0xFFFE
 
@@ -27,57 +32,58 @@
 ; rB = Y
 ; rC = KEY_HIT
 
-set rA, 20
-set rB, 20
-set rC, 0
-
 !main
-    LOD rD, [KEY]
+    set rA, 20
+    set rB, 20
+    set rC, 0
+
+!main_loop
+    lod rD, [KEY]            ; load in keyboard input
   
-    ; Player Movement
-    CMP rD, 'W'
-    JE !UP
+; player movement code
+    cmp rD, 'W'
+    je !UP
 
-    CMP rD, 'S'
-    JE !DOWN
+    cmp rD, 'S'
+    je !DOWN
 
-    CMP rD, 'A'
-    JE !LEFT
+    cmp rD, 'A'
+    je !LEFT
 
-    CMP rD, 'D'
-    JE !RIGHT
+    cmp rD, 'D'
+    je !RIGHT
 
-    !end_movement
-        ADD rE, COLORAMT
+!end_movement
+    add rE, COLORAMT
 
-    STR [X1], rA
-    STR [Y1], rB
-    STR [STROKE], rE
-    STR [POINT], rZ
-    STR [UPDATE], rZ
+    str [X1], rA
+    str [Y1], rB
+    str [STROKE], rE
+    str [POINT], rZ
+    str [UPDATE], rZ
 
-    JMP !main
-
+    jmp !main_loop
+;-----------------------------
 !UP
-    CMP rB, 0
-    JLE !end_movement
-    DEC rB
-    JMP !end_movement
+    cmp rB, 0
+    jle !end_movement
+    dec rB
+    jmp !end_movement
 
 !DOWN
-    CMP rB, 63 ; the lowest point
-    JGE !end_movement
-    INC rB
-    JMP !end_movement
+    cmp rB, 63              ; the highest possible y value
+    jge !end_movement
+    inc rB
+    jmp !end_movement
 
 !LEFT
-    CMP rA, 0
-    JLE !end_movement
-    DEC rA
-    JMP !end_movement
+    cmp rA, 0
+    jle !end_movement
+    dec rA
+    jmp !end_movement
 
 !RIGHT
-    CMP rA, 63
-    JGE !end_movement
-    INC rA
-    JMP !end_movement
+    cmp rA, 63              ; the highest possible x value
+    jge !end_movement
+    inc rA
+    jmp !end_movement
