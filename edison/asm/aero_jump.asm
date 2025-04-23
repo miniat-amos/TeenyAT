@@ -91,7 +91,7 @@ jmp !main
 .var score              0               ; a score to add fun, make sure port b is in decimal mode
 
 !lives_string
-    "Lives: "
+.raw "Lives: "
 
 !main
     set rA, 0xFFFF
