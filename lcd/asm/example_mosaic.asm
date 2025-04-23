@@ -26,6 +26,7 @@
 .const POINT 0xE012
 .const MOUSEX 0xFFFC
 .const MOUSEY 0xFFFD
+.const MOUSEB 0xFFFB
 .const TERM 0xFFFF
 .const KEY 0xFFFE
 
