@@ -51,14 +51,13 @@
 ; change color of and draw it at the mouse   
 !changecolor_and_paint
     add rD, COLORAMT
-    STR [X1], rA
-    STR [Y1], rB
-    STR [STROKE], rD
-    STR [POINT], rZ
-    STR [UPDATE], rZ
+    str [X1], rA
+    str [Y1], rB
+    str [STROKE], rD
+    str [POINT], rZ
+    str [UPDATE], rZ
     jmp !main
-
-
+;---------------------------------
 ; increment the color of all the pixles by MUTATEAMT 
 !mutate
     set rA, 0
@@ -68,11 +67,11 @@
     jne !main    
     lod rE, [rA + UPDATESCREEN]
     add rE, MUTATEAMT
-    STR [rA + UPDATESCREEN], rE
-    INC rA
+    str [rA + UPDATESCREEN], rE
+    inc rA
     cmp rA, 0x1000
     jg !end
     jmp !loop
 !end
-    STR [UPDATE],rZ
+    str [UPDATE],rZ
     jmp !main
