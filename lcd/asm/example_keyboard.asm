@@ -64,6 +64,7 @@
     str [UPDATE], rZ
 
     jmp !main_loop
+
 ;-----------------------------
 !UP
     cmp rB, 0
@@ -71,18 +72,21 @@
     dec rB
     jmp !end_movement
 
+;-----------------------------
 !DOWN
     cmp rB, 63              ; the highest possible y value
     jge !end_movement
     inc rB
     jmp !end_movement
 
+;-----------------------------
 !LEFT
     cmp rA, 0
     jle !end_movement
     dec rA
     jmp !end_movement
 
+;-----------------------------
 !RIGHT
     cmp rA, 63              ; the highest possible x value
     jge !end_movement

@@ -61,6 +61,7 @@
     cal !update_snow                ; move white pixels down the screen
     str [UPDATE], rZ
     jmp !main_loop
+
 ;-------------------------------------
 ; draw a random white pixel along the top edge of the screen
 !gen_snow
@@ -73,6 +74,7 @@
     str [Y1], rZ
     str [POINT], rZ
     ret
+
 ;-------------------------------------
 !update_snow
     set rA, 0x1000                  ; have rA start at the bottom of the screen
@@ -150,6 +152,7 @@
     je !snow_shimmy_return
     inc rC
     jmp !snow_shimmy_fail
+
 ;-------------------------------------      
 !set_light_yellow
     set rD, YELLOW

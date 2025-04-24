@@ -47,6 +47,7 @@
     je !mutate
 
     jmp !main
+
 ;---------------------------------
 ; change color of and draw it at the mouse   
 !changecolor_and_paint
@@ -57,6 +58,7 @@
     str [POINT], rZ
     str [UPDATE], rZ
     jmp !main
+
 ;---------------------------------
 ; increment the color of all the pixles by MUTATEAMT 
 !mutate

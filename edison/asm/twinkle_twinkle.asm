@@ -92,7 +92,7 @@
     !end
     jmp !end
 
-; ------------------------------------------
+;------------------------------------------
 ; Play "Twinkle Twinkle Little Star"
 ; Structure: 6 Phrases
 !play_twinkle
@@ -104,7 +104,7 @@
     cal !phrase6    ; "How I wonder what you are"
     ret
 
-; ------------------------------------------
+;------------------------------------------
 ; Phrase 1: "Twinkle, twinkle, little star" 
 ; Notes: C, C, G, G, A, A, G 
 !phrase1
@@ -137,7 +137,7 @@
     cal !delay_half
     ret
 
-; ------------------------------------------
+;------------------------------------------
 ; Phrase 2: "How I wonder what you are" 
 ; Notes: F, F, E, E, D, D, C 
 !phrase2
@@ -170,7 +170,7 @@
     cal !delay_half
     ret
 
-; ------------------------------------------
+;------------------------------------------
 ; Phrase 3: "Up above the world so high" 
 ; Notes: G, G, F, F, E, E, D 
 !phrase3
@@ -203,7 +203,7 @@
     cal !delay_half
     ret
 
-; ------------------------------------------
+;------------------------------------------
 ; Phrase 4: "Like a diamond in the sky" 
 ; Notes: G, G, F, F, E, E, D 
 !phrase4
@@ -236,7 +236,7 @@
     cal !delay_half
     ret
 
-; ------------------------------------------
+;------------------------------------------
 ; Phrase 5: Repeat Phrase 1
 !phrase5
     set rA, SOUND_C4
@@ -268,7 +268,7 @@
     cal !delay_half
     ret
 
-; ------------------------------------------
+;------------------------------------------
 ; Phrase 6: Repeat Phrase 2
 !phrase6
     set rA, SOUND_F4
@@ -300,7 +300,7 @@
     cal !delay_half
     ret
 
-; -----------------------------------------
+;-----------------------------------------
 ; Delay Routine: Quarter Note
 !delay_quarter
     set rD, DELAY_QUARTER
@@ -313,7 +313,7 @@
     set rE, 0
     ret
 
-; -----------------------------------------
+;-----------------------------------------
 ; Delay Routine: Half Note
 !delay_half
     set rD, DELAY_HALF
@@ -326,7 +326,7 @@
     set rE, 0
     ret
 
-; ------------------------------------------
+;------------------------------------------
 ; Print String Routine
 !print_string_rB
     psh rB
