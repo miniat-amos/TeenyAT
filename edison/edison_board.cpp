@@ -100,6 +100,7 @@ int initialize_board(){
 
     window = tigrWindow(background_img->w, background_img->h, "Edison Board", TIGR_FIXED);
     
+    segment_dips.u = 0x0100;        // make port B dip switch init to decimal mode
     reset_board();
 
     return EXIT_SUCCESS;
