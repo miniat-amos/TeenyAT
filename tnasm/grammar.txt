@@ -71,7 +71,7 @@ code_10_line ::= code_10_inst register_and_immediate.
 code_11_line ::= code_11_inst immediate.
 code_12_line ::= code_12_inst.
 code_13_line ::= code_13_inst REGISTER.
-code_14_line ::= code_14_inst REGISTER plus_or_minus immediate.
+code_14_line ::= code_14_inst register_and_immediate.
 code_15_line ::= code_15_inst immediate.
 
 code_1_inst ::= ADD.

@@ -53,6 +53,7 @@
     rOt rB, !early ;2
 
     JMP PC - 4
+    JMP -4 + PC
     STR [aero], r6
     DLy r3 + 5
     DLy r5
