@@ -83,7 +83,7 @@
     str [BUZZER_RIGHT], rZ
     str [BUZZER_LEFT], rZ
 
-    !end
+!end
     jmp !end
 
 ; ------------------------------------------

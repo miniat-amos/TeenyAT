@@ -1,6 +1,12 @@
-.const RAND 0x8010
-.const RAND_BITS 0x8011
+; TeenyAT Constants
+.const PORT_A_DIR   0x8000
+.const PORT_B_DIR   0x8001
+.const PORT_A       0x8002
+.const PORT_B       0x8003
+.const RAND         0x8010
+.const RAND_BITS    0x8011
 
+; LCD Peripherals
 .const LIVESCREEN 0x9000
 .const UPDATESCREEN 0xA000
 .const X1 0xD000
@@ -17,6 +23,7 @@
 .const POINT 0xE012
 .const MOUSEX 0xFFFC
 .const MOUSEY 0xFFFD
+.const MOUSEB 0xFFFB
 .const TERM 0xFFFF
 .const KEY 0xFFFE
 
@@ -24,46 +31,46 @@
 .const SLOWDOWN 750
 
 !main
-    SET rA, 63
-    SET rB, rZ
-    SET rC, 0
-    SET rD, 0
-    SET rE, 0  ; color of our lines
+    set rA, 63
+    set rB, rZ
+    set rC, 0
+    set rD, 0
+    set rE, 0           ; color of our lines
 
 !down
-    STR [X1], rA
-    STR [Y1], rB
-    STR [X2], rC
-    STR [Y2], rB
-    STR [STROKE], rE
-    STR [LINE], rA
+    str [X1], rA
+    str [Y1], rB
+    str [X2], rC
+    str [Y2], rB
+    str [STROKE], rE
+    str [LINE], rA      ; blit line to update buffer
 
-    ADD rE, AMT
-    ADD rB, 2
-    DLY SLOWDOWN
-    CMP rB, 64
-    JNE !down
+    add rE, AMT
+    add rB, 2
+    dly SLOWDOWN        ; delay SLOWDOWN amount of cycles
+    cmp rB, 64
+    jne !down
 
-    DEC rB
+    dec rB
 
 !up
-    STR [X1], rA
-    STR [Y1], rB
-    STR [X2], rC
-    STR [Y2], rB
-    STR [STROKE], rE
-    STR [LINE], rA
+    str [X1], rA
+    str [Y1], rB
+    str [X2], rC
+    str [Y2], rB
+    str [STROKE], rE
+    str [LINE], rA
 
-    ADD rE, AMT
-    SUB rB, 2
-    DLY SLOWDOWN
-    CMP rB, 0
-    JGE !up
+    add rE, AMT
+    sub rB, 2
+    dly SLOWDOWN        ; delay SLOWDOWN amount of cycles
+    cmp rB, 0
+    jge !up
 
 !again
-    STR [UPDATE], rZ
+    str [UPDATE], rZ    ; swap buffers
 
-    SET rC, 0
-    SET rB, 0
-    JMP !down
+    set rC, 0
+    set rB, 0
+    jmp !down
 

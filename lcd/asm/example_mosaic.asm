@@ -1,9 +1,15 @@
 ; Hit key A to draw new mosaic
 ; Hit key S to mutate mosaic
 
-.const RAND 0x8010
-.const RAND_BITS 0x8011
+; TeenyAT Constants
+.const PORT_A_DIR   0x8000
+.const PORT_B_DIR   0x8001
+.const PORT_A       0x8002
+.const PORT_B       0x8003
+.const RAND         0x8010
+.const RAND_BITS    0x8011
 
+; LCD Peripherals
 .const LIVESCREEN 0x9000
 .const UPDATESCREEN 0xA000
 .const X1 0xD000
@@ -28,60 +34,63 @@
 .const COLORAMT 50
 .const AMT 100
 
-jmp !loop
 !main
-    SET rD, rZ
-    STR [UPDATE], rZ
-    !key_loop
-    LOD rA, [KEY]
-    CMP rA, 65 ; A KEY
-    JE !loop
-    CMP rA, 83 ; S Key 
-    JE !mutate
-    JMP !main
-!loop
-    ; get random x1 and y1 values
-    LOD rA, [RAND_BITS]
-    MOD rA, 64
-    LOD rB, [RAND_BITS]
-    MOD rB, 64
-    ; get random color valye
-    LOD rC, [RAND]
-    STR [STROKE], rC
+    jmp !draw_loop
 
+!main_loop
+    set rD, rZ
+    str [UPDATE], rZ
 
-    STR [X1], rA
-    STR [Y1], rB
+!key_loop
+    lod rA, [KEY]
+    cmp rA, 'A'                      ; 'A' key is pressed
+    je !draw_loop
+    cmp rA, 'S'                      ; 'S' key is pressed
+    je !mutate
+    jmp !main_loop
 
-     ; get random x1 and y1 values
-    LOD rA, [RAND_BITS]
-    MOD rA, 64
-    LOD rB, [RAND_BITS]
-    MOD rB, 64
-    ; get random color valye
-    LOD rC, [RAND]
-    STR [FILL], rC
+!draw_loop
+; get random x1 and y1 values keeping in bounds
+    lod rA, [RAND_BITS]
+    mod rA, 64
+    lod rB, [RAND_BITS]
+    mod rB, 64
+    lod rC, [RAND]                   ; get random stroke color
+    str [STROKE], rC
 
+    str [X1], rA
+    str [Y1], rB
 
-    STR [X2], rA
-    STR [Y2], rB
-    STR [RECT], rZ
-    INC rD
-    CMP rD, AMT
-    JGE !main  
-    JMP !loop
+; get random x2 and y2 values in bounds
+    lod rA, [RAND_BITS]
+    mod rA, 64
+    lod rB, [RAND_BITS]
+    mod rB, 64
 
+    lod rC, [RAND]                   ; get random fill color 
+    str [FILL], rC
 
+    str [X2], rA
+    str [Y2], rB
+    str [RECT], rZ                   ; blit rectangle to update buffer
+
+    inc rD
+    cmp rD, AMT
+    jge !main_loop  
+
+    jmp !draw_loop
+
+; increment the color of all the pixles MUTATEAMT
 !mutate
-    SET rA, 0
-    !mutate_loop
-        LOD rE, [rA + UPDATESCREEN]
-        ADD rE, MUTATEAMT
-        STR [rA + UPDATESCREEN], rE
-        INC rA
-        CMP rA, 0x1000
-        JG !end_mutate
-        JMP !mutate_loop
-    !end_mutate
-        STR [UPDATE],rZ
-        JMP !main
+    set rA, 0
+!mutate_loop
+    lod rE, [rA + UPDATESCREEN]
+    add rE, MUTATEAMT
+    str [rA + UPDATESCREEN], rE
+    inc rA
+    cmp rA, 0x1000
+    jg !end_mutate
+    jmp !mutate_loop
+!end_mutate
+    str [UPDATE],rZ
+    jmp !main_loop

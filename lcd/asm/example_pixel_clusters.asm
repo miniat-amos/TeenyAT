@@ -1,6 +1,12 @@
-.const RAND 0x8010
-.const RAND_BITS 0x8011
+; TeenyAT Constants
+.const PORT_A_DIR   0x8000
+.const PORT_B_DIR   0x8001
+.const PORT_A       0x8002
+.const PORT_B       0x8003
+.const RAND         0x8010
+.const RAND_BITS    0x8011
 
+; LCD Peripherals
 .const LIVESCREEN 0x9000
 .const UPDATESCREEN 0xA000
 .const X1 0xD000
@@ -17,33 +23,29 @@
 .const POINT 0xE012
 .const MOUSEX 0xFFFC
 .const MOUSEY 0xFFFD
-.const MOUSEB 0xFFFB
 .const TERM 0xFFFF
 .const KEY 0xFFFE
 
 .const AMT 50
 
-!main 
-    SET rA, rZ 
-    SET rB, rZ 
-    SET rC, rZ 
-    SET rD, rZ
-!loop 
+!main
 
-    STR [rC + UPDATESCREEN], rA 
+    str [rC + UPDATESCREEN], rA     ; put color rA into update buffer
 
-    INC rC 
-    INC rD
-    MOD rD, 4
+    inc rC                          ; change which pixle were looking at 
 
-    CMP rC, 0x1000 
-    JE !end 
+    inc rD                          ; add one to rD and modulus by 4
+    mod rD, 4
 
-    CMP rD,0
-    JNE !loop
-    ADD rA, AMT 
+    cmp rC, 0x1000                  ; check if we've reached the max update screen address
+    je !end_loop                    ; if we have end update 
 
-    JMP !loop 
+    cmp rD, 0                 
+    jne !main
 
-!end 
-STR [UPDATE], rZ 
+    add rA, AMT                     ; increment color value by amount 
+
+    jmp !main 
+
+!end_loop 
+    str [UPDATE], rZ                ; update our buffer

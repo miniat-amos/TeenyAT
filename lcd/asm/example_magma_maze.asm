@@ -1,6 +1,12 @@
-.const RAND 0x8010
-.const RAND_BITS 0x8011
+; TeenyAT Constants
+.const PORT_A_DIR   0x8000
+.const PORT_B_DIR   0x8001
+.const PORT_A       0x8002
+.const PORT_B       0x8003
+.const RAND         0x8010
+.const RAND_BITS    0x8011
 
+; LCD Peripherals
 .const LIVESCREEN 0x9000
 .const UPDATESCREEN 0xA000
 .const X1 0xD000
@@ -17,6 +23,7 @@
 .const POINT 0xE012
 .const MOUSEX 0xFFFC
 .const MOUSEY 0xFFFD
+.const MOUSEB 0xFFFB
 .const TERM 0xFFFF
 .const KEY 0xFFFE
 
@@ -44,7 +51,7 @@
     STR [STROKE], rZ
     STR [RECT], rZ
 
-    LOD rA, [LIVESCREEN]
+    lod rA, [LIVESCREEN]
 
     STR [STROKE], rZ
 
@@ -71,9 +78,9 @@
     MPY rA, rB
 
     ; randomly choose forward vs back slash direction
-    LOD rB, [RAND]
+    lod rB, [RAND]
     AND rB, 0x0001
-    CMP rB, rZ
+    cmp rB, rZ
     JNE !forward_slash
 
 ;back_slash
@@ -129,28 +136,28 @@
     ADD rA, UPDATESCREEN
 
     ; checking the bottom right start pixel    
-    LOD rB, [rA]
-    CMP rB, MAZE_COLOR
+    lod rB, [rA]
+    cmp rB, MAZE_COLOR
     JNE  !continue_maze_pixel_scan
 
     ; check bottom left pixel
-    LOD rB, [rA - 1]
-    CMP rB, MAZE_COLOR
-;    JE  !wipe_4_block
+    lod rB, [rA - 1]
+    cmp rB, MAZE_COLOR
+;    je  !wipe_4_block
     JNE  !continue_maze_pixel_scan
 
 
 ;    ; check upper right pixel
-;    LOD rB, [rA - 64]
-;    CMP rB, MAZE_COLOR
+;    lod rB, [rA - 64]
+;    cmp rB, MAZE_COLOR
 ;    JNE  !continue_maze_pixel_scan
 
 !wipe_4_block
 
     ; only wipe with some probability so it looks more natural, 1:4 chance
-    LOD rB, [RAND]
+    lod rB, [RAND]
     AND rB, 0x1
-    CMP rB, rZ
+    cmp rB, rZ
     JNE !continue_maze_pixel_scan
     
     SET rC, DATABASE_FABULOUS
@@ -174,15 +181,15 @@
     SET rB, rA - 1
     ADD rB, UPDATESCREEN   
 
-    LOD rC, [rB]
+    lod rC, [rB]
 ;if_magma_to_glisten
-    CMP rC, DATABASE_FABULOUS
-    JE  !done_magma_to_glisten
-    CMP rC, BLACK
-    JE  !done_magma_to_glisten
+    cmp rC, DATABASE_FABULOUS
+    je  !done_magma_to_glisten
+    cmp rC, BLACK
+    je  !done_magma_to_glisten
 
     ; shift magma color a little
-    LOD rD, [RAND_BITS]
+    lod rD, [RAND_BITS]
     MOD rD, 48
     ADD rC, rD
     STR [rB], rC
@@ -199,10 +206,10 @@
     SET rA, rC - 1
     ADD rA, UPDATESCREEN
 
-    LOD rB, [RAND_BITS]
+    lod rB, [RAND_BITS]
     AND rB, 0x07FF
 ;if_create_rand_magma
-    CMP rB, rZ
+    cmp rB, rZ
     JNE !done_create_rand_magma
     STR [rA], rE
 !done_create_rand_magma
@@ -223,17 +230,17 @@
     ADD rB, UPDATESCREEN   
 
 ;if_pixel_is_magma
-    LOD rC, [rB]
-    CMP rC, DATABASE_FABULOUS
-    JE !done_pixel_is_magma
-    CMP rC, BLACK
-    JE !done_pixel_is_magma
+    lod rC, [rB]
+    cmp rC, DATABASE_FABULOUS
+    je !done_pixel_is_magma
+    cmp rC, BLACK
+    je !done_pixel_is_magma
 
 ; the pixel is magma
 
-    LOD rD, [RAND]
+    lod rD, [RAND]
     AND rD, 0x1
-    LOD rE, [RAND]
+    lod rE, [RAND]
     AND rE, 0x1
     ADD rD, rE
     DEC rD
@@ -243,10 +250,10 @@
     ;;; probabilities of {1,2,1}, respectively
     ;;;
 
-    CMP rD, -1
-    JE  !ooze_left
-    CMP rD, 1
-    JE  !ooze_right
+    cmp rD, -1
+    je  !ooze_left
+    cmp rD, 1
+    je  !ooze_right
 
 !ooze_down
     ADD rB, 64
@@ -260,14 +267,14 @@
     INC rB
 
 !try_oozed_magma
-    LOD rC, [rB]
-    CMP rC, BLACK
-    JE !done_pixel_is_magma
+    lod rC, [rB]
+    cmp rC, BLACK
+    je !done_pixel_is_magma
 
-    LOD rC, [RAND]
+    lod rC, [RAND]
 ;    AND rC, 0x11
     AND rC, 0x1
-    CMP rC, rZ
+    cmp rC, rZ
     JNE !done_pixel_is_magma
     SET rE, MAGMA
     STR [rB], rE

@@ -1,4 +1,4 @@
-;====================================
+; ====================================
 ; Color Picker example
 ;
 ; The TeenyAT LCD has a unique color system similar
@@ -8,9 +8,15 @@
 ; see all the LCD colors and use your mouse to find 
 ; out its integer value from the output on the terminal.
 
-.const RAND 0x8010
-.const RAND_BITS 0x8011
+; TeenyAT Constants
+.const PORT_A_DIR   0x8000
+.const PORT_B_DIR   0x8001
+.const PORT_A       0x8002
+.const PORT_B       0x8003
+.const RAND         0x8010
+.const RAND_BITS    0x8011
 
+; LCD Peripherals
 .const LIVESCREEN 0x9000
 .const UPDATESCREEN 0xA000
 .const X1 0xD000
@@ -31,31 +37,27 @@
 .const TERM 0xFFFF
 .const KEY 0xFFFE
 
-;;;
-;;; Draw all 4K colors on the screen
-;;;
 
-    SET rC, 4096           ; 64x64 = 4096
-    SET rA, UPDATESCREEN   ; address of next pixel
-    SET rB, rZ             ; which color index to render
+; draw all 4K colors on the screen
+!main
+    set rC, 4096           ; 64x64 = 4096
+    set rA, UPDATESCREEN   ; address of next pixel
+    set rB, rZ             ; which color index to render
 !draw_next_color
-    STR [rA], rB
-    INC rA
-    INC rB
-    LUP rC, !draw_next_color
+    str [rA], rB
+    inc rA
+    inc rB
+    lup rC, !draw_next_color
 
-    STR [UPDATE], rZ
+    str [UPDATE], rZ
 
-;;;
-;;; Show the color code under the mouse to the terminal
-;;;
-
+; show the color code under the mouse to the terminal
 !show_color
-    LOD rA, [MOUSEX]
-    LOD rB, [MOUSEY]
-    MPY rB, 64
-    ADD rB, rA + UPDATESCREEN
-    LOD rC, [rB]
-    STR [TERM], rC 
+    lod rA, [MOUSEX]
+    lod rB, [MOUSEY]
+    mpy rB, 64
+    add rB, rA + UPDATESCREEN
+    lod rC, [rB]
+    str [TERM], rC 
 
-    JMP !show_color
+    jmp !show_color

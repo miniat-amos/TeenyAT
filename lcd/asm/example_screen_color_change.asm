@@ -1,6 +1,12 @@
-.const RAND 0x8010
-.const RAND_BITS 0x8011
+; TeenyAT Constants
+.const PORT_A_DIR   0x8000
+.const PORT_B_DIR   0x8001
+.const PORT_A       0x8002
+.const PORT_B       0x8003
+.const RAND         0x8010
+.const RAND_BITS    0x8011
 
+; LCD Peripherals
 .const LIVESCREEN 0x9000
 .const UPDATESCREEN 0xA000
 .const X1 0xD000
@@ -21,15 +27,18 @@
 .const KEY 0xFFFE
 
 !main 
-    STR [X1], rZ
-    STR [Y1], rZ
-    SET rA, 63
-    STR [X2], rA
-    STR [Y2], rA
-    STR [DRAWSTROKE], rZ  ;no stroke
-!top
-    STR [FILL], rC
-    STR [RECT], rD
-    STR [UPDATE], SP
-    INC rC  
-    JMP !top
+    str [X1], rZ          ; store zero into X1 address
+    str [Y1], rZ          ; store zero into Y1 address
+
+    set rA, 63      
+    str [X2], rA          ; store rA into X2 address
+    str [Y2], rA          ; store rA into Y2 address
+
+    str [DRAWSTROKE], rZ  ; storing zero in to DRAWSTROKE means no stroke 
+
+!loop
+    str [FILL], rC        ; store rC to the FILL address
+    str [RECT], rZ        ; blit rectangle to update buffer
+    str [UPDATE], rZ      ; swap the display buffers
+    inc rC                ; increase color value by 1
+    jmp !loop

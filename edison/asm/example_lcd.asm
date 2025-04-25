@@ -43,7 +43,7 @@
 ; Either none or any combination of them can be toggled at a time       
 
 !reset
-set rA, FIRST_CHARACTER
+    set rA, FIRST_CHARACTER
 !main
     cmp rA, LAST_CHARACTER
     jg !reset
