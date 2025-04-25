@@ -572,6 +572,42 @@ shared_ptr <token> p_plus_or_minus() {
     return val;
 }
 
+typedef struct reg_and_immed reg_and_immed;
+
+struct reg_and_immed {
+    tny_uword reg;
+    tny_word immed;
+};
+
+/*
+ * register_and_immedite ::= REGISTER plus_or_minus immediate.
+ * register_and_immedite ::= immediate PLUS REGISTER.
+ */
+shared_ptr <reg_and_immed> p_register_and_immediate() {
+    shared_ptr <reg_and_immed> result = nullptr;
+    shared_ptr <token> reg, sign = nullptr;
+    shared_ptr <tny_word> immed;
+    int save = tnext;
+    if(
+        (tnext = save, 
+         (reg = term(T_REGISTER)) && (sign = p_plus_or_minus()) &&
+         (immed = p_immediate()))
+        ||
+        (tnext = save,
+         (immed = p_immediate()) && term(T_PLUS) && (reg = term(T_REGISTER)))
+    ) {
+        // OK... what do I do???
+        result = make_shared<reg_and_immed>();
+        result->immed = *immed;
+        if(sign && sign->id == T_MINUS) {
+            result->immed.s *= -1;
+        }
+        result->reg = reg->value.u;
+    }
+
+    return result;
+}
+
 bool is_teeny(tny_sword n) {
     tny_word small;
     small.instruction.immed4 = n;

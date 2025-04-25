@@ -52,6 +52,9 @@ number ::= plus_or_minus NUMBER.
 plus_or_minus ::= PLUS.
 plus_or_minus ::= MINUS.
 
+register_and_immedite ::= REGISTER plus_or_minus immediate.
+register_and_immedite ::= immediate PLUS REGISTER.
+
 code_1_line ::= code_1_inst REGISTER COMMA REGISTER.
 code_1_line ::= code_1_mem_inst REGISTER COMMA LBRACKET REGISTER RBRACKET.
 code_2_line ::= code_2_inst REGISTER COMMA REGISTER plus_or_minus immediate.
