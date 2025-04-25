@@ -656,24 +656,23 @@ bool p_code_1_line() {
 }
 
 /*
- * code_2_line ::= code_2_inst REGISTER COMMA REGISTER plus_or_minus immediate.
- * code_2_line ::= code_2_mem_inst REGISTER COMMA LBRACKET REGISTER plus_or_minus immediate RBRACKET.
+ * code_2_line ::= code_2_inst REGISTER COMMA register_and_immediate.
+ * code_2_line ::= code_2_mem_inst REGISTER COMMA LBRACKET register_and_immediate RBRACKET.
  */
 bool p_code_2_line() {
     bool result = false;
-    shared_ptr <token> dreg, oper, sreg, sign;
-    shared_ptr <tny_word> immed;
+    shared_ptr <token> dreg, oper;
+    shared_ptr <reg_and_immed>reg_immed = nullptr;
     int save = tnext;
     if(
         (tnext = save,
          (oper = p_code_2_inst()) && (dreg = term(T_REGISTER)) && term(T_COMMA) &&
-         (sreg = term(T_REGISTER)) && (sign = p_plus_or_minus()) &&
-         (immed = p_immediate()) && term(T_EOL))
+         (reg_immed = p_register_and_immediate()) && term(T_EOL))
          ||
          (tnext = save,
           (oper = p_code_2_mem_inst()) && (dreg = term(T_REGISTER)) && term(T_COMMA) &&
-          term(T_LBRACKET) && (sreg = term(T_REGISTER)) && (sign = p_plus_or_minus()) &&
-          (immed = p_immediate()) && term(T_RBRACKET) && term(T_EOL))
+          term(T_LBRACKET) && (reg_immed = p_register_and_immediate()) && 
+          term(T_RBRACKET) && term(T_EOL))
     ) {
 
         instruction inst;
@@ -683,10 +682,10 @@ bool p_code_2_line() {
         f.instruction.opcode = token_to_opcode(oper->id);
         f.instruction.teeny = 0;
         f.instruction.reg1 = dreg->value.u;
-        f.instruction.reg2 = sreg->value.u;
+        f.instruction.reg2 = reg_immed->reg;
         f.instruction.immed4 = 0;
 
-        inst.second.s = immed->s * (sign->id == T_PLUS ? +1 : -1);
+        inst.second.s = reg_immed->immed.s;
 
         bool make_teeny = is_teeny(inst.second.s);
         if(make_teeny) {

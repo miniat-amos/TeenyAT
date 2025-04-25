@@ -40,6 +40,10 @@
     mpy r2, !more           ;2
     SHF rD, r2 - !middle    ;2
     lod r3, [rD]
+    lod rA, [SP - 19]
+    lod rA, [-19 + SP]
+    lod PC, [!top_of_loop + rC]
+    lod PC, [rC + !top_of_loop]
 !more
     BTF r1, r3 + thirty_one ;2
     BtS r3, 5
