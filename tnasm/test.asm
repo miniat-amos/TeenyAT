@@ -60,6 +60,10 @@
     lod r4, 'a'
     lod r4, '\n'
 
+    psh r5 + thirty_one
+    psh thirty_one + r5
+
+
     ; here's an example do..loop using LUP
     SET rC, 17
 !top_of_loop
