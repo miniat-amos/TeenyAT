@@ -10,6 +10,7 @@ Thumbs.db
 *.o
 tnasm/tnasm
 lcd/lcd
+edison/edison
 
 # IDE stuff
 *.dSYM
