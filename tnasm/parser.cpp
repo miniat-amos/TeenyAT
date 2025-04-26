@@ -1449,7 +1449,6 @@ shared_ptr <token> p_code_3_inst() {
     (tnext = save, result = term(T_ROL)) ||
     (tnext = save, result = term(T_ROR)) ||
     (tnext = save, result = term(T_SET)) ||
-    (tnext = save, result = term(T_LOD)) ||
     (tnext = save, result = term(T_BTS)) ||
     (tnext = save, result = term(T_BTC)) ||
     (tnext = save, result = term(T_BTF)) ||
