@@ -1,4 +1,4 @@
-CFLAGS += -I.. -I./include -Os 
+CFLAGS += -I.. -I./include -O3 
 WFLAGS = -Wall -Wextra -Wpedantic
 CPPFLAGS += $(CFLAGS) --std=c++17
 EXE_EXT :=
