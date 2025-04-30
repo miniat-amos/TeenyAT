@@ -8,6 +8,7 @@
 #include "segment.h"
 #include "edison_sprite_locations.h"
 #include "audio.h"
+#include "bin_assets.h"
 
 Tigr* window;
 Tigr* background_img;
@@ -38,63 +39,73 @@ int buzzer_state[2] = {0};
 /* Loads images along with window width and height */
 int initialize_board(){
 
-    background_img = tigrLoadImage("exp_board_images/edison.png");
-    if (!background_img) {
-        printf("Failed to load image <edison_board.png> .\n");
+    background_img = tigrLoadImageMem(bin_asset_exp_board_images_edison_png,
+                                      bin_asset_exp_board_images_edison_png_len);
+    if(!background_img) {
+        printf("Failed to load asset <edison_board>\n");
         return EXIT_FAILURE;
     }
 
-    lcd_font_img = tigrLoadImage("exp_board_images/teenyat_font.png");
-    if (!lcd_font_img ) {
-        printf("Failed to load image <teenyat_font.png> .\n");
+    lcd_font_img = tigrLoadImageMem(bin_asset_exp_board_images_teenyat_font_png,
+                                    bin_asset_exp_board_images_teenyat_font_png_len);
+    if(!lcd_font_img ) {
+        printf("Failed to load asset <teenyat_font>\n");
         return EXIT_FAILURE;
     }
 
-    leds_img = tigrLoadImage("exp_board_images/leds.png");
-    if (!leds_img ) {
-        printf("Failed to load image <leds.png> .\n");
+    leds_img = tigrLoadImageMem(bin_asset_exp_board_images_leds_png,
+                                bin_asset_exp_board_images_leds_png_len);
+    if(!leds_img ) {
+        printf("Failed to load asset <leds>\n");
         return EXIT_FAILURE;
     }
 
-    push_buttons_img = tigrLoadImage("exp_board_images/buttons.png");
-    if (!push_buttons_img ) {
-        printf("Failed to load image <buttons.png> .\n");
+    push_buttons_img = tigrLoadImageMem(bin_asset_exp_board_images_buttons_png,
+                                        bin_asset_exp_board_images_buttons_png_len);
+    if(!push_buttons_img ) {
+        printf("Failed to load asset <buttons>\n");
         return EXIT_FAILURE;
     }
 
-    dip_button_img = tigrLoadImage("exp_board_images/dips.png");
-    if (!dip_button_img ) {
-        printf("Failed to load image <dips.png> .\n");
+    dip_button_img = tigrLoadImageMem(bin_asset_exp_board_images_dips_png,
+                                      bin_asset_exp_board_images_dips_png_len);
+    if(!dip_button_img ) {
+        printf("Failed to load asset <dips>\n");
         return EXIT_FAILURE;
     }
     
-    seg_seven_img = tigrLoadImage("exp_board_images/seven_segment.png");
-    if (!seg_seven_img ) {
-        printf("Failed to load image <seven_segment.png> .\n");
+    seg_seven_img = tigrLoadImageMem(bin_asset_exp_board_images_seven_segment_png,
+                                     bin_asset_exp_board_images_seven_segment_png_len);
+    if(!seg_seven_img ) {
+        printf("Failed to load asset <seven_segment>\n");
         return EXIT_FAILURE;
     }
     
-    fader_slot_img = tigrLoadImage("exp_board_images/fader_slot.png");
-    if (!fader_slot_img ) {
-        printf("Failed to load image <fader_slot.png.png> .\n");
+    fader_slot_img = tigrLoadImageMem(bin_asset_exp_board_images_fader_slot_png,
+                                      bin_asset_exp_board_images_fader_slot_png_len);
+    if(!fader_slot_img ) {
+        printf("Failed to load asset <fader_slot>\n");
         return EXIT_FAILURE;
     }
     
-    fader_img = tigrLoadImage("exp_board_images/fader.png");
-    if (!fader_img ) {
-        printf("Failed to load image <fader.png.png> .\n");
+    fader_img = tigrLoadImageMem(bin_asset_exp_board_images_fader_png,
+                                 bin_asset_exp_board_images_fader_png_len);
+    if(!fader_img ) {
+        printf("Failed to load asset <fader>\n");
         return EXIT_FAILURE;
     }
 
-    dpad_img = tigrLoadImage("exp_board_images/dpad.png");
-    if (!dpad_img) {
-        printf("Failed to load image <dpad.png> .\n");
+    dpad_img = tigrLoadImageMem(bin_asset_exp_board_images_dpad_png,
+                                bin_asset_exp_board_images_dpad_png_len);
+    if(!dpad_img) {
+        printf("Failed to load asset <dpad>\n");
         return EXIT_FAILURE;
     }
 
-    buzzer_img = tigrLoadImage("exp_board_images/buzzers.png");
-    if (!buzzer_img) {
-        printf("Failed to load image <buzzers.png> .\n");
+    buzzer_img = tigrLoadImageMem(bin_asset_exp_board_images_buzzers_png,
+                                  bin_asset_exp_board_images_buzzers_png_len);
+    if(!buzzer_img) {
+        printf("Failed to load asset <buzzers>\n");
         return EXIT_FAILURE;
     }
 
