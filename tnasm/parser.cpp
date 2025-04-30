@@ -476,10 +476,7 @@ shared_ptr <tny_word> p_immediate() {
     shared_ptr <token> ident, label;
     int save = tnext;
 
-    if((tnext = save, val = p_raw_value())) {
-        /* nothing to do */
-    }
-    else if((tnext = save, label = term(T_LABEL))) {
+    if((tnext = save, label = term(T_LABEL))) {
         /* TODO: look up label's address */
         if(pass == 1) {
             /*
@@ -514,6 +511,19 @@ shared_ptr <tny_word> p_immediate() {
                 val = nullptr;
             }
         }
+        else {
+            /* 
+             * First pass still needs to ensure val is valid, since the syntax 
+             * is valid, but the constant or variable may not yet have been
+             * defined.  We'll catch the undefined ones on pass > 1.
+             * 
+             * We'll just sen back a pointer to a zero.
+             */
+            val = shared_ptr <tny_word>(new tny_word{.u = 0x0});
+        }
+    }
+    else if((tnext = save, val = p_raw_value())) {
+        /* nothing to do */
     }
 
     return val;
