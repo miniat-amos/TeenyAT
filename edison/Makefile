@@ -1,4 +1,6 @@
-CFLAGS += -I.. -I./include -O3 
+CFLAGS += -I.. -I./include
+AUDIO_CFLAGS = $(CFLAGS) -O2
+CFLAGS += -O3
 WFLAGS = -Wall -Wextra -Wpedantic
 CPPFLAGS += $(CFLAGS) --std=c++17
 EXE_EXT :=
@@ -24,7 +26,7 @@ endif
 all: 
 	gcc -c tigr.c -o tigr.o $(CFLAGS) 
 	gcc -c ../teenyat.c -o teenyat.o $(CFLAGS) $(WFLAGS)
-	gcc -c audio.c -o audio.o $(CFLAGS) $(WFLAGS) -Wno-unused-result -Wno-c2x-extensions
+	gcc -c audio.c -o audio.o $(AUDIO_CFLAGS) $(WFLAGS) -Wno-unused-result -Wno-c2x-extensions
 
 	g++ -o generate_assets generate_assets.cpp $(CPPFLAGS) $(WFLAGS)
 	./generate_assets $(wildcard exp_board_images/*.png)
