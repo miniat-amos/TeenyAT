@@ -114,7 +114,7 @@ jmp !main
 ; animate the player by 
 ; switching between 0xE2 and 0xE3 sprites
 !draw_player
-    lod rB, player_y   ; y coord
+    lod rB, [player_y]   ; y coord
     cmp rB, 2          ; is the player in the air?
     jl !fall_player    ; fall back down
 
@@ -142,7 +142,7 @@ jmp !main
 ; checks for any input on PORT_A
 ; will not jump player unless player_jumped = 0
 !check_for_jump
-    lod rA, player_jumped
+    lod rA, [player_jumped]
     cmp rA, 0
     jne !jump_ignored
 
@@ -156,7 +156,7 @@ jmp !main
 ; Writes to PORT_B the current score.
 !update_score
     psh rA
-    lod rA, score
+    lod rA, [score]
     str [PORT_B], rA
     pop rA
     ret
@@ -165,7 +165,7 @@ jmp !main
 ; score variable whenever it is called
 !inc_score
     psh rA
-    lod rA, score
+    lod rA, [score]
     inc rA
     str [score], rA
     pop rA
@@ -176,7 +176,7 @@ jmp !main
     set rB, 2 ; y coord
     set rC, 0xF2 ; aero sprite 
     bts rC, 15 ; flip aero
-    lod rA, aero_x
+    lod rA, [aero_x]
     str [LCD_CURSOR_X], rA  
     str [LCD_CURSOR_Y], rB 
     str [LCD_CURSOR], rZ
@@ -193,11 +193,11 @@ jmp !main
     ret
 
 !check_collision
-    lod rA, aero_x
+    lod rA, [aero_x]
     cmp rA, 4 ; is the aero over where player is
     jne !collision_checked ; no collision w/aero
 
-    lod rD, player_y
+    lod rD, [player_y]
     cmp rD, 2
     jne !collision_checked ; no collision w/aero
 
@@ -217,7 +217,7 @@ jmp !main
     cal !delay
     cal !speed_up ; speed up the delay!
 
-    lod rA, aero_x
+    lod rA, [aero_x]
     set rA, 19
     str [aero_x], rA
 
@@ -229,11 +229,11 @@ jmp !main
 ; Make the player jump when
 ; input is recieved from PORT_A
 !jump_player
-    lod rB, player_jumped
+    lod rB, [player_jumped]
     set rB, 1
     str [player_jumped], rB
 
-    lod rB, player_y
+    lod rB, [player_y]
     cmp rB, 2
     jl !player_jumped ; is the player in the air?
 
@@ -257,7 +257,7 @@ jmp !main
 
 ; Force player to fall back down
 !fall_player
-    lod rB, player_y
+    lod rB, [player_y]
     set rA, 4 ; player x-coord (always the same)
     str [LCD_CURSOR_X], rA
     str [LCD_CURSOR_Y], rB
@@ -308,7 +308,7 @@ jmp !main
     cal !print_string_rB
 
     set rC, 0xCA ; heart sprite
-    lod rA, lives_left ; how many hearts do we have to draw?
+    lod rA, [lives_left] ; how many hearts do we have to draw?
     cal !life_loop
     ret
 
@@ -340,7 +340,7 @@ jmp !main
     ; old hearts that have been drawn have to be erased..
     ; .. took me way to long to solve that bug out :(
     str [LCD_CURSOR_Y], rZ
-    lod rD, lives_left
+    lod rD, [lives_left]
     cmp rD, 1 ; check how many hearts are left
     jle !game_over ; end game if lives are empty
 
@@ -362,7 +362,7 @@ jmp !main
 ; Speed the demo up!
 ; to enhance gameplay
 !speed_up
-    lod rE, delay_amt
+    lod rE, [delay_amt]
     cmp rE, MAX_SPEED ; check if reached max_speed
     jl !sped_up
     sub rE, SPEED_UP_AMT ; how much should we speed up by?
@@ -440,7 +440,7 @@ jmp !main
 ; game ends when there is no lives remaining.
 !game_over
     ; reset delay
-    lod rA, delay_amt
+    lod rA, [delay_amt]
     set rA, INITIAL_SPEED
     str [delay_amt], rA
 
@@ -586,7 +586,7 @@ jmp !main
 ; Main delay loop
 ; Because the virtual machine is so fast..
 !delay
-    lod rD, delay_amt
+    lod rD, [delay_amt]
     set rE, rZ
     cal !inner_delay_loop                     
     set rE, rZ

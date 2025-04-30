@@ -58,8 +58,8 @@
     DLy r3 + 5
     DLy r5
     DLy 31
-    lod r4, 'a'
-    lod r4, '\n'
+    lod r4, ['a']
+    lod r4, ['\n']
 
     psh r5 + thirty_one
     psh thirty_one + r5
@@ -78,7 +78,7 @@
     CAL rB + 0xF7
 
     lod r5, [r1 - amos]
-    lod PC, aero
+    lod PC, [aero]
 
     RoL rB, 3
     ror rA, 2
