@@ -27,7 +27,7 @@ all:
 	gcc -c audio.c -o audio.o $(CFLAGS) $(WFLAGS) -Wno-unused-result -Wno-c2x-extensions
 
 	g++ -o generate_assets generate_assets.cpp $(CPPFLAGS) $(WFLAGS)
-	./generate_assets exp_board_images/*.png
+	./generate_assets $(wildcard exp_board_images/*.png)
 
 	g++ -c bin_assets.cpp -o bin_assets.o $(CPPFLAGS) $(WFLAGS)
 	g++ -c utils.cpp -o utils.o $(CPPFLAGS) $(WFLAGS)
