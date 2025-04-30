@@ -11,6 +11,7 @@ Thumbs.db
 tnasm/tnasm
 lcd/lcd
 edison/edison
+edison/bin_assets.*
 
 # IDE stuff
 *.dSYM
