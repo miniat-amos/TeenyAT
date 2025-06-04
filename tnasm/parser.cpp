@@ -1149,6 +1149,8 @@ bool p_code_13_line() {
             f.inst_flags.carry = 1;
         }
 
+        address++;
+
         if(pass > 1) {
             bin_words.push_back(f);
         }
