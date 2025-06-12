@@ -6,6 +6,8 @@ The **TeenyAT** *(pronounced Teeny-@)* is a 16-bit virtual embedded microcontrol
 
 The **TeenyAT** project has a unique instruction set and a complete assembler. The *[tnasm](tnasm)* assembler and each included system can be compiled using `make` with their respective `Makefile`s. 
 
+[Leroy](./docs/leroy.md) is glad you stopped by.
+
 ## Core Architectural Elements
 
 ### Memory
