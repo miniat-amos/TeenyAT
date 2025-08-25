@@ -12,3 +12,4 @@ Leroy is the official mascot of the TeenyAT.  While we don't know _everything_ t
 - You can tell him your concerns, and he will ***address*** them
 - An unusual gardener, when he found an animal had ***nibble***d his corn, he tried to ***patch the kernel***s
 - Once, his car engine burst into flames, but he was protected by the interior's ***firewall***
+- Leroy has a pet dog named ***Chip***
