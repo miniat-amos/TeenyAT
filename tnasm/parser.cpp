@@ -279,7 +279,7 @@ shared_ptr <token> p_variable_line_empty() {
         else if(pass > 1) {
             bin_words.push_back({.u = 0});
         }
-        address++;
+        address += 1;
     }
     return val;
 }
@@ -304,7 +304,7 @@ shared_ptr <token> p_variable_line_immediate() {
         else if(pass > 1) {
             bin_words.push_back(*immed);
         }
-        address++;
+        address += 1;
     }
     return val;
 }
@@ -654,11 +654,12 @@ bool p_code_1_line() {
         f.instruction.reg2 = sreg->value.u;
         f.instruction.immed4 = 0;
 
+        address += 1;
+
         if(pass > 1) {
             bin_words.push_back(f);
         }
 
-        address += 1;
         result = true;
     }
 
@@ -701,7 +702,7 @@ bool p_code_2_line() {
         if(make_teeny) {
             f.instruction.immed4 = inst.second.s;
             f.instruction.teeny = 1;
-            address++;
+            address += 1;
         }
         else {
             address += 2;
@@ -762,7 +763,7 @@ bool p_code_3_line() {
         if(make_teeny) {
             f.instruction.immed4 = inst.second.s;
             f.instruction.teeny = 1;
-            address++;
+            address += 1;
         }
         else {
             address += 2;
@@ -799,11 +800,12 @@ bool p_code_4_line() {
         f.instruction.reg2 = 0;
         f.instruction.immed4 = 0;
 
+        address += 1;
+
         if(pass > 1) {
             bin_words.push_back(f);
         }
 
-        address += 1;
         result = true;
     }
 
@@ -832,13 +834,14 @@ bool p_code_5_line() {
         }
         else if(oper->id == T_INV) {
             f.instruction.immed4 = ~0;
-        } 
+        }
+
+        address += 1;
 
         if(pass > 1) {
             bin_words.push_back(f);
         }
 
-        address++;
         result = true;
     }
 
@@ -873,7 +876,7 @@ bool p_code_6_line() {
         if(make_teeny) {
             f.instruction.immed4 = inst.second.s;
             f.instruction.teeny = 1;
-            address++;
+            address += 1;
         }
         else {
             address += 2;
@@ -919,7 +922,7 @@ bool p_code_7_line() {
         if(make_teeny) {
             f.instruction.immed4 = inst.second.s;
             f.instruction.teeny = 1;
-            address++;
+            address += 1;
         }
         else {
             address += 2;
@@ -957,7 +960,7 @@ bool p_code_8_line() {
         f.instruction.reg2 = sreg->value.u;
         f.instruction.immed4 = 0;
 
-        address++;
+        address += 1;
 
         if(pass > 1) {
             bin_words.push_back(f);
@@ -988,7 +991,7 @@ bool p_code_9_line() {
         f.instruction.reg2 = sreg->value.u;
         f.instruction.immed4 = 0;
 
-        address++;
+        address += 1;
 
         if(pass > 1) {
             bin_words.push_back(f);
@@ -1025,7 +1028,7 @@ bool p_code_10_line() {
         if(make_teeny) {
             f.instruction.immed4 = inst.second.s;
             f.instruction.teeny = 1;
-            address++;
+            address += 1;
         }
         else {
             address += 2;
@@ -1069,7 +1072,7 @@ bool p_code_11_line() {
         if(make_teeny) {
             f.instruction.immed4 = inst.second.s;
             f.instruction.teeny = 1;
-            address++;
+            address += 1;
         }
         else {
             address += 2;
@@ -1106,7 +1109,7 @@ bool p_code_12_line() {
         f.instruction.reg2 = 0;
         f.instruction.immed4 = 0;
 
-        address++;
+        address += 1;
 
         if(pass > 1) {
             bin_words.push_back(f);
