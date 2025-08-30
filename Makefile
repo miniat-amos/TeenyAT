@@ -3,6 +3,7 @@ AR = ar rcs
 TARGET = teenyat
 SRC = $(TARGET).c
 STATIC_LIB_SUFFIX = .a
+LIB_PREFIX = lib
 
 ifeq ($(OS),Windows_NT)
     # Windows (MinGW or Cygwin)
@@ -24,18 +25,20 @@ endif
 all: shared static
 
 # Shared library
-shared: $(TARGET)$(SHARED_LIB_SUFFIX)
+shared: $(LIB_PREFIX)$(TARGET)$(SHARED_LIB_SUFFIX)
 
-$(TARGET)$(SHARED_LIB_SUFFIX): $(SRC)
+$(LIB_PREFIX)$(TARGET)$(SHARED_LIB_SUFFIX): $(SRC)
 	$(CC) $(SHARED_LIB_FLAGS) $< -o $@
 
 # Static library
-static: $(TARGET)$(STATIC_LIB_SUFFIX)
+static: $(LIB_PREFIX)$(TARGET)$(STATIC_LIB_SUFFIX)
 
-$(TARGET)$(STATIC_LIB_SUFFIX): $(SRC)
+$(LIB_PREFIX)$(TARGET)$(STATIC_LIB_SUFFIX): $(SRC)
 	$(CC) -c $< -o $(TARGET).o
 	$(AR) $@ $(TARGET).o
 	rm $(TARGET).o
 
 clean:
-	rm -f $(TARGET).o $(TARGET)$(SHARED_LIB_SUFFIX) $(TARGET)$(STATIC_LIB_SUFFIX)
+	rm -f $(TARGET).o
+	rm -f $(LIB_PREFIX)$(TARGET)$(SHARED_LIB_SUFFIX)
+	rm -f $(LIB_PREFIX)$(TARGET)$(STATIC_LIB_SUFFIX)
