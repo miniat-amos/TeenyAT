@@ -34,11 +34,11 @@ $(LIB_PREFIX)$(TARGET)$(SHARED_LIB_SUFFIX): $(SRC)
 static: $(LIB_PREFIX)$(TARGET)$(STATIC_LIB_SUFFIX)
 
 $(LIB_PREFIX)$(TARGET)$(STATIC_LIB_SUFFIX): $(SRC)
-	$(CC) -c $< -o $(TARGET).o
-	$(AR) $@ $(TARGET).o
-	rm $(TARGET).o
+	$(CC) -c $< -o $(LIB_PREFIX)$(TARGET).o
+	$(AR) $@ $(LIB_PREFIX)$(TARGET).o
+	rm $(LIB_PREFIX)$(TARGET).o
 
 clean:
-	rm -f $(TARGET).o
+	rm -f $(LIB_PREFIX)$(TARGET).o
 	rm -f $(LIB_PREFIX)$(TARGET)$(SHARED_LIB_SUFFIX)
 	rm -f $(LIB_PREFIX)$(TARGET)$(STATIC_LIB_SUFFIX)
