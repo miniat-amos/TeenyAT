@@ -32,7 +32,7 @@ endef
 
 	SEP = \\
     SHARED_LIB_SUFFIX = .dll
-    SHARED_LIB_FLAGS = -shared
+    SHARED_LIB_FLAGS = -shared -DTNY_BUILD_DLL
 else
     # Linux and macOS	
 
