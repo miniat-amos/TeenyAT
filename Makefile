@@ -12,14 +12,41 @@ BUILD_DIR = build
 LIB_DIR = lib
 INCLUDE_DIR = include
 
-.PHONY: all shared static clean install
+STATIC_LIB_NAME = $(LIB_PREFIX)$(TARGET)$(STATIC_LIB_SUFFIX)
+SHARED_LIB_NAME = $(LIB_PREFIX)$(TARGET)$(SHARED_LIB_SUFFIX)
+
+.PHONY: all directories shared static clean install
 
 ifeq ($(OS),Windows_NT)
     # Windows (MinGW)
+
+define mkdir = 
+	if not exist $1 mkdir $1
+endef
+
+define rmdir =
+	if exist $1 rmdir /s /q $1
+endef
+
+	CP_CMD = copy
+
+	SEP = \\
     SHARED_LIB_SUFFIX = .dll
     SHARED_LIB_FLAGS = -shared
 else
-    # Linux and macOS
+    # Linux and macOS	
+
+define mkdir = 
+	mkdir -p $1
+endef
+
+define rmdir =
+	rm -rf $1
+endef
+
+	CP_CMD = cp
+
+	SEP = /
     ifeq ($(shell uname -s),Darwin)
         # macOS
         SHARED_LIB_SUFFIX = .dylib
@@ -31,35 +58,32 @@ else
     endif
 endif
 
-all: $(BUILD_DIR) $(LIB_DIR) $(INCLUDE_DIR) shared static install
+all: directories shared static install
 
-$(BUILD_DIR):
-	mkdir -p $@
-
-$(LIB_DIR):
-	mkdir -p $@
-
-$(INCLUDE_DIR):
-	mkdir -p $@
+directories:
+	$(call mkdir,$(BUILD_DIR))
+	$(call mkdir,$(LIB_DIR))
+	$(call mkdir,$(INCLUDE_DIR))
 
 # Shared library
-shared: $(BUILD_DIR)/$(LIB_PREFIX)$(TARGET)$(SHARED_LIB_SUFFIX)
+shared: $(BUILD_DIR)$(SEP)$(SHARED_LIB_NAME)
 
-$(BUILD_DIR)/$(LIB_PREFIX)$(TARGET)$(SHARED_LIB_SUFFIX): $(SRC)
+$(BUILD_DIR)$(SEP)$(SHARED_LIB_NAME): $(SRC)
 	$(CC) $(SHARED_LIB_FLAGS) $< -o $@
 
 # Static library
-static: $(BUILD_DIR)/$(LIB_PREFIX)$(TARGET)$(STATIC_LIB_SUFFIX)
+static: $(BUILD_DIR)$(SEP)$(STATIC_LIB_NAME)
 
-$(BUILD_DIR)/$(LIB_PREFIX)$(TARGET)$(STATIC_LIB_SUFFIX): $(SRC)
-	$(CC) -c $< -o $(BUILD_DIR)/$(LIB_PREFIX)$(TARGET).o
-	$(AR) $@ $(BUILD_DIR)/$(LIB_PREFIX)$(TARGET).o
-#rm $(BUILD_DIR)/$(LIB_PREFIX)$(TARGET).o
+$(BUILD_DIR)$(SEP)$(STATIC_LIB_NAME): $(SRC)
+	$(CC) -c $< -o $(BUILD_DIR)$(SEP)$(LIB_PREFIX)$(TARGET).o
+	$(AR) $@ $(BUILD_DIR)$(SEP)$(LIB_PREFIX)$(TARGET).o
 
 install:
-	cp $(BUILD_DIR)/$(LIB_PREFIX)$(TARGET)$(STATIC_LIB_SUFFIX) $(LIB_DIR)/
-	cp $(BUILD_DIR)/$(LIB_PREFIX)$(TARGET)$(SHARED_LIB_SUFFIX) $(LIB_DIR)/
-	cp $(HEADER) $(INCLUDE_DIR)/
+	$(CP_CMD) $(BUILD_DIR)$(SEP)$(STATIC_LIB_NAME) $(LIB_DIR)$(SEP)
+	$(CP_CMD) $(BUILD_DIR)$(SEP)$(SHARED_LIB_NAME) $(LIB_DIR)$(SEP)
+	$(CP_CMD) $(HEADER) $(INCLUDE_DIR)$(SEP)
 
 clean:
-	rm -rf $(BUILD_DIR) $(LIB_DIR) $(INCLUDE_DIR)
+	$(call rmdir,$(BUILD_DIR))
+	$(call rmdir,$(LIB_DIR))
+	$(call rmdir,$(INCLUDE_DIR))
