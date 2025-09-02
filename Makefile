@@ -15,18 +15,8 @@ INCLUDE_DIR = include
 STATIC_LIB_NAME = $(LIB_PREFIX)$(TARGET)$(STATIC_LIB_SUFFIX)
 SHARED_LIB_NAME = $(LIB_PREFIX)$(TARGET)$(SHARED_LIB_SUFFIX)
 
-.PHONY: all directories shared static clean install
-
 ifeq ($(OS),Windows_NT)
     # Windows (MinGW)
-
-define mkdir = 
-	if not exist $1 mkdir $1
-endef
-
-define rmdir =
-	if exist $1 rmdir /s /q $1
-endef
 
 	CP_CMD = copy
 
@@ -35,14 +25,6 @@ endef
     SHARED_LIB_FLAGS = -shared -DTNY_BUILD_DLL
 else
     # Linux and macOS	
-
-define mkdir = 
-	mkdir -p $1
-endef
-
-define rmdir =
-	rm -rf $1
-endef
 
 	CP_CMD = cp
 
@@ -58,13 +40,19 @@ endef
     endif
 endif
 
+.PHONY: all directories shared static clean install
+
 all: directories shared static install
 
 directories:
 	@echo Creating output directories...
-	@$(call mkdir,$(BUILD_DIR))
-	@$(call mkdir,$(LIB_DIR))
-	@$(call mkdir,$(INCLUDE_DIR))
+ifeq ($(OS),Windows_NT)
+	@if not exist $(BUILD_DIR) mkdir $(BUILD_DIR)
+	@if not exist $(LIB_DIR) mkdir $(LIB_DIR)
+	@if not exist $(INCLUDE_DIR) mkdir $(INCLUDE_DIR)
+else
+	@mkdir -p $(BUILD_DIR) $(LIB_DIR) $(INCLUDE_DIR)
+endif
 	@echo Done
 
 # Shared library
@@ -89,7 +77,11 @@ install:
 
 clean:
 	@echo Removing output directories...
-	@$(call rmdir,$(BUILD_DIR))
-	@$(call rmdir,$(LIB_DIR))
-	@$(call rmdir,$(INCLUDE_DIR))
+ifeq ($(OS),Windows_NT)
+	@if exist $(BUILD_DIR) rmdir /s /q $(BUILD_DIR)
+	@if exist $(LIB_DIR) rmdir /s /q $(LIB_DIR)
+	@if exist $(INCLUDE_DIR) rmdir /s /q $(INCLUDE_DIR)
+else
+	@rm -rf $(BUILD_DIR) $(LIB_DIR) $(INCLUDE_DIR)
+endif
 	@echo Done
