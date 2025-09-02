@@ -20,13 +20,21 @@ extern "C" {
 
 #endif // __cplusplus
 
+/*
+ * On Windows, builds are slightly complicated.
+ * - If building the TeenyAT shared library (DLL), you must define TNY_BUILD_DLL.
+ * - If using the TeenyAT shared library (DLL), you must define TNY_DLL.
+ * - If linking the static library or including the teenyat.h/c directly in
+ *   your program, just ensure neither TNY_BUILD_DLL or TNY_DLL are defined.
+ */
 #ifdef _WIN32
-
-  #ifdef TNY_BUILD_DLL
-    #define TNY_EXPORT __declspec(dllexport)
-  #else
-    #define TNY_EXPORT __declspec(dllimport)
-  #endif
+	#ifdef TNY_BUILD_DLL
+		#define TNY_EXPORT __declspec(dllexport)
+	#elif TNY_DLL
+		#define TNY_EXPORT __declspec(dllimport)
+	#else
+		#define TNY_EXPORT
+	#endif
 #else
   #define TNY_EXPORT
 #endif
