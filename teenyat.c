@@ -95,6 +95,7 @@ static void default_bus_write(teenyat *t, tny_uword addr, tny_word data, uint16_
 	return;
 }
 
+TNY_EXPORT
 bool tny_init_from_file(teenyat *t, FILE *bin_file,
                         TNY_READ_FROM_BUS_FNPTR bus_read,
                         TNY_WRITE_TO_BUS_FNPTR bus_write) {
@@ -124,6 +125,7 @@ bool tny_init_from_file(teenyat *t, FILE *bin_file,
 	return true;
 }
 
+TNY_EXPORT
 bool tny_init_clocked(teenyat *t, FILE *bin_file,
 	TNY_READ_FROM_BUS_FNPTR bus_read,
 	TNY_WRITE_TO_BUS_FNPTR bus_write,
@@ -139,6 +141,7 @@ bool tny_init_clocked(teenyat *t, FILE *bin_file,
 	return result;
 }
 
+TNY_EXPORT
 bool tny_init_unclocked(teenyat *t, FILE *bin_file,
 	TNY_READ_FROM_BUS_FNPTR bus_read,
 	TNY_WRITE_TO_BUS_FNPTR bus_write){
@@ -151,6 +154,7 @@ bool tny_init_unclocked(teenyat *t, FILE *bin_file,
 	return result;
 }
 
+TNY_EXPORT
 bool tny_set_initial_pace_cnt(teenyat *t,int16_t pace_cnt){
 	if(!t) return false;
 	t->clock_manager.initial_pace_cnt = pace_cnt;
@@ -158,6 +162,7 @@ bool tny_set_initial_pace_cnt(teenyat *t,int16_t pace_cnt){
 	return true;
 }
 
+TNY_EXPORT
 bool tny_reset(teenyat *t) {
 	if(!t) return false;
 
@@ -260,12 +265,14 @@ void tny_modify_port_levels(teenyat *t, bool is_system_request, tny_word data, b
 	return;
 }
 
+TNY_EXPORT
 void tny_port_change(teenyat *t, TNY_PORT_CHANGE_FNPTR port_change) {
 	t->port_change = port_change;
 
 	return;
 }
 
+TNY_EXPORT
 void tny_get_ports(teenyat *t, tny_word *a, tny_word *b) {
 	if(a != NULL) {
 		*a = t->port_a;
@@ -278,6 +285,7 @@ void tny_get_ports(teenyat *t, tny_word *a, tny_word *b) {
 	return;
 }
 
+TNY_EXPORT
 void tny_set_ports(teenyat *t, tny_word *a, tny_word *b) {
 	if(a != NULL) {
 		tny_modify_port_levels(t, true, *a, true);
@@ -290,6 +298,7 @@ void tny_set_ports(teenyat *t, tny_word *a, tny_word *b) {
 	return;
 }
 
+TNY_EXPORT
 void tny_clock(teenyat *t) {
 	 
 	/* Get initial time of our clock cycles 
