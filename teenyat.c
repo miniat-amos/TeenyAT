@@ -188,6 +188,17 @@ bool tny_reset(teenyat *t) {
 
 	t->port_change = NULL;
 
+    /* Disable all architectural features */
+    t->control_status_register.u = 0;
+
+    /* Clear & disable all interrupts by default */
+    t->interrupt_enable_register.u = 0;
+    t->interrupt_queue_register.u  = 0;
+    t->interrupt_return_address.u  = 0;
+    t->interrupt_return_flags.u    = 0;
+    /* Maybe dont memset? could simulate randomness... */
+    memset(t->interrupt_vector_table, 0, sizeof(t->interrupt_vector_table));
+
 	/*
 	 * Initialize each teenyat with a unique random number stream
 	 */
@@ -290,6 +301,45 @@ void tny_set_ports(teenyat *t, tny_word *a, tny_word *b) {
 	return;
 }
 
+void tny_external_interrupt(teenyat* t, tny_uword external_interrupt) {
+    external_interrupt = (1U  << (external_interrupt & 0x7));   // convert our interrupt into an 8 bit power of 2
+    t->interrupt_queue_register.u |= (external_interrupt << 8); // mask in the interrupt into the upper half of our iqr
+    return;
+}
+
+/* Assumes that bits is non-zero */
+tny_uword tny_get_interrupt_index(tny_uword bits) {
+    tny_uword n = 0;
+    if (!(bits & 0x000000FF)) { n +=  8; bits >>=  8; }
+    if (!(bits & 0x0000000F)) { n +=  4; bits >>=  4; }
+    if (!(bits & 0x00000003)) { n +=  2; bits >>=  2; }
+    if (!(bits & 0x00000001))   n +=  1;
+    return n;
+}
+
+void handle_interrupts(teenyat *t) {
+   bool      IE  = t->control_status_register.csr.interrupt_enable;
+   bool      IC  = t->control_status_register.csr.interrupt_clearing;
+   tny_uword IER = t->interrupt_enable_register.u;
+   tny_uword IQR = t->interrupt_queue_register.u & IER; //mask our queue register with enabled interrupts
+   tny_uword INT = IQR & -IQR; // get the highest priority interrupt
+   if(IE && INT) {
+      tny_uword ivt_index = tny_get_interrupt_index(INT); // get the index into the ivt
+      /* preserve our old program counter and flags */
+      t->interrupt_return_address.u = t->reg[TNY_REG_PC].u;
+      t->interrupt_return_flags.u = t->flags.u;
+      /* jump to the corresponding ISR address */
+      t->reg[TNY_REG_PC].u = t->interrupt_vector_table[ivt_index].u;
+      t->control_status_register.csr.interrupt_enable = 0; // disable interrupts
+      t->interrupt_queue_register.u  &= ~INT; // clear the request
+   }
+   /* clear interrupts if interrupt clearing is enabled */
+   if(IC) {
+      t->interrupt_queue_register.u &= IER;
+   }
+   return;
+}
+
 void tny_clock(teenyat *t) {
 	 
 	/* Get initial time of our clock cycles 
@@ -309,13 +359,16 @@ void tny_clock(teenyat *t) {
 	if(t->delay_cycles) {
 		t->delay_cycles--;
 	}else{
-		/*
-		* All instruction fetches are limited to the range 0x0000 through 0x7FFF.
-		* Modifications to the PC are always truncated to that range.  As such,
-		* an unusual circumstance could arrive where a two-word instruction begins
-		* at 0x7FFF and has its second word retrieved from 0x0000.  This almost
-		* certainly not something anyone would want, but it's how it works :-)
-		*/
+        /*
+         * All instruction fetches are limited to the range 0x0000 through 0x7FFF.
+         * Modifications to the PC are always truncated to that range.  As such,
+         * an unusual circumstance could arrive where a two-word instruction begins
+         * at 0x7FFF and has its second word retrieved from 0x0000.  This almost
+         * certainly not something anyone would want, but it's how it works :-)
+         */
+
+        handle_interrupts(t);
+
 		trunc_pc(t);
 
 		tny_uword orig_PC = t->reg[TNY_REG_PC].u; /* backup for error reporting */
@@ -380,8 +433,21 @@ void tny_clock(teenyat *t) {
 				case TNY_RANDOM_BITS_ADDRESS:
 					t->reg[reg1].u = tny_random(t);
 					break;
+                case TNY_CONTROL_STATUS_REGISTER:
+                    t->reg[reg1] = t->control_status_register;
+                    break;
+                case TNY_INTERRUPT_ENABLE_REGISTER:
+                    t->reg[reg1] = t->interrupt_enable_register;
+                    break;
+                case TNY_INTERRUPT_QUEUE_REGISTER:
+                    t->reg[reg1] = t->interrupt_queue_register;
+                    break;
 				default:
-					if(addr >= TNY_PERIPHERAL_BASE_ADDRESS) {
+                    /* Check if reading from interrupt service */
+                    if(addr >= TNY_INTERRUPT_VECTOR_TABLE_START && addr <= TNY_INTERRUPT_VECTOR_TABLE_END) {
+                        t->reg[reg1] = t->interrupt_vector_table[addr - TNY_INTERRUPT_VECTOR_TABLE_START];
+                    }
+                    else if(addr >= TNY_PERIPHERAL_BASE_ADDRESS) {
 						/* read from peripheral address */
 						t->delay_cycles += TNY_BUS_EXTERNAL_DELAY_ADJUST;
 
@@ -428,11 +494,24 @@ void tny_clock(teenyat *t) {
 				case TNY_RANDOM_ADDRESS:
 					/* Do nothing */
 					break;
-				case TNY_RANDOM_BITS_ADDRESS:
+                case TNY_RANDOM_BITS_ADDRESS:
 					/* Do nothing */
 					break;
+                case TNY_CONTROL_STATUS_REGISTER:
+                    t->control_status_register = t->reg[reg2];
+                    break;
+                case TNY_INTERRUPT_ENABLE_REGISTER:
+                    t->interrupt_enable_register = t->reg[reg2];
+                    break;
+                case TNY_INTERRUPT_QUEUE_REGISTER:
+                    t->interrupt_queue_register = t->reg[reg2];
+                    break;
 				default:
-					if(addr >= TNY_PERIPHERAL_BASE_ADDRESS) {
+                    /* Check if writing to interrupt service */
+                    if(addr >= TNY_INTERRUPT_VECTOR_TABLE_START && addr <= TNY_INTERRUPT_VECTOR_TABLE_END) {
+                        t->interrupt_vector_table[addr - TNY_INTERRUPT_VECTOR_TABLE_START] = t->reg[reg2];
+                    }
+                    else if(addr >= TNY_PERIPHERAL_BASE_ADDRESS) {
 						/* write to peripheral address */
 						t->delay_cycles += TNY_BUS_EXTERNAL_DELAY_ADJUST;
 
@@ -646,7 +725,7 @@ void tny_clock(teenyat *t) {
 			break;
 		case TNY_OPCODE_JMP:
 			{
-				bool flags_checked = false;
+                bool flags_checked = false;
 				bool condition_satisfied = false;
 				if(carry) {
 					flags_checked = true;
@@ -679,13 +758,25 @@ void tny_clock(teenyat *t) {
 			}
 			break;
 		case TNY_OPCODE_DLY:
-			{
-				tny_sword delay_cnt = t->reg[reg2].s + immed;
-				if(delay_cnt >= 1) {
+            {
+                tny_sword delay_cnt = t->reg[reg2].s + immed;
+			    if(delay_cnt >= 1) {
 					t->delay_cycles = delay_cnt - 1; // current instruction already 1 cycle
-				}
-			}
+			    }
+            }
 			break;
+        case TNY_OPCODE_INT:
+            {
+                tny_sword interrupt_number = t->reg[reg2].s + immed;
+                tny_uword interrupt_mask = (1U  << (interrupt_number & 0xF)); // convert our interrupt into 8 bit power of 2
+                t->interrupt_queue_register.u |= interrupt_mask; // mask in the interrupt into the upper half of our iqr
+            }
+            break;
+        case TNY_OPCODE_IRT:
+            set_pc(t, t->interrupt_return_address.u); // restore pc
+            t->flags.u = t->interrupt_return_flags.u; // restore flags
+            t->control_status_register.csr.interrupt_enable = 1;  // reenable interrups
+            break;
 		default:
 			fprintf(stderr, "Unknown opcode (%d) encountered at 0x%04X on cycle %" PRIu64 "\n",
 					opcode, orig_PC, t->cycle_cnt);
