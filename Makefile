@@ -12,9 +12,6 @@ BUILD_DIR = build
 LIB_DIR = lib
 INCLUDE_DIR = include
 
-STATIC_LIB_NAME = $(LIB_PREFIX)$(TARGET)$(STATIC_LIB_SUFFIX)
-SHARED_LIB_NAME = $(LIB_PREFIX)$(TARGET)$(SHARED_LIB_SUFFIX)
-
 ifeq ($(OS),Windows_NT)
     # Windows (MinGW)
 
@@ -39,6 +36,9 @@ else
         SHARED_LIB_FLAGS = -shared -fPIC
     endif
 endif
+
+STATIC_LIB_NAME = $(LIB_PREFIX)$(TARGET)$(STATIC_LIB_SUFFIX)
+SHARED_LIB_NAME = $(LIB_PREFIX)$(TARGET)$(SHARED_LIB_SUFFIX)
 
 .PHONY: all directories shared static clean install
 
