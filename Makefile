@@ -42,12 +42,14 @@ INCLUDE_DIR = $(OUT_DIR)$(SEP)include
 STATIC_LIB_NAME = $(LIB_PREFIX)$(TARGET)$(STATIC_LIB_SUFFIX)
 SHARED_LIB_NAME = $(LIB_PREFIX)$(TARGET)$(DYNAMIC_SUFFIX)$(SHARED_LIB_SUFFIX)
 
+MSG = [ INFO ] :
+
 .PHONY: all directories shared static clean install
 
 all: directories shared static install
 
 directories:
-	@echo Creating output directories...
+	@echo $(MSG) Creating output directories
 ifeq ($(OS),Windows_NT)
 	@if not exist $(OUT_DIR) mkdir $(OUT_DIR)
 	@if not exist $(BUILD_DIR) mkdir $(BUILD_DIR)
@@ -56,33 +58,38 @@ ifeq ($(OS),Windows_NT)
 else
 	@mkdir -p $(BUILD_DIR) $(LIB_DIR) $(INCLUDE_DIR)
 endif
-	@echo Done
 
 # Shared library
 shared: $(BUILD_DIR)$(SEP)$(SHARED_LIB_NAME)
 
 $(BUILD_DIR)$(SEP)$(SHARED_LIB_NAME): $(SRC)
+	@echo $(MSG) Building the shared/dynamic library
 	$(CC) $(SHARED_LIB_FLAGS) $< -o $@
 
 # Static library
 static: $(BUILD_DIR)$(SEP)$(STATIC_LIB_NAME)
 
 $(BUILD_DIR)$(SEP)$(STATIC_LIB_NAME): $(SRC)
+	@echo $(MSG) Building the static library
 	$(CC) -c $< -o $(BUILD_DIR)$(SEP)$(LIB_PREFIX)$(TARGET).o
 	$(AR) $@ $(BUILD_DIR)$(SEP)$(LIB_PREFIX)$(TARGET).o
 
 install:
-	@echo Leaving static and shared libraries in .$(SEP)$(LIB_DIR)
+	@echo $(MSG) Copying files to installable directories
+
+	@echo $(MSG) Leaving the static library in $(LIB_DIR)
 	$(CP_CMD) $(BUILD_DIR)$(SEP)$(STATIC_LIB_NAME) $(LIB_DIR)$(SEP)
+
+	@echo $(MSG) Leaving the shared/dynamic library in $(LIB_DIR)
 	$(CP_CMD) $(BUILD_DIR)$(SEP)$(SHARED_LIB_NAME) $(LIB_DIR)$(SEP)
-	@echo Leaving $(HEADER) in .$(SEP)$(INCLUDE_DIR)
+
+	@echo $(MSG) Leaving $(HEADER) in $(INCLUDE_DIR)
 	$(CP_CMD) $(HEADER) $(INCLUDE_DIR)$(SEP)
 
 clean:
-	@echo Removing output directories...
+	@echo $(MSG) Removing output directories
 ifeq ($(OS),Windows_NT)
 	@if exist $(OUT_DIR) rmdir /s /q $(OUT_DIR)
 else
 	@rm -rf $(OUT_DIR)
 endif
-	@echo Done
