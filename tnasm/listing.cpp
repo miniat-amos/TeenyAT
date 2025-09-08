@@ -2,7 +2,7 @@
 #include <iomanip>
 #include <vector>
 
-#include "../teenyat.h"
+#include "teenyat.h"
 #include "token.h"
 #include "listing.h"
 

@@ -3,7 +3,7 @@
 #include <memory>
 #include <map>
 
-#include "../teenyat.h"
+#include "teenyat.h"
 #include "token.h"
 #include "parser.h"
 #include "listing.h"

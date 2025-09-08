@@ -8,7 +8,7 @@
 #include <ctype.h>
 #include <cstring>
 
-#include "../teenyat.h"
+#include "teenyat.h"
 #include "token.h"
 #include "parser.h"
 #include "listing.h"
