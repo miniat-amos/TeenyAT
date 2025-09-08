@@ -1,11 +1,15 @@
+ifeq ($(MAKELEVEL), 0)
+	# Attempting to build local to this directory
+	$(error Please build lcd with the root Makefile)
+endif
+
+
 CFLAGS += -I.. -I./include -O3 
 WFLAGS = -Wall -Wextra -Wpedantic
 CPPFLAGS += $(CFLAGS) --std=c++17
 ifeq ($(OS),Windows_NT)
 	LDFLAGS += -s -lopengl32 -lgdi32
-	RMCMD = del 
 else
-	RMCMD = rm -f
 	UNAME_S := $(shell uname -s)
 	ifeq ($(UNAME_S),Darwin)
 		LDFLAGS += -framework OpenGL -framework Cocoa
@@ -14,14 +18,20 @@ else
 	endif
 endif
 
-all:
-	gcc -c tigr.c -o tigr.o $(CFLAGS) 
-	gcc -c ../teenyat.c -o teenyat.o $(CFLAGS) $(WFLAGS)
-	g++ -c color.cpp -o color.o $(CPPFLAGS) $(WFLAGS)
-	g++ -c util.cpp -o util.o $(CPPFLAGS) $(WFLAGS)
-	g++ -c screen.cpp -o screen.o $(CPPFLAGS) $(WFLAGS)
-	g++ -c main.cpp -o main.o $(CPPFLAGS) $(WFLAGS)
-	g++ tigr.o screen.o teenyat.o main.o color.o util.o -o lcd $(LDFLAGS)
+LCD_BUILD_DIR = ..$(SEP)$(BUILD_DIR)
+BIN = $(LCD_BUILD_DIR)$(SEP)lcd$(EXE_EXT)
 
-clean:
-	$(RMCMD) lcd *.o
+
+.PHONY: all
+
+all:
+	gcc -c tigr.c -o $(LCD_BUILD_DIR)$(SEP)tigr.o $(CFLAGS) 
+	gcc -c ../teenyat.c -o $(LCD_BUILD_DIR)$(SEP)teenyat.o $(CFLAGS) $(WFLAGS)
+	g++ -c color.cpp -o $(LCD_BUILD_DIR)$(SEP)color.o $(CPPFLAGS) $(WFLAGS)
+	g++ -c util.cpp -o $(LCD_BUILD_DIR)$(SEP)util.o $(CPPFLAGS) $(WFLAGS)
+	g++ -c screen.cpp -o $(LCD_BUILD_DIR)$(SEP)screen.o $(CPPFLAGS) $(WFLAGS)
+	g++ -c main.cpp -o $(LCD_BUILD_DIR)$(SEP)main.o $(CPPFLAGS) $(WFLAGS)
+	g++ $(LCD_BUILD_DIR)$(SEP)tigr.o $(LCD_BUILD_DIR)$(SEP)screen.o \
+		$(LCD_BUILD_DIR)$(SEP)teenyat.o $(LCD_BUILD_DIR)$(SEP)main.o \
+		$(LCD_BUILD_DIR)$(SEP)color.o $(LCD_BUILD_DIR)$(SEP)util.o \
+		-o $(BIN) $(LDFLAGS)

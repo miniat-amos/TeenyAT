@@ -50,9 +50,9 @@ MSG = [ INFO ] :
 
 export BUILD_DIR BIN_DIR SEP EXE_EXT MSG
 
-.PHONY: all directories shared static clean install
+.PHONY: all directories shared static clean install lcd
 
-all: directories shared static tnasm install
+all: directories shared static tnasm lcd install
 
 directories:
 	@echo $(MSG) Creating output directories
@@ -86,7 +86,11 @@ tnasm: $(BIN_DIR)$(SEP)tnasm$(EXE_EXT)
 $(BIN_DIR)$(SEP)tnasm$(EXE_EXT): static
 	$(MAKE) -C tnasm
 
-install: static shared tnasm
+lcd: directories static
+	@echo $(MSG) Building the LCD system
+	$(MAKE) -C lcd
+
+install: static shared tnasm lcd
 	@echo $(MSG) Copying files to installable directories
 
 	@echo $(MSG) Leaving the static library in $(LIB_DIR)
@@ -100,6 +104,9 @@ install: static shared tnasm
 
 	@echo $(MSG) Leaving tnasm$(EXE_EXT) in $(BIN_DIR)
 	$(CP_CMD) $(BUILD_DIR)$(SEP)tnasm$(EXE_EXT) $(BIN_DIR)$(SEP)
+
+	@echo $(MSG) Leaving lcd$(EXE_EXT) in $(BIN_DIR)
+	$(CP_CMD) $(BUILD_DIR)$(SEP)lcd$(EXE_EXT) $(BIN_DIR)$(SEP)
 
 clean:
 	@echo $(MSG) Removing output directories
