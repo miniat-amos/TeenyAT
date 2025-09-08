@@ -55,7 +55,7 @@ export BUILD_DIR BIN_DIR SEP EXE_EXT MSG
 all: directories shared static tnasm lcd install
 
 directories:
-	@echo $(MSG) Creating output directories
+	@echo $(MSG) Creating common output directories
 ifeq ($(OS),Windows_NT)
 	@if not exist $(OUT_DIR) mkdir $(OUT_DIR)
 	@if not exist $(BUILD_DIR) mkdir $(BUILD_DIR)
@@ -87,10 +87,9 @@ $(BIN_DIR)$(SEP)tnasm$(EXE_EXT): static
 	$(MAKE) -C tnasm
 
 lcd: directories static
-	@echo $(MSG) Building the LCD system
 	$(MAKE) -C lcd
 
-install: static shared tnasm lcd
+install: directories static shared tnasm lcd
 	@echo $(MSG) Copying files to installable directories
 
 	@echo $(MSG) Leaving the static library in $(LIB_DIR)
@@ -106,7 +105,7 @@ install: static shared tnasm lcd
 	$(CP_CMD) $(BUILD_DIR)$(SEP)tnasm$(EXE_EXT) $(BIN_DIR)$(SEP)
 
 	@echo $(MSG) Leaving lcd$(EXE_EXT) in $(BIN_DIR)
-	$(CP_CMD) $(BUILD_DIR)$(SEP)lcd$(EXE_EXT) $(BIN_DIR)$(SEP)
+	$(CP_CMD) $(BUILD_DIR)$(SEP)lcd$(SEP)lcd$(EXE_EXT) $(BIN_DIR)$(SEP)
 
 clean:
 	@echo $(MSG) Removing output directories

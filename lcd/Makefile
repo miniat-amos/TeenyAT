@@ -12,12 +12,13 @@ else
 	endif
 endif
 
-LCD_BUILD_DIR = ..$(SEP)$(BUILD_DIR)
+LCD_BUILD_DIR = ..$(SEP)$(BUILD_DIR)$(SEP)lcd
 BIN = $(LCD_BUILD_DIR)$(SEP)lcd$(EXE_EXT)
 
-.PHONY: all check_makelevel
+.PHONY: all check_makelevel directories
 
-all: check_makelevel
+all: check_makelevel directories
+	@echo $(MSG) Building the LCD system
 	gcc -c tigr.c -o $(LCD_BUILD_DIR)$(SEP)tigr.o $(CFLAGS) 
 	gcc -c ../teenyat.c -o $(LCD_BUILD_DIR)$(SEP)teenyat.o $(CFLAGS) $(WFLAGS)
 	g++ -c color.cpp -o $(LCD_BUILD_DIR)$(SEP)color.o $(CPPFLAGS) $(WFLAGS)
@@ -33,4 +34,12 @@ check_makelevel:
 ifeq ($(MAKELEVEL), 0)
 	# Attempting to build local to this directory
 	$(error Please build lcd with the root Makefile)
+endif
+
+directories: check_makelevel
+	@echo $(MSG) Creating LCD build directory
+ifeq ($(OS),Windows_NT)
+	@if not exist $(LCD_BUILD_DIR) mkdir $(LCD_BUILD_DIR)
+else
+	@mkdir -p $(LCD_BUILD_DIR)
 endif
