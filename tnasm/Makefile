@@ -11,22 +11,10 @@ else
 endif
 
 WFLAGS = -Wall -Wextra -Wpedantic
-BIN = $(BUILD_DIR)$(SEP)tnasm$(EXE_EXT)
+BIN = ..$(SEP)$(BUILD_DIR)$(SEP)tnasm$(EXE_EXT)
 
 all: $(BIN) 
 
 $(BIN): $(SOURCES)
 	@echo $(MSG) Building tnasm
 	$(CXX) -o $(BIN) $(WFLAGS) $(CXX_FLAGS) $(SOURCES)
-
-clean:
-	@echo $(MSG) Removing output directories
-ifeq ($(OS),Windows_NT)
-	@if exist $(OUT_DIR) rmdir /s /q $(OUT_DIR)
-else
-	@rm -rf $(OUT_DIR)
-endif
-
-
-
-	rm -f tnasm

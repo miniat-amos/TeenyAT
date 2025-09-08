@@ -37,7 +37,7 @@ else
 
 endif
 
-OUT_DIR = $(CURDIR)$(SEP)out
+OUT_DIR = out
 BUILD_DIR = $(OUT_DIR)$(SEP)build
 LIB_DIR = $(OUT_DIR)$(SEP)lib
 INCLUDE_DIR = $(OUT_DIR)$(SEP)include
