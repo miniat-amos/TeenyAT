@@ -12,6 +12,7 @@ DYNAMIC_SUFFIX = _d
 ifeq ($(OS),Windows_NT)
     # Windows (MinGW)
 
+	SHELL := cmd.exe
 	CP_CMD = copy
 
 	SEP = \\
@@ -48,7 +49,7 @@ SHARED_LIB_NAME = $(LIB_PREFIX)$(TARGET)$(DYNAMIC_SUFFIX)$(SHARED_LIB_SUFFIX)
 
 MSG = [ INFO ] :
 
-export BUILD_DIR BIN_DIR SEP EXE_EXT MSG
+export SHELL BUILD_DIR BIN_DIR SEP EXE_EXT MSG
 
 .PHONY: all directories shared static clean install lcd
 
