@@ -41,9 +41,9 @@ tny_uword tny_random(teenyat *t);
 uint64_t  tny_calibrate_1_MHZ(void);
 
 static void set_elg_flags(teenyat *t, tny_sword alu_result) {
-	t->flags.equals = (alu_result == 0);
-	t->flags.less =  alu_result & (1 << 15);
-	t->flags.greater = (alu_result > 0);
+	t->flags.inst_flags.equals = (alu_result == 0);
+	t->flags.inst_flags.less =  (alu_result >> 15) & 1;
+	t->flags.inst_flags.greater = (alu_result > 0);
 
 	return;
 }
@@ -173,10 +173,10 @@ bool tny_reset(teenyat *t) {
 	t->reg[TNY_REG_D].u = 0;
 	t->reg[TNY_REG_E].u = 0;
 
-	t->flags.carry = false;
-	t->flags.equals = false;
-	t->flags.less = false;
-	t->flags.greater = false;
+	t->flags.inst_flags.carry = false;
+	t->flags.inst_flags.equals = false;
+	t->flags.inst_flags.less = false;
+	t->flags.inst_flags.greater = false;
 
 	/* "instruction" and "immediate" members do not need initialization */
 
@@ -524,19 +524,19 @@ void tny_clock(teenyat *t) {
 			break;
 		case TNY_OPCODE_ADD:
 			tmp = (uint32_t)(t->reg[reg1].s) + (uint32_t)((uint32_t)(t->reg[reg2].s) + (uint32_t)immed);
-			t->flags.carry = tmp & (1 << 16);
+			t->flags.inst_flags.carry = tmp & (1 << 16);
 			t->reg[reg1].s = tmp;
 			set_elg_flags(t, t->reg[reg1].s);
 			break;
 		case TNY_OPCODE_SUB:
 			tmp = (uint32_t)(t->reg[reg1].s) - (uint32_t)((uint32_t)(t->reg[reg2].s) + (uint32_t)immed);
-			t->flags.carry = tmp & (1 << 16);
+			t->flags.inst_flags.carry = tmp & (1 << 16);
 			t->reg[reg1].s = tmp;
 			set_elg_flags(t, t->reg[reg1].s);
 			break;
 		case TNY_OPCODE_MPY:
 			tmp = (uint32_t)(t->reg[reg1].s) * (uint32_t)((uint32_t)(t->reg[reg2].s) + (uint32_t)immed);
-			t->flags.carry = tmp & (1 << 16);
+			t->flags.inst_flags.carry = tmp & (1 << 16);
 			t->reg[reg1].s = tmp;
 			set_elg_flags(t, t->reg[reg1].s);
 			break;
@@ -578,15 +578,15 @@ void tny_clock(teenyat *t) {
 					bits_to_shift *= -1;
 					if(bits_to_shift <= 15) {
 						t->reg[reg1].u <<= bits_to_shift - 1;
-						t->flags.carry = t->reg[reg1].u & (1 << 15);
+						t->flags.inst_flags.carry = (t->reg[reg1].u >> 15) & 1;
 						t->reg[reg1].u <<= 1;
 					}
 					else {
 						if(bits_to_shift == 16) {
-							t->flags.carry = t->reg[reg1].u & (1 << 0);
+							t->flags.inst_flags.carry = t->reg[reg1].u & (1 << 0);
 						}
 						else {
-							t->flags.carry = 0;
+							t->flags.inst_flags.carry = 0;
 						}
 						t->reg[reg1].u = 0;
 					}
@@ -595,15 +595,15 @@ void tny_clock(teenyat *t) {
 					/* shift right */
 					if(bits_to_shift <= 15) {
 						t->reg[reg1].u >>= bits_to_shift - 1;
-						t->flags.carry = t->reg[reg1].u & (1 << 0);
+						t->flags.inst_flags.carry = t->reg[reg1].u & (1 << 0);
 						t->reg[reg1].u >>= 1;
 					}
 					else {
 						if(bits_to_shift == 16) {
-							t->flags.carry = t->reg[reg1].u & (1 << 15);
+							t->flags.inst_flags.carry = (t->reg[reg1].u >> 15) & 1;
 						}
 						else {
-							t->flags.carry = 0;
+							t->flags.inst_flags.carry = 0;
 						}
 						t->reg[reg1].u = 0;
 					}
@@ -621,27 +621,27 @@ void tny_clock(teenyat *t) {
 					tny_uword main_part = t->reg[reg1].u << bits_to_rotate;
 					tny_uword wrap_part = t->reg[reg1].u >> (16 - bits_to_rotate);
 					t->reg[reg1].u = main_part | wrap_part;
-					t->flags.carry = t->reg[reg1].u & (1 << 0);
+					t->flags.inst_flags.carry = t->reg[reg1].u & (1 << 0);
 				}
 				else if(bits_to_rotate > 0) {
 					/* rotate right */
 					tny_uword main_part = t->reg[reg1].u >> bits_to_rotate;
 					tny_uword wrap_part = t->reg[reg1].u << (16 - bits_to_rotate);
 					t->reg[reg1].u = main_part | wrap_part;
-					t->flags.carry = t->reg[reg1].u & (1 << 15);
+					t->flags.inst_flags.carry = (t->reg[reg1].u >> 15) & 1;
 				}
 				set_elg_flags(t, t->reg[reg1].s);
 			}
 			break;
 		case TNY_OPCODE_NEG:
 			tmp = (uint32_t)0 - (uint32_t)(t->reg[reg1].s);
-			t->flags.carry = tmp & (1 << 16);
+			t->flags.inst_flags.carry = tmp & (1 << 16);
 			t->reg[reg1].s = tmp;
 			set_elg_flags(t, t->reg[reg1].s);
 			break;
 		case TNY_OPCODE_CMP:
 			tmp = (uint32_t)(t->reg[reg1].s) - (uint32_t)((uint32_t)(t->reg[reg2].s) + (uint32_t)immed);
-			t->flags.carry = tmp & (1 << 16);
+			t->flags.inst_flags.carry = tmp & (1 << 16);
 			set_elg_flags(t, (tny_sword)tmp);
 			break;
 		case TNY_OPCODE_JMP:
@@ -650,19 +650,19 @@ void tny_clock(teenyat *t) {
 				bool condition_satisfied = false;
 				if(carry) {
 					flags_checked = true;
-					condition_satisfied |= t->flags.carry;
+					condition_satisfied |= t->flags.inst_flags.carry;
 				}
 				if(equals) {
 					flags_checked = true;
-					condition_satisfied |= t->flags.equals;
+					condition_satisfied |= t->flags.inst_flags.equals;
 				}
 				if(less) {
 					flags_checked = true;
-					condition_satisfied |= t->flags.less;
+					condition_satisfied |= t->flags.inst_flags.less;
 				}
 				if(greater) {
 					flags_checked = true;
-					condition_satisfied |= t->flags.greater;
+					condition_satisfied |= t->flags.inst_flags.greater;
 				}
 				if(!flags_checked || condition_satisfied) {
 					set_pc(t, t->reg[reg1].s + immed);
@@ -671,7 +671,7 @@ void tny_clock(teenyat *t) {
 			break;
 		case TNY_OPCODE_LUP:
 			tmp = (uint32_t)(t->reg[reg1].s) - 1;
-			t->flags.carry = tmp & (1 << 16);
+			t->flags.inst_flags.carry = tmp & (1 << 16);
 			t->reg[reg1].s = tmp;
 			set_elg_flags(t, (tny_sword)tmp);
 			if(tmp != 0) {

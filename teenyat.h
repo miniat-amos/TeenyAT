@@ -186,21 +186,22 @@ struct teenyat {
 	tny_word reg[8];
 	/**
 	 * Flag bits are set by CMP and all ALU instructions.
-	 */
-	struct {
-		/**
-		 * Carry is set/cleared by arithmetic, shift and rotate instructions.
-		 * For shift/rotate instructions, the final bit shifted out of storage
-		 * determines the flag.  If the shift length is zero, the flag is
-		 * unchanged. */
-		bool carry;
-		/** Set/cleared if the result of a CMP or ALU instruction is 0 or not */
-		bool equals;
-		/** This flag is effectively the sign bit of the CMP or ALU result */
-		bool less;
-		/** Set if CMP or ALU result is positive and non-zero */
-		bool greater;
-	} flags;
+     *
+     * Access the bits directly through the inst_flags member of the tny_word union
+     *
+     * Carry is set/cleared by arithmetic, shift and rotate instructions.
+     * For shift/rotate instructions, the final bit shifted out of storage
+     * determines the flag.  If the shift length is zero, the flag is
+     * unchanged.
+     *
+     * Equals is set/cleared if the result of a CMP or ALU instruction is 0 or not
+     *
+     * Less is effectively the sign bit of the CMP or ALU result
+     *
+     * Greater is set/cleared if CMP or ALU result is positive and non-zero
+     *
+     **/
+    tny_word flags;
 	/**
 	 * System calllback function to handle TeenyAT read requests
 	 */
