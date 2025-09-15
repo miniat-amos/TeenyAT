@@ -40,7 +40,7 @@ endif
 all: release
 
 
-release: CFLAGS += -s -O2
+release: CFLAGS += -O2
 release: .build
 
 
