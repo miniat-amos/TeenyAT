@@ -11,3 +11,5 @@ add_library(teenyat_d SHARED teenyat.c)
 set_target_properties(teenyat_d PROPERTIES OUTPUT_NAME teenyat_d)
 
 file(COPY teenyat.h DESTINATION "${CMAKE_BINARY_DIR}/out/include")
+
+add_subdirectory(tnasm)
