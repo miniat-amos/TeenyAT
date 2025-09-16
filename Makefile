@@ -10,7 +10,7 @@ ifeq ($(OS),Windows_NT)
 
 	SHELL := cmd.exe
 	CP_CMD = copy
-
+	SEP = \
 	SHARED_LIB_SUFFIX = .dll
 	SHARED_LIB_FLAGS = -shared -DTNY_BUILD_DLL
 	EXE_EXT = .exe
@@ -52,25 +52,25 @@ debug: .build
 #==============================================
 .build:
 
-	@#---------- DIRECTORIES ----------
+	@echo $(MSG) ---------- DIRECTORIES ----------
 
 	@echo $(MSG) Creating common output directories
 ifeq ($(OS),Windows_NT)
 	@if not exist out mkdir out
-	@if not exist out/build mkdir out/build
-	@if not exist out/lib mkdir out/lib
-	@if not exist out/include mkdir out/include
-	@if not exist out/bin mkdir out/bin
+	@if not exist out\build mkdir out\build
+	@if not exist out\lib mkdir out\lib
+	@if not exist out\include mkdir out\include
+	@if not exist out\bin mkdir out\bin
 else
 	@mkdir -p out/build out/lib out/include out/bin
 endif
 
-	@#---------- HEADER ----------
+	@echo $(MSG) ---------- HEADER ----------
 
 	@echo $(MSG) Leaving teenyat.h in out/include
 	$(CP_CMD) teenyat.h out/include/
 
-	@#---------- STATIC LIBRARY ----------
+	@echo $(MSG) ---------- STATIC LIBRARY ----------
 
 	@echo $(MSG) Building the static library
 	$(CC) -c teenyat.c $(CFLAGS) -o out/build/teenyat.o
@@ -79,7 +79,7 @@ endif
 	@echo $(MSG) Leaving the static library in out/lib
 	$(CP_CMD) out/build/libteenyat.a out/lib/
 
-	@#---------- SHARED/DYNAMIC LIBRARY ----------
+	@echo $(MSG) ---------- SHARED/DYNAMIC LIBRARY ----------
 
 	@echo $(MSG) Building the shared/dynamic library
 	$(CC) $(CFLAGS) $(SHARED_LIB_FLAGS) teenyat.c -o out/build/libteenyat_d$(SHARED_LIB_SUFFIX)
@@ -87,7 +87,7 @@ endif
 	@echo $(MSG) Leaving the shared/dynamic library in out/lib
 	$(CP_CMD) out/build/libteenyat_d$(SHARED_LIB_SUFFIX) out/lib/
 
-	@#---------- SUB-TOOLS ----------
+	@echo $(MSG) ---------- SUB-TOOLS ----------
 	make -C tnasm
 	@echo $(MSG) Leaving tnasm$(EXE_EXT) in out/bin
 	$(CP_CMD) tnasm/tnasm$(EXE_EXT) out/bin/
@@ -100,7 +100,6 @@ endif
 	@echo $(MSG) Leaving edison$(EXE_EXT) in out/bin
 	$(CP_CMD) edison/edison$(EXE_EXT) out/bin/
 
-	@#---------- SETUP MESSAGE ----------
 	@echo =====================================================================
 	@echo When creating your own systems with the TeenyAT, be sure to:
 	@echo - Add out/include to your compiler\'s include path
