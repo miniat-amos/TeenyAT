@@ -27,17 +27,20 @@ if(NOT HAVE_CLOCK_GETTIME OR NOT HAVE_CLOCK_MONOTONIC)
 endif()
 # END TODO
 
-add_compile_options(-Wall -Wextra -Wpedantic)
-
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/out/lib")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/out/lib")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/out/bin")
 
 add_library(teenyat STATIC teenyat.c)
+target_compile_options(teenyat PRIVATE -Wall -Wextra -Wpedantic)
+target_include_directories(teenyat PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 add_library(teenyat_d SHARED teenyat.c)
 set_target_properties(teenyat_d PROPERTIES OUTPUT_NAME teenyat_d)
+target_compile_options(teenyat_d PRIVATE -Wall -Wextra -Wpedantic)
+target_include_directories(teenyat_d PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 file(COPY teenyat.h DESTINATION "${CMAKE_BINARY_DIR}/out/include")
 
 add_subdirectory(tnasm)
+add_subdirectory(lcd)
