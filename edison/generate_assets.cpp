@@ -26,7 +26,10 @@ const size_t BYTES_PER_LINE = 10;
 string clean_filename(const string& filename) {
     string clean_name;
 
-    for(char c : filename) {
+    std::filesystem::path p(filename);
+    string file_only_name = p.filename().string();
+
+    for(char c : file_only_name) {
         if(isalnum((unsigned char)(c)) || c == '_') {
             clean_name += c;
         } else {
@@ -148,8 +151,8 @@ int main(int argc, char* argv[]) {
         }
 
         source << "/* Asset: " << path << " */" << endl;
-        source << "const size_t " << size_name << " = " << buffer.size() << ";" << endl;
-        source << "const uint8_t " << array_name << "[" << size_name << "] = {" << endl;
+        source << "extern const size_t " << size_name << " = " << buffer.size() << ";" << endl;
+        source << "extern const uint8_t " << array_name << "[" << size_name << "] = {" << endl;
         if(!source) {
             leave_no_trace("Failed to write size to source file for '" + path + "'.", header, source);
         }

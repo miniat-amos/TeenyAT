@@ -39,71 +39,71 @@ int buzzer_state[2] = {0};
 /* Loads images along with window width and height */
 int initialize_board(){
 
-    background_img = tigrLoadImageMem(bin_asset_exp_board_images_edison_png,
-                                      bin_asset_exp_board_images_edison_png_len);
+    background_img = tigrLoadImageMem(bin_asset_edison_png,
+                                      bin_asset_edison_png_len);
     if(!background_img) {
         printf("Failed to load asset <edison_board>\n");
         return EXIT_FAILURE;
     }
 
-    lcd_font_img = tigrLoadImageMem(bin_asset_exp_board_images_teenyat_font_png,
-                                    bin_asset_exp_board_images_teenyat_font_png_len);
+    lcd_font_img = tigrLoadImageMem(bin_asset_teenyat_font_png,
+                                    bin_asset_teenyat_font_png_len);
     if(!lcd_font_img ) {
         printf("Failed to load asset <teenyat_font>\n");
         return EXIT_FAILURE;
     }
 
-    leds_img = tigrLoadImageMem(bin_asset_exp_board_images_leds_png,
-                                bin_asset_exp_board_images_leds_png_len);
+    leds_img = tigrLoadImageMem(bin_asset_leds_png,
+                                bin_asset_leds_png_len);
     if(!leds_img ) {
         printf("Failed to load asset <leds>\n");
         return EXIT_FAILURE;
     }
 
-    push_buttons_img = tigrLoadImageMem(bin_asset_exp_board_images_buttons_png,
-                                        bin_asset_exp_board_images_buttons_png_len);
+    push_buttons_img = tigrLoadImageMem(bin_asset_buttons_png,
+                                        bin_asset_buttons_png_len);
     if(!push_buttons_img ) {
         printf("Failed to load asset <buttons>\n");
         return EXIT_FAILURE;
     }
 
-    dip_button_img = tigrLoadImageMem(bin_asset_exp_board_images_dips_png,
-                                      bin_asset_exp_board_images_dips_png_len);
+    dip_button_img = tigrLoadImageMem(bin_asset_dips_png,
+                                      bin_asset_dips_png_len);
     if(!dip_button_img ) {
         printf("Failed to load asset <dips>\n");
         return EXIT_FAILURE;
     }
     
-    seg_seven_img = tigrLoadImageMem(bin_asset_exp_board_images_seven_segment_png,
-                                     bin_asset_exp_board_images_seven_segment_png_len);
+    seg_seven_img = tigrLoadImageMem(bin_asset_seven_segment_png,
+                                     bin_asset_seven_segment_png_len);
     if(!seg_seven_img ) {
         printf("Failed to load asset <seven_segment>\n");
         return EXIT_FAILURE;
     }
     
-    fader_slot_img = tigrLoadImageMem(bin_asset_exp_board_images_fader_slot_png,
-                                      bin_asset_exp_board_images_fader_slot_png_len);
+    fader_slot_img = tigrLoadImageMem(bin_asset_fader_slot_png,
+                                      bin_asset_fader_slot_png_len);
     if(!fader_slot_img ) {
         printf("Failed to load asset <fader_slot>\n");
         return EXIT_FAILURE;
     }
     
-    fader_img = tigrLoadImageMem(bin_asset_exp_board_images_fader_png,
-                                 bin_asset_exp_board_images_fader_png_len);
+    fader_img = tigrLoadImageMem(bin_asset_fader_png,
+                                 bin_asset_fader_png_len);
     if(!fader_img ) {
         printf("Failed to load asset <fader>\n");
         return EXIT_FAILURE;
     }
 
-    dpad_img = tigrLoadImageMem(bin_asset_exp_board_images_dpad_png,
-                                bin_asset_exp_board_images_dpad_png_len);
+    dpad_img = tigrLoadImageMem(bin_asset_dpad_png,
+                                bin_asset_dpad_png_len);
     if(!dpad_img) {
         printf("Failed to load asset <dpad>\n");
         return EXIT_FAILURE;
     }
 
-    buzzer_img = tigrLoadImageMem(bin_asset_exp_board_images_buzzers_png,
-                                  bin_asset_exp_board_images_buzzers_png_len);
+    buzzer_img = tigrLoadImageMem(bin_asset_buzzers_png,
+                                  bin_asset_buzzers_png_len);
     if(!buzzer_img) {
         printf("Failed to load asset <buzzers>\n");
         return EXIT_FAILURE;
