@@ -12,9 +12,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 # TODO: We cannot disable extensions for C until we eliminate
-#       clock_gettime() and CLOCK_MONOTONIC as they are not standard
-#       and require _POSIX_C_SOURCE 200809L.  Once this is resolved,
-#       we can eliminate this entire section below.
+#       strdup() as it is not standard and require _POSIX_C_SOURCE 200809L.
+#       Once this is resolved, we can eliminate this entire section below.
 set(CMAKE_REQUIRED_DEFINITIONS -D_POSIX_C_SOURCE=200809L)
 include(CheckSymbolExists)
 check_symbol_exists(strdup "string.h" HAVE_STRDUP)
