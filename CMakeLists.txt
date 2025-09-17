@@ -44,3 +44,4 @@ file(COPY teenyat.h DESTINATION "${CMAKE_BINARY_DIR}/out/include")
 
 add_subdirectory(tnasm)
 add_subdirectory(lcd)
+add_subdirectory(edison)
