@@ -14,18 +14,24 @@ if [ "$1" == "debug" ]; then
     BUILD_TYPE="Debug"
     echo "Configuring for Debug build..."
 elif [ "$1" == "clean" ]; then
-    echo "Cleaning build and build_debug directories..."
+    # again, unsure if we want separate directories for this
+    #echo "Cleaning build and build_debug directories..."
+    echo "Cleaning build directories..."
     rm -rf build  # could delete build_debug if we used it
+    echo ""
     echo "Clean complete."
+    echo ""
     BUILD_EXIT=1
 elif [ "$1" == "" ]; then
     echo "Using default build configuration..."
 else
+    echo ""
     echo "Invalid parameter: $1"
     echo "Usage: ./build.sh [debug | clean]"
     echo "    No parameter - Default Release build"
     echo "    debug - Build with debug symbols"
     echo "    clean - Remove build directory"
+    echo ""
     BUILD_EXIT=1
 fi
 
