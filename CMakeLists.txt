@@ -11,22 +11,6 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-# TODO: We cannot disable extensions for C until we eliminate
-#       clock_gettime() and CLOCK_MONOTONIC as they are not standard
-#       and require _POSIX_C_SOURCE 200809L.  Once this is resolved,
-#       we can eliminate this entire section below.
-set(CMAKE_REQUIRED_DEFINITIONS -D_POSIX_C_SOURCE=200809L)
-include(CheckSymbolExists)
-check_symbol_exists(clock_gettime "time.h" HAVE_CLOCK_GETTIME)
-check_symbol_exists(CLOCK_MONOTONIC "time.h" HAVE_CLOCK_MONOTONIC)
-if(NOT HAVE_CLOCK_GETTIME OR NOT HAVE_CLOCK_MONOTONIC)
-    message(FATAL_ERROR 
-            "clock_gettime() and CLOCK_MONOTONIC are required but not found.\n"
-            "Consider forcing CMake to use GCC/G++ or Clang/Clang++ compilers."
-    )
-endif()
-# END TODO
-
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/out/lib")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/out/lib")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/out/bin")
