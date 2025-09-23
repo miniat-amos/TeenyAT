@@ -13,12 +13,12 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#else  // __cplusplus
+#else  /* __cplusplus */
 extern "C" {
 
 #include <cstdint>
 
-#endif // __cplusplus
+#endif /* __cplusplus */
 
 typedef struct teenyat teenyat;
 
@@ -81,7 +81,7 @@ typedef void(*TNY_WRITE_TO_BUS_FNPTR)(teenyat *t, tny_uword addr, tny_word data,
  *
  * Whenever a store instruction (STR) writes to one of the two GPIO port addresses,
  * values in bits identified for output may change.  If any are actually modified
- * as a result of the store, this registered callback would be run.  It is the 
+ * as a result of the store, this registered callback would be run.  It is the
  * responsibility of the callback author to determine which bits have changed
  * (and to what).
  * 
@@ -97,7 +97,7 @@ typedef void(*TNY_WRITE_TO_BUS_FNPTR)(teenyat *t, tny_uword addr, tny_word data,
  */
 typedef void(*TNY_PORT_CHANGE_FNPTR)(teenyat *t, bool is_port_a, tny_word port);
 
-/** While the TeenyAT has a 16 bit address space, RAM is only 32K words */
+/* While the TeenyAT has a 16 bit address space, RAM is only 32K words */
 #define TNY_RAM_SIZE 0x8000
 #define TNY_MAX_RAM_ADDRESS 0x7FFF
 
@@ -108,6 +108,15 @@ typedef void(*TNY_PORT_CHANGE_FNPTR)(teenyat *t, bool is_port_a, tny_word port);
 
 #define TNY_RANDOM_ADDRESS 0x8010  /* positive random values */
 #define TNY_RANDOM_BITS_ADDRESS 0x8011  /* random 16-bit pattern */
+
+#define TNY_CONTROL_STATUS_REGISTER 0x8EFF
+
+#define TNY_INTERRUPT_VECTOR_TABLE_START 0x8E00
+#define TNY_INTERRUPT_VECTOR_TABLE_END 0x8E0F
+#define TNY_INTERRUPT_ENABLE_REGISTER 0x8E10
+#define TNY_INTERRUPT_QUEUE_REGISTER 0x8E11
+#define TNY_INTERRUPT_VECTOR_TABLE_SIZE 0x10  /* 16 possible addresses */
+
 
 #define TNY_PERIPHERAL_BASE_ADDRESS 0x9000
 
@@ -137,6 +146,13 @@ union tny_word {
 		tny_uword reserved : 12;
 	} inst_flags;
 
+	/* the Control Status Register (CSR) */
+	struct {
+		tny_uword interrupt_enable  : 1;
+		tny_uword interrupt_clearing  : 1;
+		tny_uword reserved : 14;
+	} csr;
+
 	struct {
 		tny_uword byte0 : 8;
 		tny_uword byte1 : 8;
@@ -163,6 +179,7 @@ union tny_word {
 		tny_uword bit14 : 1;
 		tny_uword bit15 : 1;
 	} bits;
+
 };
 
 struct teenyat {
@@ -172,6 +189,8 @@ struct teenyat {
 	tny_word ram[TNY_RAM_SIZE];
 	/** copy of original bin file for resets */
 	tny_word bin_image[TNY_RAM_SIZE];
+    /** The 16 addresses in which we can jump to in ram for interrupts */
+    tny_word interrupt_vector_table[TNY_INTERRUPT_VECTOR_TABLE_SIZE];
 	/**
 	 * Registers...
 	 *
@@ -186,21 +205,22 @@ struct teenyat {
 	tny_word reg[8];
 	/**
 	 * Flag bits are set by CMP and all ALU instructions.
-	 */
-	struct {
-		/**
-		 * Carry is set/cleared by arithmetic, shift and rotate instructions.
-		 * For shift/rotate instructions, the final bit shifted out of storage
-		 * determines the flag.  If the shift length is zero, the flag is
-		 * unchanged. */
-		bool carry;
-		/** Set/cleared if the result of a CMP or ALU instruction is 0 or not */
-		bool equals;
-		/** This flag is effectively the sign bit of the CMP or ALU result */
-		bool less;
-		/** Set if CMP or ALU result is positive and non-zero */
-		bool greater;
-	} flags;
+     *
+     * Access the bits directly through the inst_flags member of the tny_word union
+     *
+     * Carry is set/cleared by arithmetic, shift and rotate instructions.
+     * For shift/rotate instructions, the final bit shifted out of storage
+     * determines the flag.  If the shift length is zero, the flag is
+     * unchanged.
+     *
+     * Equals is set/cleared if the result of a CMP or ALU instruction is 0 or not
+     *
+     * Less is effectively the sign bit of the CMP or ALU result
+     *
+     * Greater is set/cleared if CMP or ALU result is positive and non-zero
+     *
+     **/
+    tny_word flags;
 	/**
 	 * System calllback function to handle TeenyAT read requests
 	 */
@@ -238,6 +258,27 @@ struct teenyat {
 	 * System callback for whenever output port pins have changed
 	 */
 	TNY_PORT_CHANGE_FNPTR port_change;
+
+	/**
+	 * The system control register allows us to enable
+	 * and disable features of the architecture
+	 */
+	tny_word control_status_register;
+	/*
+	 * Determines which interrups are enabled
+	 */
+	tny_word interrupt_enable_register;
+	/*
+	 * Our priority queue of interrupts in which to
+	 * service
+	 */
+	tny_word interrupt_queue_register;
+	/*
+	 * These are the address & flags we should preserve during an interrupt
+	 */
+	tny_word interrupt_return_address;
+	tny_word interrupt_return_flags;
+
 	/**
 	 * Each teenyat instance has a unique random number generator stream,
 	 * seeded at initialization.  These are using the PCG-XSH-RR with a 64-bit
@@ -246,16 +287,16 @@ struct teenyat {
 	 */
 	struct {
 		uint64_t state;
-    	uint64_t increment;
+		uint64_t increment;
 	} random;
-	 /**
-      * Each teenyat instance is inherently initialized with a fixed cycle rate
-      * 1 MHz. This is controlled through the clock_wait_time which is our amount of 
-      * time to busy wait in a for loop. To account for aggregate error, this variable 
-      * is adaptively updated once after every pace_cnt cycles, goes by ensuring we 
-      * stay in line with our cycle time 
-      */
-     struct{
+	/**
+	 * Each teenyat instance is inherently initialized with a fixed cycle rate
+	 * 1 MHz. This is controlled through the clock_wait_time which is our amount of 
+	 * time to busy wait in a for loop. To account for aggregate error, this variable 
+	 * is adaptively updated once after every pace_cnt cycles, goes by ensuring we 
+	 * stay in line with our cycle time 
+	 */
+	struct{
 		uint64_t clock_wait_time;
 		int16_t pace_cnt;
 		/* Our first registered clock cycle */
@@ -306,6 +347,8 @@ struct teenyat {
 #define TNY_OPCODE_JMP 21
 #define TNY_OPCODE_LUP 22
 #define TNY_OPCODE_DLY 23
+#define TNY_OPCODE_INT 24
+#define TNY_OPCODE_RTI 25
 
 #define TNY_REG_ZERO 0
 #define TNY_REG_PC   1
@@ -343,89 +386,87 @@ struct teenyat {
 bool tny_init_from_file(teenyat *t, FILE *bin_file,
                         TNY_READ_FROM_BUS_FNPTR bus_read,
                         TNY_WRITE_TO_BUS_FNPTR bus_write);
+
 /**
-  * @brief
-  *   Initialize a clock instance of TeenyAT with a given MHz clock rate.
-  * 
-  * @param t
-  *   The TeenyAT instance to initialize
-  *
-  * @param bin_file
-  *   The pre-assembled .bin file to load and execute
-  *
-  * @param bus_read
-  *   Callback function for handling read requests
-  *
-  * @param bus_write
-  *   Callback function for handling write requests
-  * 
-  * @param MHz
-  *   The simulated clock speed in MHz 
-  *
-  * @return
-  *   True on success, flase otherwise.
-  *
-  * @note
-  *   Upon failed initialization, the t->initialized member can be assumed false,
-  *   but the state of all other members is undefined.
-  * 
-  * @note
-  *   During testing it was found that most host machines can run 1MHz effectively
-  * 	 so that was chosen as the standard clock rate.
-  * 
-  *  
-  */ 
+ * @brief
+ *   Initialize a clock instance of TeenyAT with a given MHz clock rate.
+ *
+ * @param t
+ *   The TeenyAT instance to initialize
+ *
+ * @param bin_file
+ *   The pre-assembled .bin file to load and execute
+ *
+ * @param bus_read
+ *   Callback function for handling read requests
+ *
+ * @param bus_write
+ *   Callback function for handling write requests
+ *
+ * @param MHz
+ *   The simulated clock speed in MHz 
+ *
+ * @return
+ *   True on success, flase otherwise.
+ *
+ * @note
+ *   Upon failed initialization, the t->initialized member can be assumed false,
+ *   but the state of all other members is undefined.
+ *
+ * @note
+ *   During testing it was found that most host machines can run 1MHz effectively
+ *   so that was chosen as the standard clock rate.
+ */
  bool tny_init_clocked(teenyat *t, FILE *bin_file,
 					   TNY_READ_FROM_BUS_FNPTR bus_read,
 					   TNY_WRITE_TO_BUS_FNPTR bus_write,
 					   uint16_t MHz);
+
 /**
-* @brief
-*   Initialize an unclock instance of TeenyAT.
-* 
-* @param t
-*   The TeenyAT instance to initialize
-*
-* @param bin_file
-*   The pre-assembled .bin file to load and execute
-*
-* @param bus_read
-*   Callback function for handling read requests
-*
-* @param bus_write
-*   Callback function for handling write requests
-* 
-* @return
-*   True on success, flase otherwise.
-*
-* @note
-*   Upon failed initialization, the t->initialized member can be assumed false,
-*   but the state of all other members is undefined.
-* 
-*/ 
+ * @brief
+ *   Initialize an unclocked instance of TeenyAT.
+ *
+ * @param t
+ *   The TeenyAT instance to initialize
+ *
+ * @param bin_file
+ *   The pre-assembled .bin file to load and execute
+ *
+ * @param bus_read
+ *   Callback function for handling read requests
+ *
+ * @param bus_write
+ *   Callback function for handling write requests
+ *
+ * @return
+ *   True on success, flase otherwise.
+ *
+ * @note
+ *   Upon failed initialization, the t->initialized member can be assumed false,
+ *   but the state of all other members is undefined.
+ */
 bool tny_init_unclocked(teenyat *t, FILE *bin_file,
 						TNY_READ_FROM_BUS_FNPTR bus_read,
 						TNY_WRITE_TO_BUS_FNPTR bus_write);
 
 /**
-* @brief
-*   Helper function for setting the initial pace
-*   count of a clocked instance of the TeenyAT
-* 
-* 
-* @param t
-*   The TeenyAT instance to set pace count of 
-* 
-* @param pace_cnt
-*   The pace count to be set
-* 
-* @return
-*   True on success, false otherwise.
-*   Attempting to reset an unitialized TeenyAT will always return false.
-* 
-* @note
-* 	This function also sets the current pace count 
-*/				  
+ * @brief
+ *   Helper function for setting the initial pace
+ *   count of a clocked instance of the TeenyAT
+ *
+ * @param t
+ *   The TeenyAT instance to set pace count of
+ *
+ * @param pace_cnt
+ *   The pace count to be set
+ *
+ * @return
+ *   True on success, false otherwise.
+ *   Attempting to reset an unitialized TeenyAT will always return false.
+ *
+ * @note
+ *   This function also sets the current pace count
+ */
 bool tny_set_initial_pace_cnt(teenyat *t,int16_t pace_cnt);
 
 /**
@@ -495,13 +536,13 @@ void tny_get_ports(teenyat *t, tny_word *a, tny_word *b);
  *
  * @param t
  *   The TeenyAT instance
- * 
+ *
  * @param a
  *   New potential bits levels for port A
- * 
+ *
  * @param b
  *   Returns the current bit levels held on port B
- * 
+ *
  * @note
  *   A NULL tny_word pointer argument identifies that port is to be ignored.
  */
@@ -513,11 +554,23 @@ void tny_set_ports(teenyat *t, tny_word *a, tny_word *b);
  *
  * @param t
  *   The TeenyAT instance
- * 
+ *
  * @param port_change
  *   Callback for handling external port level changes
  */
 void tny_port_change(teenyat *t, TNY_PORT_CHANGE_FNPTR port_change);
+
+/**
+ * @brief
+ *   Trigger an external interrupt
+ *
+ * @param t
+ *   The TeenyAT instance
+ *
+ * @param external_interrupt
+ *   A number from 0-7 denoting which external interrupt to queue
+ */
+void tny_external_interrupt(teenyat* t, tny_uword external_interrupt);
 
 #ifdef __cplusplus
 }

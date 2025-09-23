@@ -149,16 +149,20 @@ code_8_inst ::= STR.
 code_9_inst ::= PSH.
 code_9_inst ::= DLY.
 code_9_inst ::= CAL.
+code_9_inst ::= INT.
 
 code_10_inst ::= PSH.
 code_10_inst ::= DLY.
 code_10_inst ::= CAL.
+code_10_inst ::= INT.
 
 code_11_inst ::= PSH.
 code_11_inst ::= DLY.
 code_11_inst ::= CAL.
+code_11_inst ::= INT.
 
 code_12_inst ::= RET.
+code_12_inst ::= RTI.
 
 code_13_inst ::= JMP.
 code_13_inst ::= JE.

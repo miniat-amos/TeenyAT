@@ -165,6 +165,8 @@ void initialize_lexical_regex(vector <token_regex> &patterns) {
 	patterns.push_back(regex_token("neg", T_NEG, nullptr));
 	patterns.push_back(regex_token("cmp", T_CMP, nullptr));
 	patterns.push_back(regex_token("dly", T_DLY, nullptr));
+	patterns.push_back(regex_token("int", T_INT, nullptr));
+	patterns.push_back(regex_token("rti", T_RTI, nullptr));
 	patterns.push_back(regex_token("jmp", T_JMP, nullptr));
 	patterns.push_back(regex_token("je", T_JE, nullptr));
 	patterns.push_back(regex_token("jne", T_JNE, nullptr));

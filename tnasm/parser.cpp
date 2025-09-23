@@ -1105,7 +1105,16 @@ bool p_code_12_line() {
         tny_word &f = inst.first;
         f.instruction.opcode = token_to_opcode(oper->id);
         f.instruction.teeny = 1;
-        f.instruction.reg1 = TNY_REG_PC;
+        switch(oper->id) {
+        case T_RET:
+            f.instruction.reg1 = TNY_REG_PC;
+            break;
+        case T_RTI:
+            f.instruction.reg1 = 0;
+        default:
+            /* TODO: This should never happen, what to do if it does */
+            break;
+        }
         f.instruction.reg2 = 0;
         f.instruction.immed4 = 0;
 
@@ -1287,6 +1296,8 @@ tny_uword token_to_opcode(int id) {
     case T_NEG:   result = TNY_OPCODE_NEG;   break;
     case T_CMP:   result = TNY_OPCODE_CMP;   break;
     case T_DLY:   result = TNY_OPCODE_DLY;   break;
+    case T_INT:   result = TNY_OPCODE_INT;   break;
+    case T_RTI:   result = TNY_OPCODE_RTI;   break;
     case T_JMP:   result = TNY_OPCODE_JMP;   break;
     case T_JE:    result = TNY_OPCODE_JMP;   break;
     case T_JNE:   result = TNY_OPCODE_JMP;   break;
@@ -1555,6 +1566,7 @@ shared_ptr <token> p_code_8_inst() {
  * code_9_inst ::= PSH.
  * code_9_inst ::= DLY.
  * code_9_inst ::= CAL.
+ * code_9_inst ::= INT.
  */
 shared_ptr <token> p_code_9_inst() {
     shared_ptr <token> result;
@@ -1562,7 +1574,8 @@ shared_ptr <token> p_code_9_inst() {
 
     (tnext = save, result = term(T_PSH)) ||
     (tnext = save, result = term(T_DLY)) ||
-    (tnext = save, result = term(T_CAL));
+    (tnext = save, result = term(T_CAL)) ||
+    (tnext = save, result = term(T_INT));
 
     return result;
 }
@@ -1571,6 +1584,7 @@ shared_ptr <token> p_code_9_inst() {
  * code_10_inst ::= PSH.
  * code_10_inst ::= DLY.
  * code_10_inst ::= CAL.
+ * code_10_inst ::= INT.
  */
 shared_ptr <token> p_code_10_inst() {
     shared_ptr <token> result;
@@ -1578,7 +1592,8 @@ shared_ptr <token> p_code_10_inst() {
 
     (tnext = save, result = term(T_PSH)) ||
     (tnext = save, result = term(T_DLY)) ||
-    (tnext = save, result = term(T_CAL));
+    (tnext = save, result = term(T_CAL)) ||
+    (tnext = save, result = term(T_INT));
 
     return result;
 }
@@ -1587,6 +1602,7 @@ shared_ptr <token> p_code_10_inst() {
  * code_11_inst ::= PSH.
  * code_11_inst ::= DLY.
  * code_11_inst ::= CAL.
+ * code_11_inst ::= INT.
  */
 shared_ptr <token> p_code_11_inst() {
     shared_ptr <token> result;
@@ -1594,19 +1610,22 @@ shared_ptr <token> p_code_11_inst() {
 
     (tnext = save, result = term(T_PSH)) ||
     (tnext = save, result = term(T_DLY)) ||
-    (tnext = save, result = term(T_CAL));
+    (tnext = save, result = term(T_CAL)) ||
+    (tnext = save, result = term(T_INT));
 
     return result;
 }
 
 /*
  * code_12_inst ::= RET.
+ * code_12_inst ::= RTI.
  */
 shared_ptr <token> p_code_12_inst() {
     shared_ptr <token> result;
     int save = tnext;
 
-    (tnext = save, result = term(T_RET));
+    (tnext = save, result = term(T_RET)) ||
+    (tnext = save, result = term(T_RTI));
 
     return result;
 }
