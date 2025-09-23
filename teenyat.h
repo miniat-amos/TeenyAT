@@ -348,7 +348,7 @@ struct teenyat {
 #define TNY_OPCODE_LUP 22
 #define TNY_OPCODE_DLY 23
 #define TNY_OPCODE_INT 24
-#define TNY_OPCODE_IRT 25
+#define TNY_OPCODE_RTI 25
 
 #define TNY_REG_ZERO 0
 #define TNY_REG_PC   1

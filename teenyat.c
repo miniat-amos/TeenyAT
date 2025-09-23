@@ -806,7 +806,7 @@ void tny_clock(teenyat *t) {
 				t->interrupt_queue_register.u |= interrupt_mask;
 			}
 			break;
-		case TNY_OPCODE_IRT:
+		case TNY_OPCODE_RTI:
 			set_pc(t, t->interrupt_return_address.u);  // restore pc
 			t->flags.u = t->interrupt_return_flags.u;  // restore flags
 			t->control_status_register.csr.interrupt_enable = 1;  // reenable interrupts

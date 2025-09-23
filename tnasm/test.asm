@@ -90,6 +90,8 @@
     ShL rz, -1
     ShR pc, -2
 
+    INT rA
+    RTI
 
     INV rA                  ;2
 
