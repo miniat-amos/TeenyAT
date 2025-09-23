@@ -196,7 +196,9 @@ bool tny_reset(teenyat *t) {
 	t->port_change = NULL;
 
 	/* Disable all architectural features */
-	t->control_status_register.u = 0;
+	t->control_status_register.csr.interrupt_enable = 0;
+	t->control_status_register.csr.interrupt_clearing = 0;
+	t->control_status_register.csr.reserved = 0;
 
 	/* Clear & disable all interrupts by default */
 	t->interrupt_enable_register.u = 0;
@@ -310,10 +312,17 @@ void tny_set_ports(teenyat *t, tny_word *a, tny_word *b) {
 }
 
 void tny_external_interrupt(teenyat* t, tny_uword external_interrupt) {
-	/* convert our interrupt into an 8 bit power of 2 */
-	external_interrupt = (1U  << (external_interrupt & 0x7));
+	/*
+	 * Make a mask with a 1 in the position of the external interrupt number
+	 * offset so external interrupt 0..7 is mapped to bits 8..15 as the
+	 * external eight interrupts are mapped to the interrupt vector table
+	 * as ints 8..15.
+	 * 
+	 * external_interrupt > 7 are wrapped
+	 */
+	tny_uword iqr_mask = 1U << ((external_interrupt % 8) + 8);
 	/* mask in the interrupt into the upper half of our iqr */
-	t->interrupt_queue_register.u |= (external_interrupt << 8);
+	t->interrupt_queue_register.u |= iqr_mask;
 
 	return;
 }
@@ -333,17 +342,17 @@ void handle_interrupts(teenyat *t) {
 	bool      IE  = t->control_status_register.csr.interrupt_enable;
 	bool      IC  = t->control_status_register.csr.interrupt_clearing;
 	tny_uword IER = t->interrupt_enable_register.u;
-	tny_uword IQR = t->interrupt_queue_register.u & IER; //mask our queue register with enabled interrupts
-	tny_uword INT = IQR & -IQR; // get the highest priority interrupt
+	tny_uword IQR = t->interrupt_queue_register.u & IER;  //mask our queue register with enabled interrupts
+	tny_uword INT = IQR & -IQR;  // get the highest priority interrupt
 	if(IE && INT) {
-		tny_uword ivt_index = tny_get_interrupt_index(INT); // get the index into the ivt
+		tny_uword ivt_index = tny_get_interrupt_index(INT);  // get the index into the ivt
 		/* preserve our old program counter and flags */
 		t->interrupt_return_address.u = t->reg[TNY_REG_PC].u;
 		t->interrupt_return_flags.u = t->flags.u;
 		/* jump to the corresponding ISR address */
 		t->reg[TNY_REG_PC].u = t->interrupt_vector_table[ivt_index].u;
-		t->control_status_register.csr.interrupt_enable = 0; // disable interrupts
-		t->interrupt_queue_register.u  &= ~INT; // clear the request
+		t->control_status_register.csr.interrupt_enable = 0;  // disable interrupts
+		t->interrupt_queue_register.u  &= ~INT;  // clear the request
 	}
 
 	/* clear interrupts if interrupt clearing is enabled */
@@ -786,15 +795,20 @@ void tny_clock(teenyat *t) {
 		case TNY_OPCODE_INT:
 			{
 				tny_sword interrupt_number = t->reg[reg2].s + immed;
-				/* convert our interrupt into 8 bit power of 2 */
-				tny_uword interrupt_mask = (1U  << (interrupt_number & 0xF));
+
+				/*
+				 * Make a mask with a 1 in the position of the interrupt number
+				 *
+				 * interrupt > 15 are wrapped
+				 */
+				tny_uword interrupt_mask = 1U << (interrupt_number % 16);
 				/* mask in the interrupt into the upper half of our iqr */
 				t->interrupt_queue_register.u |= interrupt_mask;
 			}
 			break;
 		case TNY_OPCODE_IRT:
-			set_pc(t, t->interrupt_return_address.u); // restore pc
-			t->flags.u = t->interrupt_return_flags.u; // restore flags
+			set_pc(t, t->interrupt_return_address.u);  // restore pc
+			t->flags.u = t->interrupt_return_flags.u;  // restore flags
 			t->control_status_register.csr.interrupt_enable = 1;  // reenable interrupts
 			break;
 		default:
