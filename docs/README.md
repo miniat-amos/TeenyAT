@@ -47,6 +47,8 @@ Each instruction follows a standard format:
 | [`JMP`](./instructions/jmp.md)   | Set program counter to value        | `jmp !main_loop`|
 | [`LUP`](./instructions/lup.md)   | Loop to label register amount     | `lup rA, !kill_loop`|
 | [`DLY`](./instructions/dly.md)   | Delay value amount of cycles        | `dly rA`|
+| [`INT`](./instructions/int.md)   | Generate an interrupt, 0..15      | `int 5`|
+| [`RTI`](./instructions/rti.md)   | Return from an interrupt handler   | `rti`|
 
 <a name="pseudo-table"/>
 
