@@ -14,35 +14,35 @@
 
 #include "teenyat.h"
 
-/**
-  * 	Platform Independent microsecond clock function  
-  * */ 
- #if defined(_WIN64) || defined(_WIN32) 
-     #include <windows.h>
-     /* Query windows high resolution clock for time */
-     uint64_t us_clock(void) {
-         LARGE_INTEGER frequency, counter;
-         QueryPerformanceFrequency(&frequency);
-         QueryPerformanceCounter(&counter);
-         /* Convert to micorseconds */
-         return (counter.QuadPart * 1000000LL) / frequency.QuadPart;
-     }
- #else
-     #include <unistd.h>
-     uint64_t us_clock(void) {
-         struct timespec ts;
-         clock_gettime(CLOCK_MONOTONIC, &ts);
-         /* Convert to micorseconds */
-         return (uint64_t)(ts.tv_sec * 1000000LL + ts.tv_nsec / 1000LL);
-     }
- #endif
+/*
+ * Platform Independent microsecond clock function
+ */
+#if defined(_WIN64) || defined(_WIN32)
+	#include <windows.h>
+	/* Query windows high resolution clock for time */
+	uint64_t us_clock(void) {
+		LARGE_INTEGER frequency, counter;
+		QueryPerformanceFrequency(&frequency);
+		QueryPerformanceCounter(&counter);
+		/* Convert to micorseconds */
+		return (counter.QuadPart * 1000000LL) / frequency.QuadPart;
+	}
+#else
+	#include <unistd.h>
+	uint64_t us_clock(void) {
+		struct timespec ts;
+		clock_gettime(CLOCK_MONOTONIC, &ts);
+		/* Convert to micorseconds */
+		return (uint64_t)(ts.tv_sec * 1000000LL + ts.tv_nsec / 1000LL);
+	}
+#endif
 
 tny_uword tny_random(teenyat *t);
 uint64_t  tny_calibrate_1_MHZ(void);
 
 static void set_elg_flags(teenyat *t, tny_sword alu_result) {
 	t->flags.inst_flags.equals = (alu_result == 0);
-	t->flags.inst_flags.less =  (alu_result >> 15) & 1;
+	t->flags.inst_flags.less = (alu_result >> 15) & 1;
 	t->flags.inst_flags.greater = (alu_result > 0);
 
 	return;
@@ -98,7 +98,10 @@ static void default_bus_write(teenyat *t, tny_uword addr, tny_word data, uint16_
 bool tny_init_from_file(teenyat *t, FILE *bin_file,
                         TNY_READ_FROM_BUS_FNPTR bus_read,
                         TNY_WRITE_TO_BUS_FNPTR bus_write) {
-	if(!t) return false;
+
+	if(!t) {
+		return false;
+	}
 	t->initialized = false;
 	if(!bin_file) return false;
 
@@ -107,17 +110,21 @@ bool tny_init_from_file(teenyat *t, FILE *bin_file,
 
 	/* backup .bin file */
 	size_t words_read = fread(t->bin_image, sizeof(tny_word), TNY_RAM_SIZE, bin_file);
-	if((words_read <= 0) || ferror(bin_file)) return false;
+	if((words_read <= 0) || ferror(bin_file)) {
+		return false;
+	}
 
 	/* store bus callbacks */
 	t->bus_read = bus_read ? bus_read : default_bus_read;
 	t->bus_write = bus_write ? bus_write : default_bus_write;
-    
+
 	t->clock_manager.initial_pace_cnt = TNY_DEFAULT_PACE_CNT;
-    t->clock_manager.clock_wait_time = tny_calibrate_1_MHZ();
-    t->clock_manager.pace_divisor = 1;
- 
-	if(!tny_reset(t)) return false;
+	t->clock_manager.clock_wait_time = tny_calibrate_1_MHZ();
+	t->clock_manager.pace_divisor = 1;
+
+	if(!tny_reset(t)) {
+		return false;
+	}
 
 	t->initialized = true;
 
@@ -125,10 +132,10 @@ bool tny_init_from_file(teenyat *t, FILE *bin_file,
 }
 
 bool tny_init_clocked(teenyat *t, FILE *bin_file,
-	TNY_READ_FROM_BUS_FNPTR bus_read,
-	TNY_WRITE_TO_BUS_FNPTR bus_write,
-	uint16_t MHz){
-	
+                      TNY_READ_FROM_BUS_FNPTR bus_read,
+                      TNY_WRITE_TO_BUS_FNPTR bus_write,
+                      uint16_t MHz){
+
 	if(!t) return false;
 	/* Cannot have negative or zero pace_divisor */
 	if(MHz == 0 ) return false;
@@ -140,9 +147,9 @@ bool tny_init_clocked(teenyat *t, FILE *bin_file,
 }
 
 bool tny_init_unclocked(teenyat *t, FILE *bin_file,
-	TNY_READ_FROM_BUS_FNPTR bus_read,
-	TNY_WRITE_TO_BUS_FNPTR bus_write){
-	
+                        TNY_READ_FROM_BUS_FNPTR bus_read,
+                        TNY_WRITE_TO_BUS_FNPTR bus_write){
+
 	if(!t) return false;
 
 	bool result = tny_init_from_file(t,bin_file,bus_read,bus_write);
@@ -188,16 +195,16 @@ bool tny_reset(teenyat *t) {
 
 	t->port_change = NULL;
 
-    /* Disable all architectural features */
-    t->control_status_register.u = 0;
+	/* Disable all architectural features */
+	t->control_status_register.u = 0;
 
-    /* Clear & disable all interrupts by default */
-    t->interrupt_enable_register.u = 0;
-    t->interrupt_queue_register.u  = 0;
-    t->interrupt_return_address.u  = 0;
-    t->interrupt_return_flags.u    = 0;
-    /* Maybe dont memset? could simulate randomness... */
-    memset(t->interrupt_vector_table, 0, sizeof(t->interrupt_vector_table));
+	/* Clear & disable all interrupts by default */
+	t->interrupt_enable_register.u = 0;
+	t->interrupt_queue_register.u  = 0;
+	t->interrupt_return_address.u  = 0;
+	t->interrupt_return_flags.u    = 0;
+	/* Maybe dont memset? could simulate randomness... */
+	memset(t->interrupt_vector_table, 0, sizeof(t->interrupt_vector_table));
 
 	/*
 	 * Initialize each teenyat with a unique random number stream
@@ -250,7 +257,8 @@ void tny_modify_port_levels(teenyat *t, bool is_system_request, tny_word data, b
 	tny_word src;
 	src.u = ~0 * is_system_request;
 
-	/* We must know for which bits the source of the request and direction
+	/*
+	 * We must know for which bits the source of the request and direction
 	 * bits match.  Eg, if the system wants to modify the port levels,
 	 * it can only do that for port bits with their direction set for input.
 	 */
@@ -302,49 +310,54 @@ void tny_set_ports(teenyat *t, tny_word *a, tny_word *b) {
 }
 
 void tny_external_interrupt(teenyat* t, tny_uword external_interrupt) {
-    external_interrupt = (1U  << (external_interrupt & 0x7));   // convert our interrupt into an 8 bit power of 2
-    t->interrupt_queue_register.u |= (external_interrupt << 8); // mask in the interrupt into the upper half of our iqr
-    return;
+	/* convert our interrupt into an 8 bit power of 2 */
+	external_interrupt = (1U  << (external_interrupt & 0x7));
+	/* mask in the interrupt into the upper half of our iqr */
+	t->interrupt_queue_register.u |= (external_interrupt << 8);
+
+	return;
 }
 
 /* Assumes that bits is non-zero */
 tny_uword tny_get_interrupt_index(tny_uword bits) {
-    tny_uword n = 0;
-    if (!(bits & 0x000000FF)) { n +=  8; bits >>=  8; }
-    if (!(bits & 0x0000000F)) { n +=  4; bits >>=  4; }
-    if (!(bits & 0x00000003)) { n +=  2; bits >>=  2; }
-    if (!(bits & 0x00000001))   n +=  1;
-    return n;
+	tny_uword n = 0;
+	if (!(bits & 0x000000FF)) { n +=  8; bits >>=  8; }
+	if (!(bits & 0x0000000F)) { n +=  4; bits >>=  4; }
+	if (!(bits & 0x00000003)) { n +=  2; bits >>=  2; }
+	if (!(bits & 0x00000001))   n +=  1;
+
+	return n;
 }
 
 void handle_interrupts(teenyat *t) {
-   bool      IE  = t->control_status_register.csr.interrupt_enable;
-   bool      IC  = t->control_status_register.csr.interrupt_clearing;
-   tny_uword IER = t->interrupt_enable_register.u;
-   tny_uword IQR = t->interrupt_queue_register.u & IER; //mask our queue register with enabled interrupts
-   tny_uword INT = IQR & -IQR; // get the highest priority interrupt
-   if(IE && INT) {
-      tny_uword ivt_index = tny_get_interrupt_index(INT); // get the index into the ivt
-      /* preserve our old program counter and flags */
-      t->interrupt_return_address.u = t->reg[TNY_REG_PC].u;
-      t->interrupt_return_flags.u = t->flags.u;
-      /* jump to the corresponding ISR address */
-      t->reg[TNY_REG_PC].u = t->interrupt_vector_table[ivt_index].u;
-      t->control_status_register.csr.interrupt_enable = 0; // disable interrupts
-      t->interrupt_queue_register.u  &= ~INT; // clear the request
-   }
-   /* clear interrupts if interrupt clearing is enabled */
-   if(IC) {
-      t->interrupt_queue_register.u &= IER;
-   }
-   return;
+	bool      IE  = t->control_status_register.csr.interrupt_enable;
+	bool      IC  = t->control_status_register.csr.interrupt_clearing;
+	tny_uword IER = t->interrupt_enable_register.u;
+	tny_uword IQR = t->interrupt_queue_register.u & IER; //mask our queue register with enabled interrupts
+	tny_uword INT = IQR & -IQR; // get the highest priority interrupt
+	if(IE && INT) {
+		tny_uword ivt_index = tny_get_interrupt_index(INT); // get the index into the ivt
+		/* preserve our old program counter and flags */
+		t->interrupt_return_address.u = t->reg[TNY_REG_PC].u;
+		t->interrupt_return_flags.u = t->flags.u;
+		/* jump to the corresponding ISR address */
+		t->reg[TNY_REG_PC].u = t->interrupt_vector_table[ivt_index].u;
+		t->control_status_register.csr.interrupt_enable = 0; // disable interrupts
+		t->interrupt_queue_register.u  &= ~INT; // clear the request
+	}
+
+	/* clear interrupts if interrupt clearing is enabled */
+	if(IC) {
+		t->interrupt_queue_register.u &= IER;
+	}
+
+	return;
 }
 
 void tny_clock(teenyat *t) {
-	 
 	/* Get initial time of our clock cycles 
-     *  and initialize our first pace start 
-    */
+	 * and initialize our first pace start 
+	 */
 	if(t->cycle_cnt == 0){
 		t->clock_manager.clock_epoch = us_clock();
 		t->clock_manager.pace_start = t->clock_manager.clock_epoch;
@@ -359,19 +372,19 @@ void tny_clock(teenyat *t) {
 	if(t->delay_cycles) {
 		t->delay_cycles--;
 	}else{
-        /*
-         * All instruction fetches are limited to the range 0x0000 through 0x7FFF.
-         * Modifications to the PC are always truncated to that range.  As such,
-         * an unusual circumstance could arrive where a two-word instruction begins
-         * at 0x7FFF and has its second word retrieved from 0x0000.  This almost
-         * certainly not something anyone would want, but it's how it works :-)
-         */
+		/*
+		 * All instruction fetches are limited to the range 0x0000 through 0x7FFF.
+		 * Modifications to the PC are always truncated to that range.  As such,
+		 * an unusual circumstance could arrive where a two-word instruction begins
+		 * at 0x7FFF and has its second word retrieved from 0x0000.  This almost
+		 * certainly not something anyone would want, but it's how it works :-)
+		 */
 
-        handle_interrupts(t);
+		handle_interrupts(t);
 
 		trunc_pc(t);
 
-		tny_uword orig_PC = t->reg[TNY_REG_PC].u; /* backup for error reporting */
+		tny_uword orig_PC = t->reg[TNY_REG_PC].u;  // backup for error reporting
 
 		tny_word IR = t->ram[t->reg[TNY_REG_PC].u];
 		inc_pc(t);
@@ -389,8 +402,8 @@ void tny_clock(teenyat *t) {
 
 		if(teeny) {
 			/*
-			* This is a single word instruction encoding
-			*/
+			 * This is a single word instruction encoding
+			 */
 			dec_pc(t);
 			immed = IR.instruction.immed4;
 		}
@@ -400,8 +413,8 @@ void tny_clock(teenyat *t) {
 		}
 
 		/*
-		* EXECUTE
-		*/
+		 * EXECUTE
+		 */
 
 		uint32_t tmp;  /* for quick use to determine carry */
 
@@ -433,21 +446,23 @@ void tny_clock(teenyat *t) {
 				case TNY_RANDOM_BITS_ADDRESS:
 					t->reg[reg1].u = tny_random(t);
 					break;
-                case TNY_CONTROL_STATUS_REGISTER:
-                    t->reg[reg1] = t->control_status_register;
-                    break;
-                case TNY_INTERRUPT_ENABLE_REGISTER:
-                    t->reg[reg1] = t->interrupt_enable_register;
-                    break;
-                case TNY_INTERRUPT_QUEUE_REGISTER:
-                    t->reg[reg1] = t->interrupt_queue_register;
-                    break;
+				case TNY_CONTROL_STATUS_REGISTER:
+					t->reg[reg1] = t->control_status_register;
+					break;
+				case TNY_INTERRUPT_ENABLE_REGISTER:
+					t->reg[reg1] = t->interrupt_enable_register;
+					break;
+				case TNY_INTERRUPT_QUEUE_REGISTER:
+					t->reg[reg1] = t->interrupt_queue_register;
+					break;
 				default:
-                    /* Check if reading from interrupt service */
-                    if(addr >= TNY_INTERRUPT_VECTOR_TABLE_START && addr <= TNY_INTERRUPT_VECTOR_TABLE_END) {
-                        t->reg[reg1] = t->interrupt_vector_table[addr - TNY_INTERRUPT_VECTOR_TABLE_START];
-                    }
-                    else if(addr >= TNY_PERIPHERAL_BASE_ADDRESS) {
+					/* Check if reading from interrupt service */
+					if(addr >= TNY_INTERRUPT_VECTOR_TABLE_START &&
+					   addr <= TNY_INTERRUPT_VECTOR_TABLE_END
+					  ) {
+						t->reg[reg1] = t->interrupt_vector_table[addr - TNY_INTERRUPT_VECTOR_TABLE_START];
+					}
+					else if(addr >= TNY_PERIPHERAL_BASE_ADDRESS) {
 						/* read from peripheral address */
 						t->delay_cycles += TNY_BUS_EXTERNAL_DELAY_ADJUST;
 
@@ -465,9 +480,9 @@ void tny_clock(teenyat *t) {
 					}
 					else {
 						/* 
-						* This is an attempt to access an unaccounted for
-						* address in the "Microcontroller Device Space".
-						*/
+						 * This is an attempt to access an unaccounted for
+						 * address in the "Microcontroller Device Space".
+						 */
 					}
 					break;
 				}
@@ -494,24 +509,26 @@ void tny_clock(teenyat *t) {
 				case TNY_RANDOM_ADDRESS:
 					/* Do nothing */
 					break;
-                case TNY_RANDOM_BITS_ADDRESS:
+				case TNY_RANDOM_BITS_ADDRESS:
 					/* Do nothing */
 					break;
-                case TNY_CONTROL_STATUS_REGISTER:
-                    t->control_status_register = t->reg[reg2];
-                    break;
-                case TNY_INTERRUPT_ENABLE_REGISTER:
-                    t->interrupt_enable_register = t->reg[reg2];
-                    break;
-                case TNY_INTERRUPT_QUEUE_REGISTER:
-                    t->interrupt_queue_register = t->reg[reg2];
-                    break;
+				case TNY_CONTROL_STATUS_REGISTER:
+					t->control_status_register = t->reg[reg2];
+					break;
+				case TNY_INTERRUPT_ENABLE_REGISTER:
+					t->interrupt_enable_register = t->reg[reg2];
+					break;
+				case TNY_INTERRUPT_QUEUE_REGISTER:
+					t->interrupt_queue_register = t->reg[reg2];
+					break;
 				default:
-                    /* Check if writing to interrupt service */
-                    if(addr >= TNY_INTERRUPT_VECTOR_TABLE_START && addr <= TNY_INTERRUPT_VECTOR_TABLE_END) {
-                        t->interrupt_vector_table[addr - TNY_INTERRUPT_VECTOR_TABLE_START] = t->reg[reg2];
-                    }
-                    else if(addr >= TNY_PERIPHERAL_BASE_ADDRESS) {
+					/* Check if writing to interrupt service */
+					if(addr >= TNY_INTERRUPT_VECTOR_TABLE_START &&
+					   addr <= TNY_INTERRUPT_VECTOR_TABLE_END
+					  ) {
+						t->interrupt_vector_table[addr - TNY_INTERRUPT_VECTOR_TABLE_START] = t->reg[reg2];
+					}
+					else if(addr >= TNY_PERIPHERAL_BASE_ADDRESS) {
 						/* write to peripheral address */
 						t->delay_cycles += TNY_BUS_EXTERNAL_DELAY_ADJUST;
 
@@ -527,17 +544,17 @@ void tny_clock(teenyat *t) {
 					}
 					else {
 						/* 
-						* This is an attempt to access an unaccounted for
-						* address in the "Microcontroller Device Space".
-						*/
+						 * This is an attempt to access an unaccounted for
+						 * address in the "Microcontroller Device Space".
+						 */
 					}
 					break;
 				}
 
 				/*
-				* To promote student use of registers, all bus operations,
-				* including RAM access comes with an extra penalty.
-				*/
+				 * To promote student use of registers, all bus operations,
+				 * including RAM access comes with an extra penalty.
+				 */
 				t->delay_cycles += TNY_BUS_DELAY;
 			}
 			break;
@@ -547,9 +564,9 @@ void tny_clock(teenyat *t) {
 			t->reg[TNY_REG_SP].u--;
 			t->reg[TNY_REG_SP].u &= TNY_MAX_RAM_ADDRESS;
 			/*
-			* To promote student use of registers, all bus operations,
-			* including RAM access comes with an extra penalty.
-			*/
+			 * To promote student use of registers, all bus operations,
+			 * including RAM access comes with an extra penalty.
+			 */
 			t->delay_cycles += TNY_BUS_DELAY;
 			break;
 		case TNY_OPCODE_POP:
@@ -557,9 +574,9 @@ void tny_clock(teenyat *t) {
 			t->reg[TNY_REG_SP].u &= TNY_MAX_RAM_ADDRESS;
 			t->reg[reg1] = t->ram[t->reg[TNY_REG_SP].u];
 			/*
-			* To promote student use of registers, all bus operations,
-			* including RAM access comes with an extra penalty.
-			*/
+			 * To promote student use of registers, all bus operations,
+			 * including RAM access comes with an extra penalty.
+			 */
 			t->delay_cycles += TNY_BUS_DELAY;
 			break;
 		case TNY_OPCODE_BTS:
@@ -596,9 +613,9 @@ void tny_clock(teenyat *t) {
 			t->reg[TNY_REG_SP].u &= TNY_MAX_RAM_ADDRESS;
 			set_pc(t, t->reg[reg2].s + immed);
 			/*
-			* To promote student use of registers, all bus operations,
-			* including RAM access comes with an extra penalty.
-			*/
+			 * To promote student use of registers, all bus operations,
+			 * including RAM access comes with an extra penalty.
+			 */
 			t->delay_cycles += TNY_BUS_DELAY;
 			break;
 		case TNY_OPCODE_ADD:
@@ -725,7 +742,7 @@ void tny_clock(teenyat *t) {
 			break;
 		case TNY_OPCODE_JMP:
 			{
-                bool flags_checked = false;
+				bool flags_checked = false;
 				bool condition_satisfied = false;
 				if(carry) {
 					flags_checked = true;
@@ -758,25 +775,28 @@ void tny_clock(teenyat *t) {
 			}
 			break;
 		case TNY_OPCODE_DLY:
-            {
-                tny_sword delay_cnt = t->reg[reg2].s + immed;
-			    if(delay_cnt >= 1) {
-					t->delay_cycles = delay_cnt - 1; // current instruction already 1 cycle
-			    }
-            }
+			{
+				tny_sword delay_cnt = t->reg[reg2].s + immed;
+				if(delay_cnt >= 1) {
+					/* current instruction already 1 cycle */
+					t->delay_cycles = delay_cnt - 1;
+				}
+			}
 			break;
-        case TNY_OPCODE_INT:
-            {
-                tny_sword interrupt_number = t->reg[reg2].s + immed;
-                tny_uword interrupt_mask = (1U  << (interrupt_number & 0xF)); // convert our interrupt into 8 bit power of 2
-                t->interrupt_queue_register.u |= interrupt_mask; // mask in the interrupt into the upper half of our iqr
-            }
-            break;
-        case TNY_OPCODE_IRT:
-            set_pc(t, t->interrupt_return_address.u); // restore pc
-            t->flags.u = t->interrupt_return_flags.u; // restore flags
-            t->control_status_register.csr.interrupt_enable = 1;  // reenable interrups
-            break;
+		case TNY_OPCODE_INT:
+			{
+				tny_sword interrupt_number = t->reg[reg2].s + immed;
+				/* convert our interrupt into 8 bit power of 2 */
+				tny_uword interrupt_mask = (1U  << (interrupt_number & 0xF));
+				/* mask in the interrupt into the upper half of our iqr */
+				t->interrupt_queue_register.u |= interrupt_mask;
+			}
+			break;
+		case TNY_OPCODE_IRT:
+			set_pc(t, t->interrupt_return_address.u); // restore pc
+			t->flags.u = t->interrupt_return_flags.u; // restore flags
+			t->control_status_register.csr.interrupt_enable = 1;  // reenable interrupts
+			break;
 		default:
 			fprintf(stderr, "Unknown opcode (%d) encountered at 0x%04X on cycle %" PRIu64 "\n",
 					opcode, orig_PC, t->cycle_cnt);
@@ -793,7 +813,7 @@ void tny_clock(teenyat *t) {
 	if(--(t->clock_manager.pace_cnt) == 0) {
 		/*
 		 * Time to recalibrate our pace
-		*/
+		 */
 		uint64_t now_us = us_clock();
 		uint64_t us_elapsed = now_us - (t->clock_manager.pace_start);
 
@@ -820,44 +840,44 @@ void tny_clock(teenyat *t) {
 }
 
 tny_uword tny_random(teenyat *t) {
-    uint64_t tmp = t->random.state;
+	uint64_t tmp = t->random.state;
 
-    /*
+	/*
 	 * Find the next state in the sequence.  The weird large immediate value
 	 * is a special constant chosen by the world at large to do great
 	 * things for the random number. ... We don't really know about it,
 	 * but it seems to work ;-)
 	 */
-    t->random.state = tmp * 6364136223846793005ULL + t->random.increment;
+	t->random.state = tmp * 6364136223846793005ULL + t->random.increment;
 
 	/*
 	 * The code below involves some shifts of seemingly random amounts.
-	 * They determine the amounts of manioulation of 64 and 16 bit values.
+	 * They determine the amounts of manipulation of 64 and 16 bit values.
 	 * 27 = 32 - 5
 	 * 18 = floor((64 - 27) / 2)
 	 * 59 = 64 - 5
 	 */
 
-    /* use top 5 bits of previous state to "randomly" rotate */
-    unsigned bitcnt_to_rotate = tmp >> 59;
+	/* use top 5 bits of previous state to "randomly" rotate */
+	unsigned bitcnt_to_rotate = tmp >> 59;
 
-    /* scramble the previous state and truncate to 16 bits */
-    uint32_t to_rotate = (tmp >> 18 ^ tmp) >> 27;
+	/* scramble the previous state and truncate to 16 bits */
+	uint32_t to_rotate = (tmp >> 18 ^ tmp) >> 27;
 
-    /* return the right-rotated the scrambled previous state */
+	/* return the right-rotated the scrambled previous state */
 	uint32_t result = to_rotate >> bitcnt_to_rotate;
 	/* the bitmask below ensures the left shift is fewer than 32 bits */
 	result |= to_rotate << (-bitcnt_to_rotate & ~(~0U << 5));
 
 	/* truncate result and return as 16-bit tny_uword */
-    return (tny_uword)result;
+	return (tny_uword)result;
 }
 
-/**
-  * This function will estimate the number of iterations needed in
-  * a busy loop to consume 1 us (clock period for 1 MHz).
-  */ 
- uint64_t tny_calibrate_1_MHZ(void){
+/*
+ * This function will estimate the number of iterations needed in
+ * a busy loop to consume 1 us (clock period for 1 MHz).
+ */ 
+uint64_t tny_calibrate_1_MHZ(void){
 	const uint64_t TRIAL_CNT = 5212004;
 	uint64_t start = us_clock();
 
