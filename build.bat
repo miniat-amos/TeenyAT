@@ -3,6 +3,40 @@ setlocal
 
 pushd .
 
+:: check for and prefer GCC/G++
+echo Checking for GCC/G++
+where gcc >nul 2>&1
+if %errorlevel%==0 (
+    where g++ >nul 2>&1
+    if %errorlevel%==0 (
+        set C=gcc
+        set CXX=g++
+        goto :end_compiler_check
+    )
+
+)
+
+echo Missing either GCC or G++
+:: check for Clang/Clang++
+echo Checking for Clang/Clang++
+where clang >nul 2>&1
+if %errorlevel%==0 (
+    where clang++ >nul 2>&1
+    if %errorlevel%==0 (
+        set C=clang
+        set CXX=clang++
+        goto :end_compiler_check
+    )
+
+)
+
+:: Niether GCC/G++ or Clang/Clang++ was found
+echo Error: No suitable compiler (GCC/G++ or Clang/Clang++) found
+exit /b
+
+:end_compiler_check
+
+
 set BUILD_DIR=build
 set BUILD_TYPE=Release
 
@@ -16,9 +50,6 @@ if "%1"=="debug" (
     :: again, unsure if we want separate directories for this
     :: rd /s /q build build_debug
     rd /s /q build
-    echo.
-    echo Clean complete.
-    echo.
 
     popd
     exit /b
@@ -45,15 +76,15 @@ if not exist "%BUILD_DIR%" (
 cd "%BUILD_DIR%"
 
 echo Running CMake configuration...
-cmake -DCMAKE_BUILD_TYPE="%BUILD_TYPE%" ..
+set MAKE_TARGET=-G "MinGW Makefiles"
+set C_COMPILER=-DCMAKE_C_COMPILER="!C!"
+set CXX_COMPILER=-DCMAKE_CXX_COMPILER="!CXX!"
+set BUILD=-DCMAKE_BUILD_TYPE="%BUILD_TYPE%"
+cmake %MAKE_TARGET% %C_COMPILER% %CXX_COMPILER% %BUILD% ..
 
 echo Building project...
 cmake --build .
 
 popd
-
-echo.
-echo Build complete!
-echo.
 
 endlocal
