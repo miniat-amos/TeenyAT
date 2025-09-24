@@ -1,6 +1,15 @@
 cmake_minimum_required(VERSION 3.10)
 project(edison LANGUAGES C CXX)
 
+if(MSVC)
+    message(FATAL_ERROR
+            "MSVC detected as the compiler, which is not supported.\n"
+            "Please reconfigure with CMake to use GCC/G++ or Clang.\n"
+            "Once you've installed one of these compiler suites, the\n"
+            "easiest way to do this on Windows is to run the\n"
+            "build.bat file in the TeenyAT root directory.")
+endif()
+
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 # TODO: We cannot disable C extensions unless we eliminate
@@ -33,20 +42,6 @@ add_custom_command(
 
 #-------------- Edison build  ----------------
 
-# TODO: We cannot disable extensions for C until we eliminate
-#       strdup() as it is not standard and require _POSIX_C_SOURCE 200809L.
-#       Once this is resolved, we can eliminate this entire section below.
-set(CMAKE_REQUIRED_DEFINITIONS -D_POSIX_C_SOURCE=200809L)
-include(CheckSymbolExists)
-check_symbol_exists(strdup "string.h" HAVE_STRDUP)
-if(NOT HAVE_STRDUP)
-    message(FATAL_ERROR 
-            "strdup()is required but not found.\n"
-            "Consider forcing CMake to use GCC/G++ or Clang/Clang++ compilers."
-    )
-endif()
-# END TODO
-
 add_executable(edison
     audio.c
     tigr.c
@@ -73,17 +68,18 @@ target_compile_options(edison PRIVATE $<$<NOT:$<CONFIG:Debug>>:-O2>)
 
 # tigr.c generates lots of warnings with -Wall -Wextra -Wpedantic,
 # so set these options only for all other source files.
-set_property(SOURCE
-    audio.c,
+set(WARNING_OPTIONS -Wall -Wextra -Wpedantic)
+set(WARNING_SOURCES
+    audio.c
     ${ASSET_OUTPUT_SOURCE}  # the generated cpp version of board images
-    edison_board.cpp,
-    lcd_screen.cpp,
-    leds.cpp,
-    main.cpp,
-    segment.cpp,
-    utils.cpp,
-    PROPERTY COMPILE_OPTIONS -Wall -Wextra -Wpedantic
+    edison_board.cpp
+    lcd_screen.cpp
+    leds.cpp
+    main.cpp
+    segment.cpp
+    utils.cpp
 )
+set_property(SOURCE ${WARNING_SOURCES} PROPERTY COMPILE_OPTIONS ${WARNING_OPTIONS})
 
 target_link_libraries(edison PRIVATE teenyat)
 

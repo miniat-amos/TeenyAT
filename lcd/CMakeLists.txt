@@ -1,6 +1,15 @@
 cmake_minimum_required(VERSION 3.10)
 project(lcd LANGUAGES C CXX)
 
+if(MSVC)
+    message(FATAL_ERROR
+            "MSVC detected as the compiler, which is not supported.\n"
+            "Please reconfigure with CMake to use GCC/G++ or Clang.\n"
+            "Once you've installed one of these compiler suites, the\n"
+            "easiest way to do this on Windows is to run the\n"
+            "build.bat file in the TeenyAT root directory.")
+endif()
+
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 # TODO: We cannot disable C extensions unless we eliminate
@@ -42,7 +51,9 @@ target_compile_options(lcd PRIVATE $<$<NOT:$<CONFIG:Debug>>:-O3>)
 
 # tigr.c generates lots of warnings with -Wall -Wextra -Wpedantic,
 # so set these options only for all other source files.
-set_property(SOURCE color.cpp,main.cpp,screen.cpp,util.cpp PROPERTY COMPILE_OPTIONS "-Wall -Wextra -Wpedantic")
+set(WARNING_OPTIONS -Wall -Wextra -Wpedantic)
+set(WARNING_SOURCES color.cpp main.cpp screen.cpp util.cpp)
+set_property(SOURCE ${WARNING_SOURCES} PROPERTY COMPILE_OPTIONS ${WARNING_OPTIONS})
 
 target_link_libraries(lcd PRIVATE teenyat)
 
