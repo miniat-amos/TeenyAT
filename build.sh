@@ -4,60 +4,93 @@
 set -e
 pushd . > /dev/null # backup the inital directory
 
-# Default build directory and type
-BUILD_DIR="build"
-BUILD_TYPE="Release"
-
-# Handle command line arguments
-if [ "$1" == "debug" ]; then
-    #BUILD_DIR="build_debug"  # unsure if we want separate directories for this
-    BUILD_TYPE="Debug"
-    echo "Configuring for Debug build..."
-elif [ "$1" == "clean" ]; then
-    # again, unsure if we want separate directories for this
-    #echo "Cleaning build and build_debug directories..."
-    echo "Cleaning build directories..."
-    rm -rf build  # could delete build_debug if we used it
-    BUILD_EXIT=1
-elif [ "$1" == "" ]; then
-    echo "Using default build configuration..."
-else
+print_usage() {
     echo ""
-    echo "Invalid parameter: $1"
-    echo "Usage: ./build.sh [debug | clean]"
+    echo "Usage: ./build.sh [[debug] [verbose] | clean]"
     echo "    No parameter - Default Release build"
     echo "    debug - Build with debug symbols"
+    echo "    verbose - Enable verbose output during build"
     echo "    clean - Remove build directory"
     echo ""
-    BUILD_EXIT=1
+}
+
+# Default build directory, type, and verbosity
+BUILD_DIR="build"
+BUILD_TYPE="Release"
+VERBOSE_FLAG=""
+ARGS_FOUND=()
+
+for arg in "$@"; do
+    for found_arg in "${ARGS_FOUND[@]}"; do
+        if [ "$found_arg" == "$arg" ]; then
+            echo -e "\nError: Argument '$arg' provided more than once."
+            print_usage
+            popd > /dev/null
+            exit 1
+        fi
+    done
+    ARGS_FOUND+=("$arg")
+
+    case "$arg" in
+        debug)
+            if [ "$BUILD_TYPE" == "Release" ]; then
+                BUILD_TYPE="Debug"
+                echo "Configuring for Debug build..."
+            else
+                echo -e "\nError: Cannot combine 'debug' and 'release'."
+                print_usage
+                popd > /dev/null
+                exit 1
+            fi
+            ;;
+        verbose)
+            VERBOSE_FLAG="-- VERBOSE=1"
+            echo "Enabling verbose output..."
+            ;;
+        clean)
+            if [ "$BUILD_TYPE" == "Debug" ] || [ "$VERBOSE_FLAG" != "" ]; then
+                echo -e "\nError: Cannot combine 'clean' with 'debug' or 'verbose'."
+                print_usage
+                popd > /dev/null
+                exit 1
+            fi
+            echo "Cleaning build directories..."
+            rm -rf build
+            popd > /dev/null
+            exit 0
+            ;;
+        *)
+            echo -e "\nError: Invalid parameter, '$arg'"
+            print_usage
+            popd > /dev/null
+            exit 1
+            ;;
+    esac
+done
+
+# Create the build directory if it doesn't exist
+if [ ! -d "$BUILD_DIR" ]; then
+    echo "Creating directory: $BUILD_DIR"
+    mkdir "$BUILD_DIR"
 fi
 
-if [ -z "$BUILD_EXIT" ]; then
-    # Create the build directory if it doesn't exist
-    if [ ! -d "$BUILD_DIR" ]; then
-        echo "Creating directory: $BUILD_DIR"
-        mkdir "$BUILD_DIR"
-    fi
+cd "$BUILD_DIR"
+cmake -DCMAKE_BUILD_TYPE="$BUILD_TYPE" ..
+cmake --build . $VERBOSE_FLAG
 
-    cd "$BUILD_DIR"
-    cmake -DCMAKE_BUILD_TYPE="$BUILD_TYPE" ..
-    cmake --build .
+popd > /dev/null  # restore the initial directory
 
-    popd > /dev/null  # restore the initial directory
+OS_NAME=$(uname -s)
 
-
-    OS_NAME=$(uname -s)
-
-    if [ "$OS_NAME" = "Linux" ]; then
-        # Linux
-        :
-    elif [ "$OS_NAME" = "Darwin" ]; then
-        # macOS
-        :
-    else
-        # Windows... probably shouldn't here
-        :
-    fi
-
-    set +e
+if [ "$OS_NAME" = "Linux" ]; then
+    # Linux
+    :
+elif [ "$OS_NAME" = "Darwin" ]; then
+    # macOS
+    :
+else
+    # Windows... probably shouldn't here
+    :
 fi
+
+set +e
