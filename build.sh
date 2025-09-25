@@ -6,11 +6,18 @@ pushd . > /dev/null # backup the inital directory
 
 print_usage() {
     echo ""
-    echo "Usage: ./build.sh [[debug] [verbose] | clean]"
-    echo "    No parameter - Default Release build"
-    echo "    debug - Build with debug symbols"
-    echo "    verbose - Enable verbose output during build"
-    echo "    clean - Remove build directory"
+    echo "Usage: ./build.sh [OPTION]..."
+    echo ""
+    echo "Options:"
+    echo "  <no option> Default release build"
+    echo "    debug     Build with debug symbols"
+    echo "    verbose   Enable verbose output during build"
+    echo "    clean     Remove build directory (must be used alone)"
+    echo ""
+    echo "Examples:"
+    echo "    ./build.sh                  # Release build"
+    echo "    ./build.sh debug verbose    # Debug build with verbose output"
+    echo "    ./build.sh clean            # Clean the project"
     echo ""
 }
 
