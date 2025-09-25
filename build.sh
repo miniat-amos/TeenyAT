@@ -44,7 +44,7 @@ for arg in "$@"; do
                 BUILD_TYPE="Debug"
                 echo "Configuring for Debug build..."
             else
-                echo -e "\nError: Cannot combine 'debug' and 'release'."
+                echo -e "\nError: 'debug' mode requested when mode was already set."
                 print_usage
                 popd > /dev/null
                 exit 1
