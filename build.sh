@@ -20,6 +20,7 @@ BUILD_TYPE="Release"
 VERBOSE_FLAG=""
 ARGS_FOUND=()
 
+i=1
 for arg in "$@"; do
     for found_arg in "${ARGS_FOUND[@]}"; do
         if [ "$found_arg" == "$arg" ]; then
@@ -48,8 +49,8 @@ for arg in "$@"; do
             echo "Enabling verbose output..."
             ;;
         clean)
-            if [ "$BUILD_TYPE" == "Debug" ] || [ "$VERBOSE_FLAG" != "" ]; then
-                echo -e "\nError: Cannot combine 'clean' with 'debug' or 'verbose'."
+            if [ "$BUILD_TYPE" == "Debug" ] || [ "$VERBOSE_FLAG" != "" ] || (( i < $# )); then
+                echo -e "\nError: Cannot combine 'clean' with other arguments."
                 print_usage
                 popd > /dev/null
                 exit 1
@@ -66,6 +67,8 @@ for arg in "$@"; do
             exit 1
             ;;
     esac
+
+    i=i+1
 done
 
 # Create the build directory if it doesn't exist
