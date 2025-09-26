@@ -2,6 +2,7 @@
 #include <ctime>
 #include <sstream>
 #include <cstdint>
+#include <string>
 #include <vector>
 
 #include "tigr.h"
@@ -261,6 +262,25 @@ void process_keyboard_input(Tigr* win){
           buffer_push(keyboard_input_buffer,KEYBOARD_INPUT_BUFFER_SIZE,key);
       }
   }
+}
+
+/* This function keeps track of when a key has been pushed down for the first time
+ * it will only report back if a key has been pushed down for the first time
+ * */
+bool keys_down[36] = {0};
+bool key_pressed(Tigr* win) {
+    static const std::string keys = "1234567890QWERTYUIOPASDFGHJKLZXCVBNM";
+    for (size_t i = 0; i < keys.size(); i++) {
+        bool hit = tigrKeyDown(win, keys[i]);
+        if (hit && !keys_down[i]) {
+            keys_down[i] = true;
+            /* add this key to the top of the buffer */
+            keyboard_input_buffer[0]= keys[i];
+            return true;
+        }
+        keys_down[i] = hit;
+    }
+    return false;
 }
 
 /* Render Pixels using live screen */

@@ -169,6 +169,9 @@ int main(int argc, char *argv[])
             tigrUpdate(window);
             current_frame = 0;
         }
+        if(key_pressed(window)) {
+            tny_external_interrupt(&t,0);
+        }
         tny_clock(&t);
         current_frame++;
     }
