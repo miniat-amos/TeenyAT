@@ -56,6 +56,7 @@ void rect();
 void buffer_push(int buffer[], int len,int num);
 int  buffer_pop(int buffer[], int len);
 void process_keyboard_input(Tigr*);
+bool key_pressed(Tigr*);
 
 // Just draws pixels
 void render();
