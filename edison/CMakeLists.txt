@@ -70,7 +70,7 @@ target_compile_options(edison PRIVATE $<$<NOT:$<CONFIG:Debug>>:-O2>)
 # so set these options only for all other source files.
 set(WARNING_OPTIONS -Wall -Wextra -Wpedantic)
 set(WARNING_SOURCES
-    audio.c
+    #audio.c
     ${ASSET_OUTPUT_SOURCE}  # the generated cpp version of board images
     edison_board.cpp
     lcd_screen.cpp

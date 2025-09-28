@@ -364,7 +364,7 @@ bool p_raw_line() {
             size_t i = 1;
             size_t last_char_pos = val->token_str.length() - 2;
             tny_word tmp;
-            bool filled_word_last_time;
+            bool filled_word_last_time = false;
             while(i <= last_char_pos) {
                 filled_word_last_time = false;
 
