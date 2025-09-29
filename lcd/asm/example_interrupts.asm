@@ -1,3 +1,12 @@
+;--------------------------------------------------
+; Simple demonstration of the use of interrupts.  The program
+; sets up an interreupt handler for the keyboard then performs
+; a simple loop coloring the screen.  Instead of that loop,
+; checking for key presses, the interrupt handler processes
+; those events quickly, resulting in a quick shift in the
+; colors displayed and the key pressed printed out to the
+; terminal.
+
 ; TeenyAT Constants
 .const PORT_A_DIR                0x8000
 .const PORT_B_DIR                0x8001
@@ -30,7 +39,9 @@
 .const TERM 0xFFFF
 .const KEY 0xFFFE
 
-.const CHANGE_AMT 10
+.const CHANGE_AMT 512
+.const COLOR_INCREMENT 1
+.const COLOR_PAGE_INCREMENT 33
 
 ; Setup interrupt callback by mapping it to external interrupt 8
 set rA, !key_pressed
@@ -49,15 +60,26 @@ str [ CONTROL_STATUS_REGISTER ], rA
 set rA, rZ
 set rB, rZ
 !main
-    str [ LIVESCREEN + rB ], rA
-    add rB, 3
-    add rA, 3
+    set rC, 4096
+!repeat
+    str [ UPDATESCREEN + rB ], rA
+    inc rB
     mod rB, 4096
+    add rA, COLOR_INCREMENT
+    lup rC, !repeat
+
+    str [UPDATE], rZ
+
+    add rA, COLOR_PAGE_INCREMENT
     jmp !main
 
-;---------  CALLBACK  ----------------
+;-----------  Interrupt handler for keyboard  -----------
+; Prints the key to the terminal and bumps up the color
+; display... easier seen than described :-)
 !key_pressed
-    add rA, CHANGE_AMT
+    psh rC
     lod rC, [ KEY ]
     str [ TERM ], rC
+    add rA, CHANGE_AMT
+    pop rC
     rti
