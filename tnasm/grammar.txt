@@ -90,6 +90,7 @@ code_1_inst ::= BTC.
 code_1_inst ::= BTF.
 code_1_inst ::= CMP.
 code_1_inst ::= LUP.
+code_1_inst ::= DLY.
 
 code_1_mem_inst ::= LOD.
 
@@ -109,6 +110,7 @@ code_2_inst ::= BTC.
 code_2_inst ::= BTF.
 code_2_inst ::= CMP.
 code_2_inst ::= LUP.
+code_2_inst ::= DLY.
 
 code_2_mem_inst ::= LOD.
 
@@ -130,6 +132,7 @@ code_3_inst ::= SET.
 code_3_inst ::= BTF.
 code_3_inst ::= CMP.
 code_3_inst ::= LUP.
+code_3_inst ::= DLY.
 
 code_3_mem_inst ::= LOD.
 
