@@ -91,13 +91,60 @@ OS_NAME=$(uname -s)
 
 if [ "$OS_NAME" = "Linux" ]; then
     # Linux
-    :
+    echo ""
+    echo "========================================================================"
+    echo "To complete your setup of the TeenyAT and make it easier to use the"
+    echo "library in code or use its systems and assembler, consider running the"
+    echo "following commands (or add them to your shell startup file, such as "
+    echo "your ~/.bashrc):"
+    echo "========================================================================"
+    echo ""
+    echo "# 1) Define the root of your build directory (modify as necessary)"
+    echo "export TEENYAT_BUILD_ROOT=$PWD/build"
+    echo ""
+    echo "# 2) Include directory for header when compiling"
+    echo "export CPATH=\$TEENYAT_BUILD_ROOT/out/include:\$CPATH"
+    echo ""
+    echo "# 3) Binary directory to run tnasm, lcd or edison"
+    echo "export PATH=\$TEENYAT_BUILD_ROOT/out/bin:\$PATH"
+    echo ""
+    echo "# 4) Directory for static library linking (.a)"
+    echo "export LIBRARY_PATH=\$TEENYAT_BUILD_ROOT/out/lib:\$LIBRARY_PATH"
+    echo ""
+    echo "# 5) Directory for running programs using the shared libray (.so)"
+    echo "export LD_LIBRARY_PATH=\$TEENYAT_BUILD_ROOT/out/lib:\$LD_LIBRARY_PATH"
+    echo ""
 elif [ "$OS_NAME" = "Darwin" ]; then
     # macOS
-    :
+    echo ""
+    echo "========================================================================"
+    echo "To complete your setup of the TeenyAT and make it easier to use the"
+    echo "library in code or use its systems and assembler, consider running the"
+    echo "following commands (or add them to your shell startup file, such as "
+    echo "your ~/.zshrc or ~/.bash_profile):"
+    echo "========================================================================"
+    echo ""
+    echo "# 1) Define the root of your build directory (modify as necessary)"
+    echo "export TEENYAT_BUILD_ROOT=$PWD/build"
+    echo ""
+    echo "# 2) Include directory for header when compiling"
+    echo "export CPATH=\$TEENYAT_BUILD_ROOT/out/include:\$CPATH"
+    echo ""
+    echo "# 3) Binary directory to run tnasm, lcd, or edison"
+    echo "export PATH=\$TEENYAT_BUILD_ROOT/out/bin:\$PATH"
+    echo ""
+    echo "# 4) Directory for static library linking (.a)"
+    echo "export LIBRARY_PATH=\$TEENYAT_BUILD_ROOT/out/lib:\$LIBRARY_PATH"
+    echo ""
+    echo "# 5) Directory for running programs using the shared libray (.dylib)"
+    echo "export DYLD_LIBRARY_PATH=\$TEENYAT_BUILD_ROOT/out/lib:\$DYLD_LIBRARY_PATH"
+    echo ""
 else
-    # Windows... probably shouldn't here
-    :
+    # Windows... probably shouldn't get here running sh script
+    echo ""
+    echo "You're using the build shell script on Windows when you should"
+    echo "be using the Windows batch script, \"build.bat\"."
+    echo ""
 fi
 
 set +e

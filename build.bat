@@ -89,4 +89,33 @@ cmake --build .
 
 popd
 
+if %errorlevel% NEQ 0 (
+    goto :EOF
+)
+
+echo.
+echo ========================================================================
+echo To complete your setup of the TeenyAT and make it easier to use the
+echo library in code or use its systems and assembler, consider setting up
+echo and editing the enviornment variables below.  From the Windows menu,
+echo start typing "environment" to access the application to edit your
+echo environment variables.
+echo ========================================================================
+echo.
+
+set TEENYAT_BUILD_ROOT=%CD%
+
+echo 1) Define the root of your build directory (modify as necessary).
+echo Create a variable, TEENYAT_BUILD_ROOT and set it to %TEENYAT_BUILD_ROOT%\build
+echo.
+echo 2) Set up the include directory for headers when compiling.
+echo Edit/add CPATH to include %%TEENYAT_BUILD_ROOT%%\out\include
+echo.
+echo 3) Update your PATH to run tnasm, lcd or edison and use the DLL.
+echo Edit PATH to include %%TEENYAT_BUILD_ROOT%%\out\bin
+echo.
+echo 4) Set up the library directory for static library linking (.a).
+echo Edit/add LIBRARY_PATH to include %%TEENYAT_BUILD_ROOT%%\out\lib
+echo.
+
 endlocal
