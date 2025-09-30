@@ -788,10 +788,15 @@ void tny_clock(teenyat *t) {
 			break;
 		case TNY_OPCODE_DLY:
 			{
-				tny_sword delay_cnt = t->reg[reg2].s + immed;
-				if(delay_cnt >= 1) {
+				tny_uword delay_prescale = t->reg[reg1].u;
+				if(delay_prescale == 0) {
+					delay_prescale = 1;
+				}
+				tny_uword delay_cnt = (tny_uword)(t->reg[reg2].s + immed);
+				uint64_t prescaled_delay_cycles = delay_prescale * delay_cnt;
+				if(prescaled_delay_cycles >= 1) {
 					/* current instruction already 1 cycle */
-					t->delay_cycles = delay_cnt - 1;
+					t->delay_cycles += prescaled_delay_cycles - 1;
 				}
 			}
 			break;

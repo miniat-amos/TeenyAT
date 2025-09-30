@@ -241,7 +241,7 @@ struct teenyat {
 	 * The number of remaining cycles to delay to simulate the cost of the
 	 * previous instruction.
 	 */
-	unsigned int delay_cycles;
+	uint64_t delay_cycles;
 	/**
 	 * The held values on port A
 	 */
