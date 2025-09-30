@@ -1362,7 +1362,8 @@ shared_ptr <token> p_code_1_inst() {
     (tnext = save, result = term(T_BTC)) ||
     (tnext = save, result = term(T_BTF)) ||
     (tnext = save, result = term(T_CMP)) ||
-    (tnext = save, result = term(T_LUP));
+    (tnext = save, result = term(T_LUP)) ||
+    (tnext = save, result = term(T_DLY));
 
     return result;
 }
@@ -1416,7 +1417,8 @@ shared_ptr <token> p_code_2_inst() {
     (tnext = save, result = term(T_BTC)) ||
     (tnext = save, result = term(T_BTF)) ||
     (tnext = save, result = term(T_CMP)) ||
-    (tnext = save, result = term(T_LUP));
+    (tnext = save, result = term(T_LUP)) ||
+    (tnext = save, result = term(T_DLY));
 
     return result;
 }
@@ -1479,7 +1481,8 @@ shared_ptr <token> p_code_3_inst() {
     (tnext = save, result = term(T_BTC)) ||
     (tnext = save, result = term(T_BTF)) ||
     (tnext = save, result = term(T_CMP)) ||
-    (tnext = save, result = term(T_LUP));
+    (tnext = save, result = term(T_LUP)) ||
+    (tnext = save, result = term(T_DLY));
 
     return result;
 }
