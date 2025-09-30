@@ -129,6 +129,14 @@ typedef void(*TNY_PORT_CHANGE_FNPTR)(teenyat *t, bool is_port_a, tny_word port);
 
 #define TNY_DEFAULT_PACE_CNT 500
 
+typedef struct alu_flags {
+	bool greater : 1;
+	bool less    : 1;
+	bool equals  : 1;
+	bool carry   : 1;
+	int reserved: 12;
+} alu_flags;
+
 union tny_word {
 	struct {
 		tny_sword immed4  : 4;
@@ -220,7 +228,7 @@ struct teenyat {
      * Greater is set/cleared if CMP or ALU result is positive and non-zero
      *
      **/
-    tny_word flags;
+    alu_flags flags;
 	/**
 	 * System calllback function to handle TeenyAT read requests
 	 */
@@ -277,7 +285,7 @@ struct teenyat {
 	 * These are the address & flags we should preserve during an interrupt
 	 */
 	tny_word interrupt_return_address;
-	tny_word interrupt_return_flags;
+	alu_flags interrupt_return_flags;
 
 	/**
 	 * Each teenyat instance has a unique random number generator stream,
