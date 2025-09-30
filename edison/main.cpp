@@ -146,7 +146,7 @@ void port_change(teenyat *t, bool is_port_a, tny_word port);
 int main(int argc, char* argv[])
 {  
     if(argc < 2) {
-        std::cout << "Please provide an binary file" << std::endl;
+        std::cout << "Please provide a binary file" << std::endl;
         return 1;
     }
 
