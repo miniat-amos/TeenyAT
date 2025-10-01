@@ -115,7 +115,29 @@ Here in the output, you can trace how many cycles it takes for the assembly abov
 ........@@@@@@@.......@@@@@@@.......@@@@@@@.......@@@@@@@.......@@@@@@@.......
 ```
 ---
-  
+
+## Building TeenyAT
+
+The TeenyAT uses [CMake](http://cmake.org) for its builds.  If you're familiar
+with CMake, feel free to use it in the traditional CMake way.  To make things
+simpler, though, you can just execute the build script appropriate for your
+operating system.
+
+| Linux | macOS | Windows |
+| :---: | :---: | :---: |
+| build.sh | build.sh | build.bat |
+
+After running your build script from the root of you TeenyAT repository,
+you'll be left with a `build/out` directory that contains the executables
+for the Teeny Assembler (tnasm), the color LCD, and the Edison experiment
+board systems.  Additionally, the `teenyat.h` header and prebuilt static
+and shared/dynamic libraries are there.  
+
+For Linux/Ubuntu users, you'll need to install the X11 and MESA-based 
+utility library files:
+
+```sudo apt install libx11-dev libglu1-mesa-dev```
+
 ## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
