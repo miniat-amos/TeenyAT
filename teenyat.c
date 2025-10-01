@@ -502,6 +502,10 @@ void tny_clock(teenyat *t) {
 			break;
 		case TNY_OPCODE_STR:
 			{
+				/*
+				 * To promote student use of registers, all bus operations,
+				 * including RAM access comes with an extra penalty.
+				 */
 				t->delay_cycles += TNY_BUS_DELAY;
 
 				tny_uword addr = t->reg[reg1].s + immed;
@@ -562,12 +566,6 @@ void tny_clock(teenyat *t) {
 					}
 					break;
 				}
-
-				/*
-				 * To promote student use of registers, all bus operations,
-				 * including RAM access comes with an extra penalty.
-				 */
-				t->delay_cycles += TNY_BUS_DELAY;
 			}
 			break;
 		case TNY_OPCODE_PSH:
