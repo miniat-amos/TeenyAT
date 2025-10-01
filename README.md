@@ -1,10 +1,10 @@
-# TeenyAT Virtual Architecture 
+# TeenyAT Virtual Architecture
 
 ![Devious looking jellyfish](docs/img/leroy.gif)
 
 The **TeenyAT** *(pronounced Teeny-@)* is a 16-bit virtual embedded microcontroller delivered as a C library (single header and single source) so systems can be simulated around it with ease. It's also good fun developing assembly programs to run on our premade systems! System designers create an instance (or more) of the TeenyAT, providing a binary image to load and execute, interacting with its TeenyAT instances through its peripheral bus and GPIO ports.
 
-The **TeenyAT** project has a unique instruction set and a complete assembler. The *[tnasm](tnasm)* assembler and each included system can be compiled using `make` with their respective `Makefile`s. 
+The **TeenyAT** project has a unique instruction set and a complete assembler. The *[tnasm](tnasm)* assembler and each included system can be compiled using `make` with their respective `Makefile`s.
 
 [Leroy](./docs/leroy.md) is glad you stopped by.
 
@@ -29,7 +29,7 @@ All TeenyAT registers are essentially general purpose, meaning any can be read f
 
 ### Instruction Encoding
 Instructions may be encoded in either one or two 16-bit words:
-- **Teeny bit = 1:** Instruction is 16 bits 
+- **Teeny bit = 1:** Instruction is 16 bits
 - **Teeny bit = 0:** Instruction is 32 bits
 
 ## Instruction Encoding
@@ -72,7 +72,7 @@ int main(int argc, char *argv[]) {
 	for ( int i=0; i <= 77; i++ ) {
 		tny_clock(&t);
 		tny_get_ports(&t,&port_a, NULL);
-		
+
 		if(port_a.bits.bit0 == 0) {
 			printf("."); // LED Off
 		}
@@ -85,7 +85,7 @@ int main(int argc, char *argv[]) {
 }
 ```
 
-##### Save this as `led.c` and compile using `gcc -o led led.c teenyat.c` 
+##### Save this as `led.c` and compile using `gcc -o led led.c teenyat.c`
 
 ### Assembly
 
@@ -101,7 +101,7 @@ set rA, rZ
     inv rA
     jmp !main
 ```
-Save this as `tbone.asm` and assemble using `tnasm tbone.asm` 
+Save this as `tbone.asm` and assemble using `tnasm tbone.asm`
 
 This gives a `tbone.bin` file that can be run by your led system by executing `led tbone.bin`[^1]
 
@@ -109,7 +109,7 @@ This gives a `tbone.bin` file that can be run by your led system by executing `l
 
 ### Results
 
-Here in the output, you can trace how many cycles it takes for the assembly above to switch the LED's state.  It's like a simple custom osciliscope! 
+Here in the output, you can trace how many cycles it takes for the assembly above to switch the LED's state.  It's like a simple custom osciliscope!
 
 ```
 ........@@@@@@@.......@@@@@@@.......@@@@@@@.......@@@@@@@.......@@@@@@@.......
@@ -131,9 +131,9 @@ After running your build script from the root of you TeenyAT repository,
 you'll be left with a `build/out` directory that contains the executables
 for the Teeny Assembler (tnasm), the color LCD, and the Edison experiment
 board systems.  Additionally, the `teenyat.h` header and prebuilt static
-and shared/dynamic libraries are there.  
+and shared/dynamic libraries are there.
 
-For Linux/Ubuntu users, you'll need to install the X11 and MESA-based 
+For Linux/Ubuntu users, you'll need to install the X11 and MESA-based
 utility library files:
 
 ```sudo apt install libx11-dev libglu1-mesa-dev```
