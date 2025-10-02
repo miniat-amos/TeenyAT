@@ -15,8 +15,8 @@ if "%1"=="debug" (
 ) else if "%1"=="clean" (
     echo Cleaning build directory...
     :: again, unsure if we want separate directories for this
-    :: rd /s /q build build_debug
-    rd /s /q build
+    :: rd /s /q build build_debug 2>NUL
+    rd /s /q build 2>NUL
 
     popd
     exit /b
