@@ -112,6 +112,7 @@ typedef void(*TNY_PORT_CHANGE_FNPTR)(teenyat *t, bool is_port_a, tny_word port);
 #define TNY_CONTROL_STATUS_REGISTER 0x8EFF
 
 #define TNY_INTERRUPT_VECTOR_TABLE_START 0x8E00
+#define TNY_INTERRUPT_CNT (TNY_INTERRUPT_VECTOR_TABLE_END - TNY_INTERRUPT_VECTOR_TABLE_START + 1)
 #define TNY_INTERRUPT_VECTOR_TABLE_END 0x8E0F
 #define TNY_INTERRUPT_ENABLE_REGISTER 0x8E10
 #define TNY_INTERRUPT_QUEUE_REGISTER 0x8E11
@@ -197,7 +198,7 @@ struct teenyat {
 	/** copy of original bin file for resets */
 	tny_word bin_image[TNY_RAM_SIZE];
     /** The 16 addresses in which we can jump to in ram for interrupts */
-    tny_word interrupt_vector_table[];
+    tny_word interrupt_vector_table[TNY_INTERRUPT_CNT];
 	/**
 	 * Registers...
 	 *
