@@ -30,15 +30,19 @@ set_property(TARGET generate_assets PROPERTY RUNTIME_OUTPUT_DIRECTORY "${CMAKE_B
 set(ASSET_OUTPUT_HEADER "${CMAKE_CURRENT_BINARY_DIR}/bin_assets.h")
 set(ASSET_OUTPUT_SOURCE "${CMAKE_CURRENT_BINARY_DIR}/bin_assets.cpp")
 
+file(GLOB ASSET_IMAGES "${CMAKE_CURRENT_SOURCE_DIR}/exp_board_images/*.png")
+
 # Define the command to run the generator
 add_custom_command(
     OUTPUT ${ASSET_OUTPUT_HEADER} ${ASSET_OUTPUT_SOURCE}
-    COMMAND $<TARGET_FILE:generate_assets>
-    ARGS ${CMAKE_CURRENT_SOURCE_DIR}/exp_board_images/*.png
-    DEPENDS generate_assets
+    COMMAND $<TARGET_FILE:generate_assets> ${ASSET_IMAGES}
+    DEPENDS generate_assets ${ASSET_IMAGES}
     WORKING_DIRECTORY ${CMAKE_CURRENT_BIN_DIR}
 )
 
+add_custom_target(assets ALL
+    DEPENDS ${ASSET_OUTPUT_HEADER} ${ASSET_OUTPUT_SOURCE}
+)
 
 #-------------- Edison build  ----------------
 
