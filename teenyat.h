@@ -367,6 +367,15 @@ struct teenyat {
 #define TNY_REG_D    6
 #define TNY_REG_E    7
 
+#define TNY_XINT0    0
+#define TNY_XINT1    1
+#define TNY_XINT2    2
+#define TNY_XINT3    3
+#define TNY_XINT4    4
+#define TNY_XINT5    5
+#define TNY_XINT6    6
+#define TNY_XINT7    7
+
 /**
  * @brief
  *   Initialize a 1MHz instance of the TeenyAT and 

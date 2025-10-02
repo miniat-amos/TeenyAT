@@ -170,7 +170,7 @@ int main(int argc, char *argv[])
             current_frame = 0;
         }
         if(key_pressed(window)) {
-            tny_external_interrupt(&t,0);
+            tny_external_interrupt(&t, TNY_XINT0);
         }
         tny_clock(&t);
         current_frame++;
