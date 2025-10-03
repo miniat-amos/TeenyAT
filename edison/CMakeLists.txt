@@ -40,9 +40,6 @@ add_custom_command(
     WORKING_DIRECTORY ${CMAKE_CURRENT_BIN_DIR}
 )
 
-add_custom_target(assets ALL
-    DEPENDS ${ASSET_OUTPUT_HEADER} ${ASSET_OUTPUT_SOURCE}
-)
 
 #-------------- Edison build  ----------------
 
