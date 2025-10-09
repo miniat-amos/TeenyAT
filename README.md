@@ -106,6 +106,7 @@ Save this as `tbone.asm` and assemble using `tnasm tbone.asm`
 This gives a `tbone.bin` file that can be run by your led system by executing `led tbone.bin`[^1]
 
 [^1]: "T-Bone" was a nickname given by students to my undergraduate assembly language faculty.
+Check out [his personal website](https://jtstreib.com/main/).
 
 ### Results
 
@@ -141,3 +142,4 @@ utility library files:
 ## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+
