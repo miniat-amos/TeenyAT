@@ -304,17 +304,18 @@ struct teenyat {
 	 * is adaptively updated once after every pace_cnt cycles, goes by ensuring we 
 	 * stay in line with our cycle time 
 	 */
-	struct{
+	struct {
 		uint64_t clock_wait_time;
 		int16_t pace_cnt;
 		/* Our first registered clock cycle */
 		uint64_t clock_epoch;
 		/* Start time of the current pace stream */
 		uint64_t pace_start;
-		/* This affects how fast the simulated clock speed is 
-		*  a value of 1 results in 1MHz while a value of 2
-		*  results in 2MHz etc....
-		* */
+		/**
+		 * This affects how fast the simulated clock speed is.
+		 * A value of 1 results in 1MHz while a value of 2
+		 * results in 2MHz etc.... 
+		 */
 		uint16_t pace_divisor;
 		/* The initial pace count to start at effects how often we update */
 		int16_t initial_pace_cnt;
