@@ -211,6 +211,9 @@ bool tny_reset(teenyat *t) {
 	/* Maybe dont memset? could simulate randomness... */
 	memset(t->interrupt_vector_table, 0, sizeof(t->interrupt_vector_table));
 
+    /* Reset our timers */
+    memset(t->timers, 0, sizeof(t->timers));
+
 	/*
 	 * Initialize each teenyat with a unique random number stream
 	 */
@@ -314,6 +317,61 @@ void tny_set_ports(teenyat *t, tny_word *a, tny_word *b) {
 	return;
 }
 
+void tny_set_timer_pin(teenyat *t, Timer timer, bool value) {
+    t->timers[timer].t_in = value;
+    return;
+}
+
+bool tny_get_timer_pin(teenyat *t, Timer timer) {
+    return t->timers[timer].t_in;
+}
+
+void update_timer(teenyat* t, Timer timer, bool event_triggered) {
+    tny_uword mode = t->timers[timer].csr.timer_csr.mode;
+    if(mode == TIMER_MODE_COUNT || (mode == TIMER_MODE_LEVEL && t->timers[timer].t_in) || event_triggered) {
+        t->timers[timer].count++;
+        /* Trigger an interrupt if the timers value is reached */
+        if(t->timers[timer].count >= t->timers[timer].compare) {
+            tny_uword interrupt_mask = 1 << (timer + TNY_TIMER_A_INT);
+			t->interrupt_queue_register.u |= interrupt_mask;
+        }
+    }
+    return;
+}
+
+void handle_timers(teenyat* t) {
+    for(int i = 0; i < TNY_TOTAL_TIMERS; i++) {
+        bool reset = t->timers[i].csr.timer_csr.reset;
+        bool enabled = t->timers[i].csr.timer_csr.enable;
+        if(reset) {
+            t->timers[i].csr.u   = 0;
+            t->timers[i].compare = 0;
+            t->timers[i].count   = 0;
+        } else if(enabled) {
+            tny_uword  cps   = t->timers[i].csr.timer_csr.clock_prescaler;
+            /* treat a cps of 0 as 1 */
+            if(cps == 0) {
+                cps = 1;
+            }
+            /* update the timers internal clock */
+            t->timers[i].internal_cycle_count++;
+            if(t->timers[i].internal_cycle_count % cps == 0) {
+                update_timer(t, i, false);
+            }
+        }
+    }
+    return;
+}
+
+void tny_trigger_timer_event(teenyat *t, Timer timer) {
+    tny_uword mode = t->timers[timer].csr.timer_csr.mode;
+    tny_uword enable = t->timers[timer].csr.timer_csr.enable;
+    if(enable && mode == TIMER_MODE_EVENT) {
+       update_timer(t, timer, true);
+    }
+    return;
+}
+
 void tny_external_interrupt(teenyat* t, tny_uword external_interrupt) {
 	/*
 	 * Make a mask with a 1 in the position of the external interrupt number
@@ -374,6 +432,9 @@ void tny_clock(teenyat *t) {
 	}
 
 	t->cycle_cnt++;
+
+    /* Timers are seperate pieces of internal hardware uneffected by delay cycles */
+    handle_timers(t);
 
 	/*
 	 * If there were still cycles left on the previous instruction, skip
@@ -465,6 +526,24 @@ void tny_clock(teenyat *t) {
 				case TNY_INTERRUPT_QUEUE_REGISTER:
 					t->reg[reg1] = t->interrupt_queue_register;
 					break;
+                case TNY_TIMER_A_CSR:
+					t->reg[reg1] = t->timers[TNY_TIMER_A].csr;
+                    break;
+                case TNY_TIMER_A_CMP:
+					t->reg[reg1].u = t->timers[TNY_TIMER_A].compare;
+                    break;
+                case TNY_TIMER_A_CNT:
+					t->reg[reg1].u = t->timers[TNY_TIMER_A].count;
+                    break;
+                case TNY_TIMER_B_CSR:
+					t->reg[reg1] = t->timers[TNY_TIMER_B].csr;
+                    break;
+                case TNY_TIMER_B_CMP:
+					t->reg[reg1].u = t->timers[TNY_TIMER_B].compare;
+                    break;
+                case TNY_TIMER_B_CNT:
+					t->reg[reg1].u = t->timers[TNY_TIMER_B].count;
+                    break;
 				default:
 					/* Check if reading from interrupt service */
 					if(addr >= TNY_INTERRUPT_VECTOR_TABLE_START &&
@@ -535,6 +614,24 @@ void tny_clock(teenyat *t) {
 				case TNY_INTERRUPT_QUEUE_REGISTER:
 					t->interrupt_queue_register = t->reg[reg2];
 					break;
+                case TNY_TIMER_A_CSR:
+					t->timers[TNY_TIMER_A].csr = t->reg[reg2];
+                    break;
+                case TNY_TIMER_A_CMP:
+					t->timers[TNY_TIMER_A].compare = t->reg[reg2].u;
+                    break;
+                case TNY_TIMER_A_CNT:
+					t->timers[TNY_TIMER_A].count  = t->reg[reg2].u;
+                    break;
+                case TNY_TIMER_B_CSR:
+					t->timers[TNY_TIMER_B].csr = t->reg[reg2];
+                    break;
+                case TNY_TIMER_B_CMP:
+					t->timers[TNY_TIMER_B].compare = t->reg[reg2].u;
+                    break;
+                case TNY_TIMER_B_CNT:
+				    t->timers[TNY_TIMER_B].count = t->reg[reg2].u;
+                    break;
 				default:
 					/* Check if writing to interrupt service */
 					if(addr >= TNY_INTERRUPT_VECTOR_TABLE_START &&
