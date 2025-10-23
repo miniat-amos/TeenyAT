@@ -81,6 +81,8 @@
 .const DELAY_THREE_QUARTER  2250    ; Duration of a 3/4 note
 .const DELAY_FULL           3000    ; Duration of a full note
 
+    jmp !main
+
 !twinkle_str 
 .raw "Twinkle Twinkle"
 
