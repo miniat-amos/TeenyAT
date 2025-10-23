@@ -72,6 +72,8 @@
 .const WAIT_SHORT   1500
 .const WAIT_LONG    3500
 
+    jmp !main
+
 !fur_elise_str 
 .raw "Fur Elise"
 
