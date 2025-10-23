@@ -127,7 +127,7 @@ typedef void(*TNY_PORT_CHANGE_FNPTR)(teenyat *t, bool is_port_a, tny_word port);
 #define TNY_BUS_DELAY 1
 #define TNY_BUS_EXTERNAL_DELAY_ADJUST 2
 
-#define TNY_DEFAULT_PACE_CNT 500
+#define TNY_DEFAULT_CALIBRATE_CYCLES 500
 
 typedef struct alu_flags {
 	bool greater : 1;
@@ -298,27 +298,27 @@ struct teenyat {
 		uint64_t increment;
 	} random;
 	/**
-	 * Each teenyat instance is inherently initialized with a fixed cycle rate
-	 * 1 MHz. This is controlled through the clock_wait_time which is our amount of 
-	 * time to busy wait in a for loop. To account for aggregate error, this variable 
-	 * is adaptively updated once after every pace_cnt cycles, goes by ensuring we 
+	 * Each teenyat instance is inherently initialized with a fixed cycle rate 
+	 * of 1 MHz. This is controlled through the busy_loop_cnt. 
+	 * To account for aggregate error, this variable is adaptively 
+	 * updated once after every calibrate_cycles, goes by ensuring we 
 	 * stay in line with our cycle time 
 	 */
-	struct {
-		uint64_t clock_wait_time;
-		int16_t pace_cnt;
-		/* Our first registered clock cycle */
-		uint64_t clock_epoch;
-		/* Start time of the current pace stream */
-		uint64_t pace_start;
+	struct{
+		uint64_t busy_loop_cnt;
+		/* The number of cycles remaining before the next recalibration */
+		int16_t cycles_until_calibrate;
+		/* Reference clock cycle */
+		uint64_t epoch;
+		/* Last time calibrated in microseconds */
+		uint64_t last_calibration_time;
 		/**
-		 * This affects how fast the simulated clock speed is.
-		 * A value of 1 results in 1MHz while a value of 2
-		 * results in 2MHz etc.... 
+		 * target frequency in MHz a value of 1 results in 1MHz 
+		 * while a value of 2 results in 2MHz etc....
 		 */
-		uint16_t pace_divisor;
-		/* The initial pace count to start at effects how often we update */
-		int16_t initial_pace_cnt;
+		uint16_t target_mhz;
+		/* The total number of cycles needed before recalibration */
+		int16_t calibrate_cycles;
 	} clock_manager;
 	/**
 	 * The number of cycles this instance has been running since initialization
@@ -475,17 +475,17 @@ bool tny_init_unclocked(teenyat *t, FILE *bin_file,
  * @param t
  *   The TeenyAT instance to set pace count of
  *
- * @param pace_cnt
- *   The pace count to be set
+ * @param calibrate_cycles
+ *   The calibrate cycles to be set
  *
  * @return
  *   True on success, false otherwise.
- *   Attempting to reset an unitialized TeenyAT will always return false.
+ *   Attempting to reset an uninitialized TeenyAT will always return false.
  *
  * @note
- *   This function also sets the current pace count
+ *   This function also sets the current calibration window
  */
-bool tny_set_initial_pace_cnt(teenyat *t,int16_t pace_cnt);
+bool tny_set_calibration_window(teenyat *t,int16_t calibrate_cycles);
 
 /**
  * @brief
@@ -498,8 +498,8 @@ bool tny_set_initial_pace_cnt(teenyat *t,int16_t pace_cnt);
  *   The TeenyAT instance to reset
  *
  * @return
- *   True on success, flase otherwise.
- *   Attempting to reset an unitialized TeenyAT will always return false.
+ *   True on success, false otherwise.
+ *   Attempting to reset an uninitialized TeenyAT will always return false.
  */
 bool tny_reset(teenyat *t);
 
