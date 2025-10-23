@@ -44,21 +44,21 @@
 .const COLOR_PAGE_INCREMENT 33
 
 ; Setup interrupt callback by mapping it to external interrupt 8
-set rA, !key_pressed
-set rB, 8
-str [ INTERRUPT_VECTOR_TABLE + rB ], rA
+    set rA, !key_pressed
+    set rB, 8
+    str [ INTERRUPT_VECTOR_TABLE + rB ], rA
 
 ; Enable external interrupt 8
-set rA, 0b00000001_00000000
-str [ INTERRUPT_ENABLE_REGISTER ], rA
+    set rA, 0b00000001_00000000
+    str [ INTERRUPT_ENABLE_REGISTER ], rA
 
 ; Enable interrupts globally
-set rA, 0b000000000000000_1
-str [ CONTROL_STATUS_REGISTER ], rA
+    set rA, 0b000000000000000_1
+    str [ CONTROL_STATUS_REGISTER ], rA
 
 ; Reset registers
-set rA, rZ
-set rB, rZ
+    set rA, rZ
+    set rB, rZ
 !main
     set rC, 4096
 !repeat
