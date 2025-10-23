@@ -66,6 +66,8 @@
 .const DELAY_LONG   1500
 .const WAIT_LONG    3500
 
+    jmp !init
+
 !happy_birthday_str
 .raw "Happy Birthday"
 
