@@ -40,7 +40,7 @@
 
 !main
 
-    ; clear the screen
+; clear the screen
     STR [X1], rZ
     STR [Y1], rZ
     SET rA, DATABASE_FABULOUS
@@ -63,7 +63,8 @@
 !next_block_row
     SET rE, BLOCK_CNT  ; rE is the col
 !next_block_col
-    ; calculate the extreme Xs of this block
+
+; calculate the extreme Xs of this block
     SET rA, BLOCK_SIZE
     SET rB, rE - 1
     MPY rA, rB
@@ -72,12 +73,12 @@
     DEC rA
     STR [X2], rA
 
-    ; calculate the top block Y
+; calculate the top block Y
     SET rA, BLOCK_SIZE
     SET rB, rD - 1
     MPY rA, rB
 
-    ; randomly choose forward vs back slash direction
+; randomly choose forward vs back slash direction
     lod rB, [RAND]
     AND rB, 0x0001
     cmp rB, rZ
@@ -129,32 +130,26 @@
     SET rE, 63  ; rE is the col
 !scan_next_col_for_maze_pixel
 
-    ; calculate rA as address of a bottom right pixel in a 4-box area
+; calculate rA as address of a bottom right pixel in a 4-box area
     SET rA, 64
     MPY rA, rD
     ADD rA, rE
     ADD rA, UPDATESCREEN
 
-    ; checking the bottom right start pixel    
+; checking the bottom right start pixel    
     lod rB, [rA]
     cmp rB, MAZE_COLOR
     JNE  !continue_maze_pixel_scan
 
-    ; check bottom left pixel
+; check bottom left pixel
     lod rB, [rA - 1]
     cmp rB, MAZE_COLOR
-;    je  !wipe_4_block
     JNE  !continue_maze_pixel_scan
 
 
-;    ; check upper right pixel
-;    lod rB, [rA - 64]
-;    cmp rB, MAZE_COLOR
-;    JNE  !continue_maze_pixel_scan
-
 !wipe_4_block
 
-    ; only wipe with some probability so it looks more natural, 1:4 chance
+; only wipe with some probability so it looks more natural, 1:4 chance
     lod rB, [RAND]
     AND rB, 0x1
     cmp rB, rZ
@@ -188,7 +183,7 @@
     cmp rC, BLACK
     je  !done_magma_to_glisten
 
-    ; shift magma color a little
+; shift magma color a little
     lod rD, [RAND_BITS]
     MOD rD, 48
     ADD rC, rD
@@ -272,7 +267,6 @@
     je !done_pixel_is_magma
 
     lod rC, [RAND]
-;    AND rC, 0x11
     AND rC, 0x1
     cmp rC, rZ
     JNE !done_pixel_is_magma
