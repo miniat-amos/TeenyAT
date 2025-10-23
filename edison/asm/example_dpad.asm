@@ -36,6 +36,8 @@
 .const LEROY_2 0xD3
 .const DELAY_AMT 375 ; assuming machine is at 1MHz
 
+    jmp !init_demo
+
 .var flipped_flag 0   
 
 ; Designated Registers:
