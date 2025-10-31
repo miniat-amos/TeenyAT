@@ -117,6 +117,15 @@ typedef void(*TNY_PORT_CHANGE_FNPTR)(teenyat *t, bool is_port_a, tny_word port);
 #define TNY_INTERRUPT_ENABLE_REGISTER 0x8E10
 #define TNY_INTERRUPT_QUEUE_REGISTER 0x8E11
 
+#define TNY_TIMER_A_CSR  0x8080
+#define TNY_TIMER_A_CMP  0x8081
+#define TNY_TIMER_A_CNT  0x8082
+
+#define TNY_TIMER_B_CSR  0x8088
+#define TNY_TIMER_B_CMP  0x8089
+#define TNY_TIMER_B_CNT  0x808A
+
+#define TNY_TOTAL_TIMERS 2  // Changing this requires updating the timer addresses above
 
 #define TNY_PERIPHERAL_BASE_ADDRESS 0x9000
 
@@ -136,6 +145,11 @@ typedef struct alu_flags {
 	bool carry   : 1;
 	int reserved: 12;
 } alu_flags;
+
+typedef enum Timer {
+    TIMER_A,
+    TIMER_B
+} Timer;
 
 union tny_word {
 	struct {
@@ -160,6 +174,13 @@ union tny_word {
 		tny_uword interrupt_clearing  : 1;
 		tny_uword reserved : 14;
 	} csr;
+
+    struct {
+      tny_uword clock_prescaler    : 12;
+      tny_uword enable             :  1;
+      tny_uword mode               :  2;
+      tny_uword reset              :  1;
+    } timer_csr;
 
 	struct {
 		tny_uword byte0 : 8;
@@ -287,6 +308,20 @@ struct teenyat {
 	tny_word interrupt_return_address;
 	alu_flags interrupt_return_flags;
 
+    /**
+     * The timers in the teenyAT consist of 3 modes:
+     * Mode 0 (timer mode) --> increments count until CNT >= CMP
+     * Mode 1 (level mode) --> same as Mode 0 however only increments while Tn is high
+     * Mode 2 (event mode) --> increments whenever a system call back was triggered
+     */
+    struct {
+        tny_word  csr;
+        tny_uword compare;
+        tny_uword count;
+        uint64_t  internal_cycle_count;
+        bool      t_in;
+    } timers[TNY_TOTAL_TIMERS];
+
 	/**
 	 * Each teenyat instance has a unique random number generator stream,
 	 * seeded at initialization.  These are using the PCG-XSH-RR with a 64-bit
@@ -376,6 +411,17 @@ struct teenyat {
 #define TNY_XINT5    5
 #define TNY_XINT6    6
 #define TNY_XINT7    7
+
+#define TNY_TIMER_A         0
+#define TNY_TIMER_B         1
+
+#define TIMER_MODE_COUNT    0
+#define TIMER_MODE_LEVEL    1
+#define TIMER_MODE_EVENT    2
+
+#define TNY_TIMER_A_INT     6
+#define TNY_TIMER_B_INT     7
+
 
 /**
  * @brief
@@ -589,6 +635,49 @@ void tny_port_change(teenyat *t, TNY_PORT_CHANGE_FNPTR port_change);
  *   A number from 0-7 denoting which external interrupt to queue
  */
 void tny_external_interrupt(teenyat* t, tny_uword external_interrupt);
+
+/**
+ * @brief
+ *   Sets the level of the associated timer's pin
+ *
+ *   While a timer is in level mode (1), the count
+ *   will increment if this pin is high otherwise
+ *   the count is unchanged
+ *
+ * @param t
+ *   The TeenyAT instance
+ *
+ * @param timer
+ *   The timer to modify
+ *
+ * @param value
+ *   The value to set the pin to
+ */
+void tny_set_timer_pin(teenyat *t, Timer timer, bool value);
+
+/**
+ * @brief
+ *   Gets the level of the associated timer's pin
+ *
+ * @param t
+ *   The TeenyAT instance
+ *
+ * @param timer
+ *   The timer to access
+ */
+bool tny_get_timer_pin(teenyat *t, Timer timer);
+
+/**
+ * @brief
+ *   Triggers a timer and increments its value if in event mode
+ *
+ * @param t
+ *   The TeenyAT instance
+ *
+ * @param timer
+ *   The timer we are looking to increment
+ */
+void tny_trigger_timer_event(teenyat *t, Timer timer);
 
 #ifdef __cplusplus
 }
