@@ -169,7 +169,7 @@ bool tny_reset(teenyat *t) {
 	if(!t) return false;
 
 	/* restore ram to it's initial post-bin-load state */
-	memcpy(t->ram, t->bin_image, TNY_RAM_SIZE);
+	memcpy(t->ram, t->bin_image, TNY_RAM_SIZE * sizeof(tny_word));
 
 	t->reg[TNY_REG_PC].u = 0x0;
 	t->reg[TNY_REG_SP].u = 0x7FFF;
