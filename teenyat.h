@@ -109,6 +109,9 @@ typedef void(*TNY_PORT_CHANGE_FNPTR)(teenyat *t, bool is_port_a, tny_word port);
 #define TNY_RANDOM_ADDRESS 0x8010  /* positive random values */
 #define TNY_RANDOM_BITS_ADDRESS 0x8011  /* random 16-bit pattern */
 
+#define TNY_CYCLE_COUNT 0x8090
+#define TNY_CYCLE_COUNT_RESET 0x8091
+
 #define TNY_CONTROL_STATUS_REGISTER 0x8EFF
 
 #define TNY_INTERRUPT_VECTOR_TABLE_START 0x8E00
@@ -158,7 +161,8 @@ union tny_word {
 	struct {
 		tny_uword interrupt_enable  : 1;
 		tny_uword interrupt_clearing  : 1;
-		tny_uword reserved : 14;
+		tny_uword clock_divisor_scale : 4;
+		tny_uword reserved : 10;
 	} csr;
 
 	struct {
@@ -325,6 +329,10 @@ struct teenyat {
 	 * or reset.
 	 */
 	uint64_t cycle_cnt;
+	/** 
+	 * Base offset for the cycle count peripheral
+	*/
+	uint64_t cycle_count_base;
 	/**
 	 * An extra pointer for system developers so data can follow a TeenyAT
 	 * instance through read/write callback functions, for example.
