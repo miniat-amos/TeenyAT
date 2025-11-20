@@ -112,6 +112,9 @@ typedef void(*TNY_PORT_CHANGE_FNPTR)(teenyat *t, bool is_port_a, tny_word port);
 #define TNY_CYCLE_COUNT 0x8090
 #define TNY_CYCLE_COUNT_RESET 0x8091
 
+#define TNY_WALL_TIME 0x8094
+#define TNY_WALL_TIME_RESET 0x8095
+
 #define TNY_CONTROL_STATUS_REGISTER 0x8EFF
 
 #define TNY_INTERRUPT_VECTOR_TABLE_START 0x8E00
@@ -333,6 +336,10 @@ struct teenyat {
 	 * Base offset for the cycle count peripheral
 	*/
 	uint64_t cycle_count_base;
+	/** 
+	 * Base offset for the wall time peripheral
+	*/
+	uint64_t wall_count_base;
 	/**
 	 * An extra pointer for system developers so data can follow a TeenyAT
 	 * instance through read/write callback functions, for example.

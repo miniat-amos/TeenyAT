@@ -249,6 +249,7 @@ bool tny_reset(teenyat *t) {
 	t->delay_cycles = 0;
 	t->cycle_cnt = 0;
 	t->cycle_count_base = 0;
+	t->wall_count_base = 0;
 
 	return true;
 }
@@ -474,6 +475,13 @@ void tny_clock(teenyat *t) {
 					t->reg[reg1].u = (tny_uword)(cycles);
 				}
 					break;
+				case TNY_WALL_TIME:
+				{
+					/* One tick is equal to 1/16 of a second */
+					uint64_t ticks = (us_clock() - t->wall_count_base) / 62500ULL;
+					t->reg[reg1].u = (tny_uword)(ticks);
+					break;
+				}
 				default:
 					/* Check if reading from interrupt service */
 					if(addr >= TNY_INTERRUPT_VECTOR_TABLE_START &&
@@ -546,6 +554,9 @@ void tny_clock(teenyat *t) {
 					break;
 				case TNY_CYCLE_COUNT_RESET:
 					t->cycle_count_base = t->cycle_cnt;
+					break;
+				case TNY_WALL_TIME_RESET:
+					t->wall_count_base = us_clock();
 					break;
 				default:
 					/* Check if writing to interrupt service */
