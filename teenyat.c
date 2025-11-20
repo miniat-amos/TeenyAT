@@ -479,7 +479,7 @@ void tny_clock(teenyat *t) {
 				case TNY_WALL_TIME:
 				{
 					/* Convert microseconds to 1/16 second ticks */
-					static const uint32_t us_per_tick = 1000000ULL / 16ULL; // 62500
+					static const uint64_t us_per_tick = 1000000ULL / 16ULL; // 62500
 					/* One tick is equal to 1/16 of a second */
 					uint64_t ticks = (us_clock() - t->wall_count_base) / us_per_tick;
 					t->reg[reg1].u = (tny_uword)(ticks);
