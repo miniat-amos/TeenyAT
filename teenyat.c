@@ -314,14 +314,13 @@ void tny_set_ports(teenyat *t, tny_word *a, tny_word *b) {
 	return;
 }
 
-void tny_external_interrupt(teenyat* t, tny_uword external_interrupt) {
+void tny_external_interrupt(teenyat* t, tny_xint external_interrupt) {
 	/*
 	 * Make a mask with a 1 in the position of the external interrupt number
 	 * offset so external interrupt 0..7 is mapped to bits 8..15 as the
 	 * external eight interrupts are mapped to the interrupt vector table
 	 * as ints 8..15.
 	 * 
-	 * external_interrupt > 7 are wrapped
 	 */
 	tny_uword iqr_mask = 1U << ((external_interrupt % 8) + 8);
 	/* mask in the interrupt into the upper half of our iqr */
@@ -803,11 +802,13 @@ void tny_clock(teenyat *t) {
 				/*
 				 * Make a mask with a 1 in the position of the interrupt number
 				 *
-				 * interrupt > 15 are wrapped
 				 */
-				tny_uword interrupt_mask = 1U << (interrupt_number % 16);
-				/* mask in the interrupt into the upper half of our iqr */
-				t->interrupt_queue_register.u |= interrupt_mask;
+
+                if(interrupt_number >= 0 && interrupt_number < 16) {
+                    tny_uword interrupt_mask = 1U << interrupt_number;
+                    /* mask in the interrupt into the upper half of our iqr */
+                    t->interrupt_queue_register.u |= interrupt_mask;
+                }
 			}
 			break;
 		case TNY_OPCODE_RTI:
