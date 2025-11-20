@@ -332,7 +332,13 @@ void tny_external_interrupt(teenyat* t, tny_xint external_interrupt) {
 	return;
 }
 
-/* Assumes that bits is non-zero */
+/**
+ * Priority scans a bit pattern and
+ * returns the bit index of the least signifigant 1
+ *
+ * Assumes that bits is non-zero
+ *
+ * */
 tny_uword tny_get_interrupt_index(tny_uword bits) {
 	tny_uword n = 0;
 	if (!(bits & 0x000000FF)) { n +=  8; bits >>=  8; }
