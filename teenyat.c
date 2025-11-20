@@ -249,7 +249,7 @@ bool tny_reset(teenyat *t) {
 	t->delay_cycles = 0;
 	t->cycle_cnt = 0;
 	t->cycle_count_base = 0;
-	t->wall_count_base = 0;
+	t->wall_count_base = us_clock();
 
 	return true;
 }
