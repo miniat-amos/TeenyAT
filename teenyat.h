@@ -143,6 +143,17 @@ typedef struct alu_flags {
 	int reserved: 12;
 } alu_flags;
 
+typedef enum tny_xint {
+    TNY_XINT0,
+    TNY_XINT1,
+    TNY_XINT2,
+    TNY_XINT3,
+    TNY_XINT4,
+    TNY_XINT5,
+    TNY_XINT6,
+    TNY_XINT7
+} tny_xint;
+
 union tny_word {
 	struct {
 		tny_sword immed4  : 4;
@@ -382,15 +393,6 @@ struct teenyat {
 #define TNY_REG_C    5
 #define TNY_REG_D    6
 #define TNY_REG_E    7
-
-#define TNY_XINT0    0
-#define TNY_XINT1    1
-#define TNY_XINT2    2
-#define TNY_XINT3    3
-#define TNY_XINT4    4
-#define TNY_XINT5    5
-#define TNY_XINT6    6
-#define TNY_XINT7    7
 
 /**
  * @brief
