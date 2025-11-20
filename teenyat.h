@@ -605,7 +605,7 @@ void tny_port_change(teenyat *t, TNY_PORT_CHANGE_FNPTR port_change);
  * @param external_interrupt
  *   A number from 0-7 denoting which external interrupt to queue
  */
-void tny_external_interrupt(teenyat* t, tny_uword external_interrupt);
+void tny_external_interrupt(teenyat* t, tny_xint external_interrupt);
 
 #ifdef __cplusplus
 }
