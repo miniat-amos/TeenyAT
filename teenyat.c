@@ -198,6 +198,7 @@ bool tny_reset(teenyat *t) {
 	/* Disable all architectural features */
 	t->control_status_register.csr.interrupt_enable = 0;
 	t->control_status_register.csr.interrupt_clearing = 0;
+	t->control_status_register.csr.clock_divisor_scale = 0;
 	t->control_status_register.csr.reserved = 0;
 
 	/* Clear & disable all interrupts by default */
@@ -247,6 +248,8 @@ bool tny_reset(teenyat *t) {
 
 	t->delay_cycles = 0;
 	t->cycle_cnt = 0;
+	t->cycle_count_base = 0;
+	t->wall_count_base = us_clock();
 
 	return true;
 }
@@ -470,6 +473,23 @@ void tny_clock(teenyat *t) {
 				case TNY_INTERRUPT_QUEUE_REGISTER:
 					t->reg[reg1] = t->interrupt_queue_register;
 					break;
+				case TNY_CYCLE_COUNT:
+				{
+					uint64_t CD = 1ULL << (t->control_status_register.csr.clock_divisor_scale);
+					/* Convert CPU cycles to timer cycles using the clock divisor */
+					uint64_t cycles = (t->cycle_cnt - t->cycle_count_base) / CD;
+					t->reg[reg1].u = (tny_uword)(cycles);
+				}
+					break; 	
+				case TNY_WALL_TIME:
+				{
+					/* Convert microseconds to 1/16 second ticks */
+					static const uint64_t us_per_tick = 1000000ULL / 16ULL; // 62500
+					/* One tick is equal to 1/16 of a second */
+					uint64_t ticks = (us_clock() - t->wall_count_base) / us_per_tick;
+					t->reg[reg1].u = (tny_uword)(ticks);
+					break;
+				}
 				default:
 					/* Check if reading from interrupt service */
 					if(addr >= TNY_INTERRUPT_VECTOR_TABLE_START &&
@@ -539,6 +559,12 @@ void tny_clock(teenyat *t) {
 					break;
 				case TNY_INTERRUPT_QUEUE_REGISTER:
 					t->interrupt_queue_register = t->reg[reg2];
+					break;
+				case TNY_CYCLE_COUNT_RESET:
+					t->cycle_count_base = t->cycle_cnt;
+					break;
+				case TNY_WALL_TIME_RESET:
+					t->wall_count_base = us_clock();
 					break;
 				default:
 					/* Check if writing to interrupt service */
