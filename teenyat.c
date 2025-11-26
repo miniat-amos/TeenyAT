@@ -118,9 +118,9 @@ bool tny_init_from_file(teenyat *t, FILE *bin_file,
 	t->bus_read = bus_read ? bus_read : default_bus_read;
 	t->bus_write = bus_write ? bus_write : default_bus_write;
 
-	t->clock_manager.calibrate_cycles = TNY_DEFAULT_CALIBRATE_CYCLES;
-	t->clock_manager.busy_loop_cnt = tny_calibrate_1_us();
-	t->clock_manager.target_mhz = 1;
+	t->clock_rate.calibrate_cycles = TNY_DEFAULT_CALIBRATE_CYCLES;
+	t->clock_rate.mhz_loop_cnt = tny_calibrate_1_us();
+	t->clock_rate.target_mhz = 1;
 
 	if(!tny_reset(t)) {
 		return false;
@@ -141,7 +141,7 @@ bool tny_init_clocked(teenyat *t, FILE *bin_file,
 	if(MHz == 0 ) return false;
 
 	bool result = tny_init_from_file(t,bin_file,bus_read,bus_write);
-	t->clock_manager.target_mhz = MHz;
+	t->clock_rate.target_mhz = MHz;
 
 	return result;
 }
@@ -160,8 +160,8 @@ bool tny_init_unclocked(teenyat *t, FILE *bin_file,
 
 bool tny_set_calibration_window(teenyat *t,int16_t calibrate_cycles){
 	if(!t) return false;
-	t->clock_manager.calibrate_cycles = calibrate_cycles;
-	t->clock_manager.cycles_until_calibrate = calibrate_cycles;
+	t->clock_rate.calibrate_cycles = calibrate_cycles;
+	t->clock_rate.cycles_until_calibrate = calibrate_cycles;
 	return true;
 }
 
@@ -244,7 +244,7 @@ bool tny_reset(teenyat *t) {
 	(void)tny_random(t);
 
 	/* Set up our initial calibrated cycles */
-	t->clock_manager.cycles_until_calibrate = t->clock_manager.calibrate_cycles;
+	t->clock_rate.cycles_until_calibrate = t->clock_rate.calibrate_cycles;
 
 	t->delay_cycles = 0;
 	t->cycle_cnt = 0;
@@ -377,8 +377,8 @@ void handle_interrupts(teenyat *t) {
 void tny_clock(teenyat *t) {
 	/* Setup clock timing on first cycle */
 	if(t->cycle_cnt == 0){
-		t->clock_manager.epoch = us_clock();
-		t->clock_manager.last_calibration_time = t->clock_manager.epoch;
+		t->clock_rate.epoch = us_clock();
+		t->clock_rate.last_calibration_time = t->clock_rate.epoch;
 	}
 
 	t->cycle_cnt++;
@@ -859,32 +859,32 @@ void tny_clock(teenyat *t) {
 	}
 
 	/* Jump out if unclocked instance of the TeenyAT */
-	if(t->clock_manager.cycles_until_calibrate < 0) return;
+	if(t->clock_rate.cycles_until_calibrate < 0) return;
 
-	if(--(t->clock_manager.cycles_until_calibrate) == 0) {
+	if(--(t->clock_rate.cycles_until_calibrate) == 0) {
 		/* Time to recalibrate our busy loop count */
 		uint64_t now_us = us_clock();
-		uint64_t us_elapsed = now_us - t->clock_manager.last_calibration_time;
-		uint64_t mhz_loop_count = t->clock_manager.busy_loop_cnt * t->clock_manager.calibrate_cycles / t->clock_manager.target_mhz;
-		t->clock_manager.busy_loop_cnt = mhz_loop_count / us_elapsed;
+		uint64_t us_elapsed = now_us - t->clock_rate.last_calibration_time;
+		uint64_t mhz_loop_count = t->clock_rate.mhz_loop_cnt * t->clock_rate.calibrate_cycles / t->clock_rate.target_mhz;
+		t->clock_rate.mhz_loop_cnt = mhz_loop_count / us_elapsed;
 
-		uint64_t time_since_epoch_us = now_us - t->clock_manager.epoch;
+		uint64_t time_since_epoch_us = now_us - t->clock_rate.epoch;
 		if(time_since_epoch_us > t->cycle_cnt) {
 			/* too slow, speed up by busy looping 5% less */
-			t->clock_manager.busy_loop_cnt = (t->clock_manager.busy_loop_cnt * 95) / 100;
+			t->clock_rate.mhz_loop_cnt = (t->clock_rate.mhz_loop_cnt * 95) / 100;
 		}
 		else if(time_since_epoch_us < t->cycle_cnt) {
 			/* too fast, slow down by busy looping 5% more*/
 			/* NOTE: 1+ ensures even tiny busy_loop_count will at least go up by 1 */
-			t->clock_manager.busy_loop_cnt = 1 + (t->clock_manager.busy_loop_cnt * 105) / 100;
+			t->clock_rate.mhz_loop_cnt = 1 + (t->clock_rate.mhz_loop_cnt * 105) / 100;
 		}
 	
-		t->clock_manager.last_calibration_time = now_us;
-		t->clock_manager.cycles_until_calibrate = t->clock_manager.calibrate_cycles;
+		t->clock_rate.last_calibration_time = now_us;
+		t->clock_rate.cycles_until_calibrate = t->clock_rate.calibrate_cycles;
 	}
 
 	/* Busy wait to fix the cycle rate */
-	for(volatile uint64_t i = 0; i < t->clock_manager.busy_loop_cnt; i++);
+	for(volatile uint64_t i = 0; i < t->clock_rate.mhz_loop_cnt; i++);
 	
 	return;
 }

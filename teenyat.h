@@ -316,14 +316,18 @@ struct teenyat {
 		uint64_t increment;
 	} random;
 	/**
-	 * Each teenyat instance is inherently initialized with a fixed cycle rate 
-	 * of 1 MHz. This is controlled through the busy_loop_cnt. 
-	 * To account for aggregate error, this variable is adaptively 
-	 * updated once after every calibrate_cycles goes by, ensuring we
-	 * stay in line with our cycle time 
+	 * teenyat instances can simulate a fixed cpu speed of 1 MHz (1 us period).
+	 * This is simulated by having each cycle perform a busy loop of nothing
+	 * which loops mhz_loop_cnt times in hopes it adds the right delay to
+	 * approximate the target 1 us period of clock rate.  After every
+	 * window of calibrate_cycles completes, we evaluate the real-world time
+	 * that has passed to determine whether the simulation has been going too
+	 * fast or slow.  If too fast, we increase the mhz_loop_cnt to extend each
+	 * future cycle.  If too slow, we decrease it.
 	 */
 	struct{
-		uint64_t busy_loop_cnt;
+		/* How many times to busy loop to simulate 1 us */
+		uint64_t mhz_loop_cnt;
 		/* The number of cycles remaining before the next recalibration */
 		int16_t cycles_until_calibrate;
 		/* Reference clock cycle */
@@ -337,7 +341,7 @@ struct teenyat {
 		uint16_t target_mhz;
 		/* The total number of cycles needed before recalibration */
 		int16_t calibrate_cycles;
-	} clock_manager;
+	} clock_rate;
 	/**
 	 * The number of cycles this instance has been running since initialization
 	 * or reset.
