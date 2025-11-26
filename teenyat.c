@@ -38,7 +38,7 @@
 #endif
 
 tny_uword tny_random(teenyat *t);
-uint64_t  tny_calibrate_1_MHZ(void);
+uint64_t  tny_calibrate_1_us(void);
 
 static void set_elg_flags(teenyat *t, tny_sword alu_result) {
 	t->flags.equals  = (alu_result == 0);
@@ -119,7 +119,7 @@ bool tny_init_from_file(teenyat *t, FILE *bin_file,
 	t->bus_write = bus_write ? bus_write : default_bus_write;
 
 	t->clock_manager.calibrate_cycles = TNY_DEFAULT_CALIBRATE_CYCLES;
-	t->clock_manager.busy_loop_cnt = tny_calibrate_1_MHZ();
+	t->clock_manager.busy_loop_cnt = tny_calibrate_1_us();
 	t->clock_manager.target_mhz = 1;
 
 	if(!tny_reset(t)) {
@@ -927,7 +927,7 @@ tny_uword tny_random(teenyat *t) {
  * This function will estimate the number of iterations needed in
  * a busy loop to consume 1 us (clock period for 1 MHz).
  */ 
-uint64_t tny_calibrate_1_MHZ(void){
+uint64_t tny_calibrate_1_us(void){
 	const uint64_t TRIAL_CNT = 5212004;
 	uint64_t start = us_clock();
 
