@@ -137,7 +137,7 @@ bool tny_init_clocked(teenyat *t, FILE *bin_file,
                       uint16_t MHz){
 
 	if(!t) return false;
-	/* Cannot have negative or zero target mhz */
+	/* Cannot have zero target mhz */
 	if(MHz == 0 ) return false;
 
 	bool result = tny_init_from_file(t,bin_file,bus_read,bus_write);
