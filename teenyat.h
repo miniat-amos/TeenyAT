@@ -319,7 +319,7 @@ struct teenyat {
 	 * Each teenyat instance is inherently initialized with a fixed cycle rate 
 	 * of 1 MHz. This is controlled through the busy_loop_cnt. 
 	 * To account for aggregate error, this variable is adaptively 
-	 * updated once after every calibrate_cycles, goes by ensuring we 
+	 * updated once after every calibrate_cycles goes by, ensuring we
 	 * stay in line with our cycle time 
 	 */
 	struct{
