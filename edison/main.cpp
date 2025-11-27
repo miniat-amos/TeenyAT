@@ -154,7 +154,7 @@ int main(int argc, char* argv[])
     teenyat t;
     FILE *bin_file = fopen(fileName.c_str(), "rb");
     if(bin_file != NULL) {
-        tny_init_clocked(&t, bin_file, bus_read, bus_write, 1);
+        tny_init_from_file(&t, bin_file, bus_read, bus_write);
         tny_port_change(&t,port_change);
         fclose(bin_file);
     }else {

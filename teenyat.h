@@ -334,11 +334,6 @@ struct teenyat {
 		uint64_t epoch;
 		/* Last time calibrated in microseconds */
 		uint64_t last_calibration_time;
-		/**
-		 * target frequency in MHz a value of 1 results in 1MHz 
-		 * while a value of 2 results in 2MHz etc....
-		 */
-		uint16_t target_mhz;
 		/* The total number of cycles needed before recalibration */
 		int16_t calibrate_cycles;
 	} clock_rate;
@@ -425,41 +420,6 @@ struct teenyat {
 bool tny_init_from_file(teenyat *t, FILE *bin_file,
                         TNY_READ_FROM_BUS_FNPTR bus_read,
                         TNY_WRITE_TO_BUS_FNPTR bus_write);
-
-/**
- * @brief
- *   Initialize a clock instance of TeenyAT with a given MHz clock rate.
- *
- * @param t
- *   The TeenyAT instance to initialize
- *
- * @param bin_file
- *   The pre-assembled .bin file to load and execute
- *
- * @param bus_read
- *   Callback function for handling read requests
- *
- * @param bus_write
- *   Callback function for handling write requests
- *
- * @param MHz
- *   The simulated clock speed in MHz 
- *
- * @return
- *   True on success, flase otherwise.
- *
- * @note
- *   Upon failed initialization, the t->initialized member can be assumed false,
- *   but the state of all other members is undefined.
- *
- * @note
- *   During testing it was found that most host machines can run 1MHz effectively
- *   so that was chosen as the standard clock rate.
- */
- bool tny_init_clocked(teenyat *t, FILE *bin_file,
-					   TNY_READ_FROM_BUS_FNPTR bus_read,
-					   TNY_WRITE_TO_BUS_FNPTR bus_write,
-					   uint16_t MHz);
 
 /**
  * @brief

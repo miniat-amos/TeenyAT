@@ -120,7 +120,6 @@ bool tny_init_from_file(teenyat *t, FILE *bin_file,
 
 	t->clock_rate.calibrate_cycles = TNY_DEFAULT_CALIBRATE_CYCLES;
 	t->clock_rate.mhz_loop_cnt = tny_calibrate_1_us();
-	t->clock_rate.target_mhz = 1;
 
 	if(!tny_reset(t)) {
 		return false;
@@ -129,21 +128,6 @@ bool tny_init_from_file(teenyat *t, FILE *bin_file,
 	t->initialized = true;
 
 	return true;
-}
-
-bool tny_init_clocked(teenyat *t, FILE *bin_file,
-                      TNY_READ_FROM_BUS_FNPTR bus_read,
-                      TNY_WRITE_TO_BUS_FNPTR bus_write,
-                      uint16_t MHz){
-
-	if(!t) return false;
-	/* Cannot have zero target mhz */
-	if(MHz == 0 ) return false;
-
-	bool result = tny_init_from_file(t,bin_file,bus_read,bus_write);
-	t->clock_rate.target_mhz = MHz;
-
-	return result;
 }
 
 bool tny_init_unclocked(teenyat *t, FILE *bin_file,
@@ -865,7 +849,7 @@ void tny_clock(teenyat *t) {
 		/* Time to recalibrate our busy loop count */
 		uint64_t now_us = us_clock();
 		uint64_t us_elapsed = now_us - t->clock_rate.last_calibration_time;
-		uint64_t mhz_loop_count = t->clock_rate.mhz_loop_cnt * t->clock_rate.calibrate_cycles / t->clock_rate.target_mhz;
+		uint64_t mhz_loop_count = t->clock_rate.mhz_loop_cnt * t->clock_rate.calibrate_cycles;
 		t->clock_rate.mhz_loop_cnt = mhz_loop_count / us_elapsed;
 
 		uint64_t time_since_epoch_us = now_us - t->clock_rate.epoch;
