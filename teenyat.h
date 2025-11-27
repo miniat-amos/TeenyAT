@@ -450,11 +450,11 @@ bool tny_init_unclocked(teenyat *t, FILE *bin_file,
 
 /**
  * @brief
- *   Helper function for setting the initial pace
- *   count of a clocked instance of the TeenyAT
+ *   Helper function for setting the number of cycles per calibration
+ *   window.  Also starts a new window of that duration.
  *
  * @param t
- *   The TeenyAT instance to set pace count of
+ *   The TeenyAT instance
  *
  * @param calibrate_cycles
  *   The calibrate cycles to be set
