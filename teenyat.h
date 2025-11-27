@@ -330,7 +330,7 @@ struct teenyat {
 		uint64_t mhz_loop_cnt;
 		/* The number of cycles remaining before the next recalibration */
 		int16_t cycles_until_calibrate;
-		/* Reference clock cycle */
+		/* Reference time in microseconds */
 		uint64_t epoch;
 		/* Last time calibrated in microseconds */
 		uint64_t last_calibration_time;
