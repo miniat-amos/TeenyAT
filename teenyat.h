@@ -354,7 +354,7 @@ struct teenyat {
 	/** 
 	 * Base offset for the wall time peripheral
 	*/
-	uint64_t wall_count_base;
+	uint64_t wall_time_base;
 	/**
 	 * An extra pointer for system developers so data can follow a TeenyAT
 	 * instance through read/write callback functions, for example.
