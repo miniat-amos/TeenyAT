@@ -395,7 +395,7 @@ struct teenyat {
 
 /**
  * @brief
- *   Initialize a 1MHz instance of the TeenyAT and 
+ *   Initialize a 1 MHz instance of the TeenyAT and 
  *   buffer the file for future resets.
  *
  * @param t

@@ -91,7 +91,7 @@
     ShR pc, -2
 
     set rB, 80
-    dly rb, 1000  ; delay ~80ms when 1MHz clocked mode
+    dly rb, 1000  ; delay ~80ms at 1 MHz
 
     dly rA, rC
     dly rD, rE - 567 
