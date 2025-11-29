@@ -360,11 +360,57 @@ void handle_interrupts(teenyat *t) {
 	return;
 }
 
+void tny_setup_clock_timing(teenyat *t) {
+	t->clock_rate.epoch = us_clock();
+	t->clock_rate.last_calibration_time = t->clock_rate.epoch;
+
+	return;
+}
+
+void tny_adjust_clock_rate_stall(teenyat *t) {
+	uint64_t now_us = us_clock();
+	uint64_t us_elapsed = now_us - t->clock_rate.last_calibration_time;
+	uint64_t mhz_loop_count = t->clock_rate.mhz_loop_cnt * t->clock_rate.calibrate_cycles;
+	t->clock_rate.mhz_loop_cnt = mhz_loop_count / us_elapsed;
+
+	uint64_t time_since_epoch_us = now_us - t->clock_rate.epoch;
+	if(time_since_epoch_us > t->cycle_cnt) {
+		/* too slow, speed up by busy looping 5% less */
+		t->clock_rate.mhz_loop_cnt = (t->clock_rate.mhz_loop_cnt * 95) / 100;
+	}
+	else if(time_since_epoch_us < t->cycle_cnt) {
+		/* too fast, slow down by busy looping 5% more*/
+		/* NOTE: 1+ ensures even tiny busy_loop_count will at least go up by 1 */
+		t->clock_rate.mhz_loop_cnt = 1 + (t->clock_rate.mhz_loop_cnt * 105) / 100;
+	}
+
+	t->clock_rate.last_calibration_time = now_us;
+	t->clock_rate.cycles_until_calibrate = t->clock_rate.calibrate_cycles;
+
+	return;
+}
+
+void tny_clock_rate_stall(teenyat *t) {
+	/* Busy wait to fix the cycle rate */
+	for(volatile uint64_t i = 0; i < t->clock_rate.mhz_loop_cnt; i++);
+
+	return;
+}
+
+void tny_manage_clock_rate(teenyat *t) {
+	if(--(t->clock_rate.cycles_until_calibrate) == 0) {
+		tny_adjust_clock_rate_stall(t);
+	}
+
+	tny_clock_rate_stall(t);
+
+	return;
+}
+
 void tny_clock(teenyat *t) {
 	/* Setup clock timing on first cycle */
 	if(t->cycle_cnt == 0){
-		t->clock_rate.epoch = us_clock();
-		t->clock_rate.last_calibration_time = t->clock_rate.epoch;
+		tny_setup_clock_timing(t);
 	}
 
 	t->cycle_cnt++;
@@ -845,32 +891,9 @@ void tny_clock(teenyat *t) {
 	}
 
 	/* Jump out if unclocked instance of the TeenyAT */
-	if(t->clock_rate.cycles_until_calibrate < 0) return;
-
-	if(--(t->clock_rate.cycles_until_calibrate) == 0) {
-		/* Time to recalibrate our busy loop count */
-		uint64_t now_us = us_clock();
-		uint64_t us_elapsed = now_us - t->clock_rate.last_calibration_time;
-		uint64_t mhz_loop_count = t->clock_rate.mhz_loop_cnt * t->clock_rate.calibrate_cycles;
-		t->clock_rate.mhz_loop_cnt = mhz_loop_count / us_elapsed;
-
-		uint64_t time_since_epoch_us = now_us - t->clock_rate.epoch;
-		if(time_since_epoch_us > t->cycle_cnt) {
-			/* too slow, speed up by busy looping 5% less */
-			t->clock_rate.mhz_loop_cnt = (t->clock_rate.mhz_loop_cnt * 95) / 100;
-		}
-		else if(time_since_epoch_us < t->cycle_cnt) {
-			/* too fast, slow down by busy looping 5% more*/
-			/* NOTE: 1+ ensures even tiny busy_loop_count will at least go up by 1 */
-			t->clock_rate.mhz_loop_cnt = 1 + (t->clock_rate.mhz_loop_cnt * 105) / 100;
-		}
-	
-		t->clock_rate.last_calibration_time = now_us;
-		t->clock_rate.cycles_until_calibrate = t->clock_rate.calibrate_cycles;
+	if(t->clock_rate.cycles_until_calibrate >= 0) {
+		tny_manage_clock_rate(t);
 	}
-
-	/* Busy wait to fix the cycle rate */
-	for(volatile uint64_t i = 0; i < t->clock_rate.mhz_loop_cnt; i++);
 	
 	return;
 }
