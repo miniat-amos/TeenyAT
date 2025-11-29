@@ -450,26 +450,6 @@ bool tny_init_unclocked(teenyat *t, FILE *bin_file,
 
 /**
  * @brief
- *   Helper function for setting the number of cycles per calibration
- *   window.  Also starts a new window of that duration.
- *
- * @param t
- *   The TeenyAT instance
- *
- * @param calibrate_cycles
- *   The calibrate cycles to be set
- *
- * @return
- *   True on success, false otherwise.
- *   Attempting to reset an uninitialized TeenyAT will always return false.
- *
- * @note
- *   This function also sets the current calibration window
- */
-bool tny_set_calibration_window(teenyat *t,int16_t calibrate_cycles);
-
-/**
- * @brief
  *   Reinitialize the TeenyAT
  *
  * Restore the TeenyAT to its initialized state as if it had just been done so

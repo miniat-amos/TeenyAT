@@ -118,7 +118,16 @@ bool tny_init_from_file(teenyat *t, FILE *bin_file,
 	t->bus_read = bus_read ? bus_read : default_bus_read;
 	t->bus_write = bus_write ? bus_write : default_bus_write;
 
+	/*
+	 * Initialize the clock_rate structure.  Note the epoch and
+	 * last_calibration_time members are not set here as their times
+	 * are set at the moment of the first clock cycle.  To keep this
+	 * organized, lines that set them (below) are commented out.
+	 */
 	t->clock_rate.calibrate_cycles = TNY_DEFAULT_CALIBRATE_CYCLES;
+	t->clock_rate.cycles_until_calibrate = TNY_DEFAULT_CALIBRATE_CYCLES;
+	// t->clock_rate.epoch = <<< SET ON FIRST CLOCK CYCLE >>> ;
+	// t->clock_rate.last_calibration_time = <<< SET ON FIRST CLOCK CYCLE >>> ;
 	t->clock_rate.mhz_loop_cnt = tny_calibrate_1_us();
 
 	if(!tny_reset(t)) {
@@ -137,16 +146,9 @@ bool tny_init_unclocked(teenyat *t, FILE *bin_file,
 	if(!t) return false;
 
 	bool result = tny_init_from_file(t,bin_file,bus_read,bus_write);
-	tny_set_calibration_window(t,-1);
+	t->clock_rate.cycles_until_calibrate = -1;  // disable clocked simulation
 	
 	return result;
-}
-
-bool tny_set_calibration_window(teenyat *t,int16_t calibrate_cycles){
-	if(!t) return false;
-	t->clock_rate.calibrate_cycles = calibrate_cycles;
-	t->clock_rate.cycles_until_calibrate = calibrate_cycles;
-	return true;
 }
 
 bool tny_reset(teenyat *t) {
