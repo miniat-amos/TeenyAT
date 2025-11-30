@@ -236,7 +236,6 @@ bool tny_reset(teenyat *t) {
 	t->delay_cycles = 0;
 	t->cycle_cnt = 0;
 	t->cycle_count_base = 0;
-	t->wall_time_base = us_clock();
 
 	return true;
 }
@@ -362,7 +361,9 @@ void handle_interrupts(teenyat *t) {
 }
 
 void tny_setup_clock_timing(teenyat *t) {
-	t->clock_rate.epoch = us_clock();
+	uint64_t now = us_clock();
+	t->clock_rate.epoch = now;
+	t->wall_time_base = now;
 	t->clock_rate.last_calibration_time = t->clock_rate.epoch;
 
 	return;
