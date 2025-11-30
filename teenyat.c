@@ -142,7 +142,7 @@ bool tny_init_from_file(teenyat *t, FILE *bin_file,
 
 bool tny_init_unclocked(teenyat *t, FILE *bin_file,
                         TNY_READ_FROM_BUS_FNPTR bus_read,
-                        TNY_WRITE_TO_BUS_FNPTR bus_write){
+                        TNY_WRITE_TO_BUS_FNPTR bus_write) {
 
 	if(!t) return false;
 
