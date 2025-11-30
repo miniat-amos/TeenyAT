@@ -326,10 +326,12 @@ struct teenyat {
 	 * future cycle.  If too slow, we decrease it.
 	 */
 	struct{
+		/* Clocked teenyat run at 1 MHz.  Unclocked are as fast as possible */
+		bool is_clocked;
 		/* How many times to busy loop to simulate 1 us */
 		uint64_t mhz_loop_cnt;
 		/* The number of cycles remaining before the next recalibration */
-		int16_t cycles_until_calibrate;
+		uint16_t cycles_until_calibrate;
 		/* Reference time in microseconds */
 		uint64_t epoch;
 		/* Last time calibrated in microseconds */
