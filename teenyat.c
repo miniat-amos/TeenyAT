@@ -124,7 +124,6 @@ bool tny_init_from_file(teenyat *t, FILE *bin_file,
 	 * are set at the moment of the first clock cycle.  To keep this
 	 * organized, lines that set them (below) are commented out.
 	 */
-	t->clock_rate.is_clocked = true;
 	t->clock_rate.calibrate_cycles = TNY_DEFAULT_CALIBRATE_CYCLES;
 	t->clock_rate.cycles_until_calibrate = TNY_DEFAULT_CALIBRATE_CYCLES;
 	// t->clock_rate.epoch = <<< SET ON FIRST CLOCK CYCLE >>> ;
@@ -147,7 +146,7 @@ bool tny_init_unclocked(teenyat *t, FILE *bin_file,
 	if(!t) return false;
 
 	bool result = tny_init_from_file(t,bin_file,bus_read,bus_write);
-	t->clock_rate.is_clocked = false;
+	t->control_status_register.csr.unclocked = 1;
 	
 	return result;
 }
@@ -893,7 +892,7 @@ void tny_clock(teenyat *t) {
 	}
 
 	/* Jump out if unclocked instance of the TeenyAT */
-	if(t->clock_rate.is_clocked) {
+	if(!t->control_status_register.csr.unclocked) {
 		tny_manage_clock_rate(t);
 	}
 	

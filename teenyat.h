@@ -176,7 +176,8 @@ union tny_word {
 		tny_uword interrupt_enable  : 1;
 		tny_uword interrupt_clearing  : 1;
 		tny_uword clock_divisor_scale : 4;
-		tny_uword reserved : 10;
+		tny_uword unclocked : 1;
+		tny_uword reserved : 9;
 	} csr;
 
 	struct {
@@ -326,8 +327,6 @@ struct teenyat {
 	 * future cycle.  If too slow, we decrease it.
 	 */
 	struct{
-		/* Clocked teenyat run at 1 MHz.  Unclocked are as fast as possible */
-		bool is_clocked;
 		/* How many times to busy loop to simulate 1 us */
 		uint64_t mhz_loop_cnt;
 		/* The number of cycles remaining before the next recalibration */
