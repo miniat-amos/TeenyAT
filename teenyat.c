@@ -585,7 +585,20 @@ void tny_clock(teenyat *t) {
 					/* Do nothing */
 					break;
 				case TNY_CONTROL_STATUS_REGISTER:
+					bool u1 = t->control_status_register.csr.unclocked;
 					t->control_status_register = t->reg[reg2];
+
+					/*
+					 * Reset CPU rate timing control if changing from unclocked
+					 * to clocked mode.
+					 */
+					bool u2 = t->control_status_register.csr.unclocked;
+					if(u1 && !u2) {
+						t->clock_rate.cycles_until_calibrate = t->clock_rate.calibrate_cycles;
+						uint64_t now = us_clock();
+						t->clock_rate.epoch = now;
+						t->clock_rate.last_calibration_time = now;
+					}
 					break;
 				case TNY_INTERRUPT_ENABLE_REGISTER:
 					t->interrupt_enable_register = t->reg[reg2];
