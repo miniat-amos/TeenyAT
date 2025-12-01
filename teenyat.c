@@ -585,6 +585,7 @@ void tny_clock(teenyat *t) {
 					/* Do nothing */
 					break;
 				case TNY_CONTROL_STATUS_REGISTER:
+				{
 					bool u1 = t->control_status_register.csr.unclocked;
 					t->control_status_register = t->reg[reg2];
 
@@ -600,6 +601,7 @@ void tny_clock(teenyat *t) {
 						t->clock_rate.last_calibration_time = now;
 					}
 					break;
+				}
 				case TNY_INTERRUPT_ENABLE_REGISTER:
 					t->interrupt_enable_register = t->reg[reg2];
 					break;
