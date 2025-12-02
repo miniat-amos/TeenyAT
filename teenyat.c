@@ -151,6 +151,41 @@ bool tny_init_unclocked(teenyat *t, FILE *bin_file,
 	return result;
 }
 
+void tny_setup_random_generator(teenyat *t) {
+	/*
+	 * Initialize each teenyat with a unique random number stream
+	 */
+	static uint64_t stream = 0;
+
+	/*
+	 * find a random seed
+	 */
+	uint64_t seed = (intptr_t)&time << 32;
+	seed ^= (intptr_t)&printf;
+	seed ^= time(NULL);
+	/* make seed "more" random w/ /dev/urandom if there */
+	FILE *f = fopen("/dev/urandom", "rb");
+	if(f != NULL) {
+		uint64_t entropy_bits;
+		if(fread(&entropy_bits, sizeof(entropy_bits), 1, f) == sizeof(entropy_bits)) {
+			seed ^= entropy_bits;
+		}
+		fclose(f);
+	}
+
+	/* Set increment to arbitrary odd constant that goes up by stream */
+	t->random.increment = ((intptr_t)&tny_reset + stream) | 1ULL;
+	stream += 2;
+
+	/*
+	 * Set initial state and "put it in the past"
+	 */
+	t->random.state = seed + t->random.increment;
+	(void)tny_random(t);
+
+	return;
+}
+
 bool tny_reset(teenyat *t) {
 	if(!t) return false;
 
@@ -198,36 +233,8 @@ bool tny_reset(teenyat *t) {
 	/* Maybe dont memset? could simulate randomness... */
 	memset(t->interrupt_vector_table, 0, sizeof(t->interrupt_vector_table));
 
-	/*
-	 * Initialize each teenyat with a unique random number stream
-	 */
-	static uint64_t stream = 0;
-
-	/*
-	 * find a random seed
-	 */
-	uint64_t seed = (intptr_t)&time << 32;
-	seed ^= (intptr_t)&printf;
-	seed ^= time(NULL);
-	/* make seed "more" random w/ /dev/urandom if there */
-	FILE *f = fopen("/dev/urandom", "rb");
-	if(f != NULL) {
-		uint64_t entropy_bits;
-		if(fread(&entropy_bits, sizeof(entropy_bits), 1, f) == sizeof(entropy_bits)) {
-			seed ^= entropy_bits;
-		}
-		fclose(f);
-	}
-
-	/* Set increment to arbitrary odd constant that goes up by stream */
-	t->random.increment = ((intptr_t)&tny_reset + stream) | 1ULL;
-	stream += 2;
-
-	/*
-	 * Set initial state and "put it in the past"
-	 */
-	t->random.state = seed + t->random.increment;
-	(void)tny_random(t);
+	/* Initialize a unique random number generator stream */
+	tny_setup_random_generator(t);
 
 	/* Set up our initial calibrated cycles */
 	t->clock_rate.cycles_until_calibrate = t->clock_rate.calibrate_cycles;
