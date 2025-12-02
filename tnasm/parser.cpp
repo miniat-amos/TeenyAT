@@ -800,6 +800,10 @@ bool p_code_4_line() {
         f.instruction.reg2 = 0;
         f.instruction.immed4 = 0;
 
+        if(oper->id == T_POP) {
+            f.instruction.reg2 = TNY_REG_SP;
+        }
+
         address += 1;
 
         if(pass > 1) {
@@ -991,6 +995,10 @@ bool p_code_9_line() {
         f.instruction.reg2 = sreg->value.u;
         f.instruction.immed4 = 0;
 
+        if(oper->id == T_PSH) {
+            f.instruction.reg1 = TNY_REG_SP;
+        }
+
         address += 1;
 
         if(pass > 1) {
@@ -1032,6 +1040,10 @@ bool p_code_10_line() {
         }
         else {
             address += 2;
+        }
+
+        if(oper->id == T_PSH) {
+            f.instruction.reg1 = TNY_REG_SP;
         }
 
         if(pass > 1) {
@@ -1076,6 +1088,10 @@ bool p_code_11_line() {
         }
         else {
             address += 2;
+        }
+
+        if(oper->id == T_PSH) {
+            f.instruction.reg1 = TNY_REG_SP;
         }
 
         if(pass > 1) {
