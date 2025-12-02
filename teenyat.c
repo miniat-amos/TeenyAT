@@ -201,7 +201,7 @@ bool tny_reset(teenyat *t) {
 	/*
 	 * Initialize each teenyat with a unique random number stream
 	 */
-	static uint64_t stream = 1;  // start at >=1 for increment constant to be unique
+	static uint64_t stream = 0;
 
 	/*
 	 * find a random seed
@@ -221,7 +221,7 @@ bool tny_reset(teenyat *t) {
 
 	/* Set increment to arbitrary odd constant that goes up by stream */
 	t->random.increment = ((intptr_t)&tny_reset + stream) | 1ULL;
-	stream++;
+	stream += 2;
 
 	/*
 	 * Set initial state and "put it in the past"
