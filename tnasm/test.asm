@@ -52,6 +52,10 @@
     ;str SP - aero, amos
     rOt rB, !early ;2
 
+;; Here are some PSH/POP expansion validations
+    pop rD, [rA]
+    psh [rC], rA
+
     JMP PC - 4
     JMP -4 + PC
     STR [aero], r6

@@ -800,6 +800,11 @@ bool p_code_4_line() {
         f.instruction.reg2 = 0;
         f.instruction.immed4 = 0;
 
+        /* In this grammar rule, POP uses the SP register implicitly */
+        if(oper->id == T_POP) {
+            f.instruction.reg2 = TNY_REG_SP;
+        }
+
         address += 1;
 
         if(pass > 1) {
@@ -991,6 +996,11 @@ bool p_code_9_line() {
         f.instruction.reg2 = sreg->value.u;
         f.instruction.immed4 = 0;
 
+        /* In this grammar rule, PSH uses the SP register implicitly */
+        if(oper->id == T_PSH){
+            f.instruction.reg1 = TNY_REG_SP;
+        }
+
         address += 1;
 
         if(pass > 1) {
@@ -1021,6 +1031,11 @@ bool p_code_10_line() {
         f.instruction.reg1 = 0;
         f.instruction.reg2 = reg_immed->reg;
         f.instruction.immed4 = 0;
+
+        /* In this grammar rule, PSH uses the SP register implicitly */
+        if(oper->id == T_PSH){
+            f.instruction.reg1 = TNY_REG_SP;
+        }
 
         inst.second.s = reg_immed->immed.s;
 
@@ -1066,6 +1081,11 @@ bool p_code_11_line() {
         f.instruction.reg2 = TNY_REG_ZERO;
         f.instruction.immed4 = 0;
 
+        /* In this grammar rule, PSH uses the SP register implicitly */
+        if(oper->id == T_PSH){
+            f.instruction.reg1 = TNY_REG_SP;
+        }
+
         inst.second.s = immed->s;
 
         bool make_teeny = is_teeny(inst.second.s);
@@ -1105,9 +1125,13 @@ bool p_code_12_line() {
         tny_word &f = inst.first;
         f.instruction.opcode = token_to_opcode(oper->id);
         f.instruction.teeny = 1;
+        f.instruction.reg2 = 0;
+        f.instruction.immed4 = 0;
+
         switch(oper->id) {
-        case T_RET:
+        case T_RET:  /* implemented as POP PC, [SP] */
             f.instruction.reg1 = TNY_REG_PC;
+            f.instruction.reg2 = TNY_REG_SP;
             break;
         case T_RTI:
             f.instruction.reg1 = 0;
@@ -1115,8 +1139,6 @@ bool p_code_12_line() {
             /* TODO: This should never happen, what to do if it does */
             break;
         }
-        f.instruction.reg2 = 0;
-        f.instruction.immed4 = 0;
 
         address += 1;
 
@@ -1370,12 +1392,14 @@ shared_ptr <token> p_code_1_inst() {
 
 /*
  * code_1_mem_inst ::= LOD.
+ * code_1_mem_inst ::= POP.
  */
 shared_ptr <token> p_code_1_mem_inst() {
     shared_ptr <token> result;
     int save = tnext;
 
-    (tnext = save, result = term(T_LOD));
+    (tnext = save, result = term(T_LOD)) ||
+    (tnext = save, result = term(T_POP));
 
     return result;
 }
@@ -1555,12 +1579,14 @@ shared_ptr <token> p_code_7_inst() {
 
 /*
  * code_8_inst ::= STR.
+ * code_8_inst ::= PSH.
  */
 shared_ptr <token> p_code_8_inst() {
     shared_ptr <token> result;
     int save = tnext;
 
-    (tnext = save, result = term(T_STR));
+    (tnext = save, result = term(T_STR)) ||
+    (tnext = save, result = term(T_PSH));
 
     return result;
 }

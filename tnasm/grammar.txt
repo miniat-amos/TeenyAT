@@ -93,6 +93,7 @@ code_1_inst ::= LUP.
 code_1_inst ::= DLY.
 
 code_1_mem_inst ::= LOD.
+code_1_mem_inst ::= POP.
 
 code_2_inst ::= ADD.
 code_2_inst ::= SUB.
@@ -148,6 +149,7 @@ code_6_inst ::= STR.
 code_7_inst ::= STR.
 
 code_8_inst ::= STR.
+code_8_inst ::= PSH.
 
 code_9_inst ::= PSH.
 code_9_inst ::= DLY.
