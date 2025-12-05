@@ -102,6 +102,12 @@
     INV rA                  ;2
 
     JNE rZ + !more
+
+    pop rA, [rB]
+
+    psh [rA], 7
+    psh [rC], rB
+    psh [SP], rA + 10
 ; and that's all
 
 !my_string
