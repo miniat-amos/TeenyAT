@@ -653,10 +653,10 @@ void tny_clock(teenyat *t) {
 			}
 			break;
 		case TNY_OPCODE_PSH:
-			t->reg[TNY_REG_SP].u &= TNY_MAX_RAM_ADDRESS;
-			t->ram[t->reg[TNY_REG_SP].u].u = t->reg[reg2].s + immed;
-			t->reg[TNY_REG_SP].u--;
-			t->reg[TNY_REG_SP].u &= TNY_MAX_RAM_ADDRESS;
+			t->reg[reg1].u &= TNY_MAX_RAM_ADDRESS;
+			t->ram[t->reg[reg1].u].u = t->reg[reg2].s + immed;
+			t->reg[reg1].u--;
+			t->reg[reg1].u &= TNY_MAX_RAM_ADDRESS;
 			/*
 			 * To promote student use of registers, all bus operations,
 			 * including RAM access comes with an extra penalty.
@@ -664,15 +664,17 @@ void tny_clock(teenyat *t) {
 			t->delay_cycles += TNY_BUS_DELAY;
 			break;
 		case TNY_OPCODE_POP:
-			t->reg[TNY_REG_SP].u++;
-			t->reg[TNY_REG_SP].u &= TNY_MAX_RAM_ADDRESS;
-			t->reg[reg1] = t->ram[t->reg[TNY_REG_SP].u];
-			/*
-			 * To promote student use of registers, all bus operations,
-			 * including RAM access comes with an extra penalty.
-			 */
-			t->delay_cycles += TNY_BUS_DELAY;
-			break;
+            {
+                t->reg[reg2].u++;
+                t->reg[reg2].u &= TNY_MAX_RAM_ADDRESS;
+                t->reg[reg1] = t->ram[reg2];
+                /*
+                * To promote student use of registers, all bus operations,
+                * including RAM access comes with an extra penalty.
+                */
+                t->delay_cycles += TNY_BUS_DELAY;
+            }
+            break;
 		case TNY_OPCODE_BTS:
 			{
 				tny_sword bit = t->reg[reg2].s + immed;

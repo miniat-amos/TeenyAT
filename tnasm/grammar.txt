@@ -19,6 +19,8 @@ loc ::= code_12_line.
 loc ::= code_13_line.
 loc ::= code_14_line.
 loc ::= code_15_line.
+loc ::= code_16_line.
+loc ::= code_17_line.
 
 variable_line ::= variable_line_empty.
 variable_line ::= variable_line_immediate.
@@ -73,6 +75,8 @@ code_12_line ::= code_12_inst.
 code_13_line ::= code_13_inst REGISTER.
 code_14_line ::= code_14_inst register_and_immediate.
 code_15_line ::= code_15_inst immediate.
+code_16_line ::= code_16_inst LBRACKET REGISTER RBRACKET COMMA immediate.
+code_17_line ::= code_17_inst LBRACKET REGISTER RBRACKET COMMA register_and_immediate.
 
 code_1_inst ::= ADD.
 code_1_inst ::= SUB.
@@ -93,6 +97,7 @@ code_1_inst ::= LUP.
 code_1_inst ::= DLY.
 
 code_1_mem_inst ::= LOD.
+code_1_mem_inst ::= POP.
 
 code_2_inst ::= ADD.
 code_2_inst ::= SUB.
@@ -148,6 +153,7 @@ code_6_inst ::= STR.
 code_7_inst ::= STR.
 
 code_8_inst ::= STR.
+code_8_inst ::= PSH.
 
 code_9_inst ::= PSH.
 code_9_inst ::= DLY.
@@ -190,3 +196,7 @@ code_15_inst ::= JL.
 code_15_inst ::= JLE.
 code_15_inst ::= JG.
 code_15_inst ::= JGE.
+
+code_16_inst ::= PSH.
+
+code_17_inst ::= PSH.
