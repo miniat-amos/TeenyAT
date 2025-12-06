@@ -55,6 +55,7 @@
 ;; Here are some PSH/POP expansion validations
     pop rD, [rA]
     psh [rC], rA
+    psh [rD], rB - 17
 
     JMP PC - 4
     JMP -4 + PC

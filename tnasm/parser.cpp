@@ -62,6 +62,7 @@ bool p_code_12_line();
 bool p_code_13_line();
 bool p_code_14_line();
 bool p_code_15_line();
+bool p_code_16_line();
 
 tny_uword token_to_opcode(int id);
 
@@ -83,6 +84,7 @@ shared_ptr <token> p_code_12_inst();
 shared_ptr <token> p_code_13_inst();
 shared_ptr <token> p_code_14_inst();
 shared_ptr <token> p_code_15_inst();
+shared_ptr <token> p_code_16_inst();
 
 extern vector <tny_word> bin_words;
 
@@ -210,7 +212,8 @@ bool p_loc() {
            (tnext = save, p_code_12_line())  ||
            (tnext = save, p_code_13_line())  ||
            (tnext = save, p_code_14_line())  ||
-           (tnext = save, p_code_15_line());
+           (tnext = save, p_code_15_line())  ||
+           (tnext = save, p_code_16_line());
 }
 
 bool p_variable_line() {
@@ -1289,6 +1292,55 @@ bool p_code_15_line() {
     return result;
 }
 
+/*
+ * code_16_line ::= code_16_inst LBRACKET REGISTER RBRACKET COMMA register_and_immediate.
+ */
+bool p_code_16_line() {
+    bool result = false;
+    shared_ptr <token> dreg, oper;
+    shared_ptr <reg_and_immed>reg_immed = nullptr;
+    int save = tnext;
+    if(
+        (tnext = save,
+         (oper = p_code_16_inst()) && term(T_LBRACKET) && (dreg = term(T_REGISTER)) && 
+          term(T_RBRACKET) && term(T_COMMA) && (reg_immed = p_register_and_immediate()) && term(T_EOL))
+    ) {
+
+        instruction inst;
+        inst.line_no = oper->line_no;
+
+        tny_word &f = inst.first;
+        f.instruction.opcode = token_to_opcode(oper->id);
+        f.instruction.teeny = 0;
+        f.instruction.reg1 = dreg->value.u;
+        f.instruction.reg2 = reg_immed->reg;
+        f.instruction.immed4 = 0;
+
+        inst.second.s = reg_immed->immed.s;
+
+        bool make_teeny = is_teeny(inst.second.s);
+        if(make_teeny) {
+            f.instruction.immed4 = inst.second.s;
+            f.instruction.teeny = 1;
+            address += 1;
+        }
+        else {
+            address += 2;
+        }
+
+        if(pass > 1) {
+            bin_words.push_back(f);
+            if(!make_teeny) {
+                bin_words.push_back(inst.second);
+            }
+        }
+
+        result = true;
+    }
+
+    return result;
+}
+
 tny_uword token_to_opcode(int id) {
     tny_uword result;
     switch(id) {
@@ -1727,6 +1779,18 @@ shared_ptr <token> p_code_15_inst() {
     (tnext = save, result = term(T_JLE)) ||
     (tnext = save, result = term(T_JG)) ||
     (tnext = save, result = term(T_JGE));
+
+    return result;
+}
+
+/*
+ * code_16_inst ::= PSH.
+ */
+shared_ptr <token> p_code_16_inst() {
+    shared_ptr <token> result;
+    int save = tnext;
+
+    (tnext = save, result = term(T_PSH));
 
     return result;
 }
