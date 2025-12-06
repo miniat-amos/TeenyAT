@@ -56,6 +56,7 @@
     pop rD, [rA]
     psh [rC], rA
     psh [rD], rB - 17
+    psh [rE], 4
 
     JMP PC - 4
     JMP -4 + PC

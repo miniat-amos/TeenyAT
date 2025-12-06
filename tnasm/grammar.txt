@@ -75,6 +75,7 @@ code_13_line ::= code_13_inst REGISTER.
 code_14_line ::= code_14_inst register_and_immediate.
 code_15_line ::= code_15_inst immediate.
 code_16_line ::= code_16_inst LBRACKET REGISTER RBRACKET COMMA register_and_immediate.
+code_17_line ::= code_17_inst LBRACKET REGISTER RBRACKET COMMA immediate.
 
 code_1_inst ::= ADD.
 code_1_inst ::= SUB.
