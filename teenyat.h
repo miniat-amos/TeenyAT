@@ -8,17 +8,14 @@
 #ifndef __TEENYAT_H__
 #define __TEENYAT_H__
 
-#ifndef __cplusplus
+#ifdef __cplusplus
+
+extern "C" {
+
+#endif /* __cplusplus */
 
 #include <stdbool.h>
 #include <stdint.h>
-
-#else  /* __cplusplus */
-extern "C" {
-
-#include <cstdint>
-
-#endif /* __cplusplus */
 
 typedef struct teenyat teenyat;
 
