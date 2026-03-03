@@ -73,21 +73,21 @@
 
 ;---------- Timer Setup ----------------
 ; Given a 1mhz clock rate the math Im using to activate our timer every second is
-; (1,000,000 / 65535) ~= 15
-; This means we need a clock prescaler of 15 or in other words increment our timer once every 15 cycles
+; (1,000,000 / 50,000) = 20
+; This means we need a clock prescaler of 20 or in other words increment our timer once every 20 cycles
 
 ; Timer A will go off once every second
-    set rA, 65535
+    set rA, 50000
     str [ TIMER_A_CMP ], rA
-    set rA, 15               ; set our cps to be 15
+    set rA, 20               ; set our cps to be 20
     bts rA, 12               ; enable our timer (bit12)
     str [ TIMER_A_CSR ], rA
 
 ; Timer B will go off every half a second
-    set rA, 65535
+    set rA, 50000
     str [ TIMER_B_CMP ], rA
-    set rA, 7                ; set our cps to be 7 ( about half of 15 )
-    bts rA, 12               ; enable our timer (bit12)
+    set rA, 10                ; set our cps to be 10 ( half of 20 )
+    bts rA, 12                ; enable our timer (bit12)
     str [ TIMER_B_CSR ], rA
 
 ;---------- Main Loop --------------------
