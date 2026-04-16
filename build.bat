@@ -85,7 +85,7 @@ set BUILD=-DCMAKE_BUILD_TYPE="%BUILD_TYPE%"
 cmake %MAKE_TARGET% %C_COMPILER% %CXX_COMPILER% %BUILD% ..
 
 echo Building project...
-cmake --build .
+cmake --build . --parallel
 
 popd
 

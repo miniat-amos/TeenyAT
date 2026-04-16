@@ -1,11 +1,11 @@
 ; D-PAD USAGE DEMO
 ;
-; UPDATED FOR 1MHz TeenyAT
+; UPDATED FOR 1 MHz TeenyAT
 ;
 ; A simple demo to show off the experiment board's d-pad controls.
 ; 
 ; - John Pertell 11.09.24 - Release
-;                03.07.25 - Updated for 1MHz TeenyAT
+;                03.07.25 - Updated for 1 MHz TeenyAT
 
 .const PORT_A_DIR 0x8000
 .const PORT_B_DIR 0x8001
@@ -34,7 +34,7 @@
 
 .const LEROY_1 0xD1
 .const LEROY_2 0xD3
-.const DELAY_AMT 375 ; assuming machine is at 1MHz
+.const DELAY_AMT 375 ; assuming machine is at 1 MHz
 
     jmp !init_demo
 

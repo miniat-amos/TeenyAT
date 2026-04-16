@@ -8,17 +8,14 @@
 #ifndef __TEENYAT_H__
 #define __TEENYAT_H__
 
-#ifndef __cplusplus
+#ifdef __cplusplus
+
+extern "C" {
+
+#endif /* __cplusplus */
 
 #include <stdbool.h>
 #include <stdint.h>
-
-#else  /* __cplusplus */
-extern "C" {
-
-#include <cstdint>
-
-#endif /* __cplusplus */
 
 typedef struct teenyat teenyat;
 
@@ -109,6 +106,12 @@ typedef void(*TNY_PORT_CHANGE_FNPTR)(teenyat *t, bool is_port_a, tny_word port);
 #define TNY_RANDOM_ADDRESS 0x8010  /* positive random values */
 #define TNY_RANDOM_BITS_ADDRESS 0x8011  /* random 16-bit pattern */
 
+#define TNY_CYCLE_COUNT 0x8090
+#define TNY_CYCLE_COUNT_RESET 0x8091
+
+#define TNY_WALL_TIME 0x8094
+#define TNY_WALL_TIME_RESET 0x8095
+
 #define TNY_CONTROL_STATUS_REGISTER 0x8EFF
 
 #define TNY_INTERRUPT_VECTOR_TABLE_START 0x8E00
@@ -137,6 +140,17 @@ typedef struct alu_flags {
 	int reserved: 12;
 } alu_flags;
 
+typedef enum tny_xint {
+    TNY_XINT0,
+    TNY_XINT1,
+    TNY_XINT2,
+    TNY_XINT3,
+    TNY_XINT4,
+    TNY_XINT5,
+    TNY_XINT6,
+    TNY_XINT7
+} tny_xint;
+
 union tny_word {
 	struct {
 		tny_sword immed4  : 4;
@@ -158,7 +172,9 @@ union tny_word {
 	struct {
 		tny_uword interrupt_enable  : 1;
 		tny_uword interrupt_clearing  : 1;
-		tny_uword reserved : 14;
+		tny_uword clock_divisor_scale : 4;
+		tny_uword unclocked : 1;
+		tny_uword reserved : 9;
 	} csr;
 
 	struct {
@@ -298,33 +314,40 @@ struct teenyat {
 		uint64_t increment;
 	} random;
 	/**
-	 * Each teenyat instance is inherently initialized with a fixed cycle rate 
-	 * of 1 MHz. This is controlled through the busy_loop_cnt. 
-	 * To account for aggregate error, this variable is adaptively 
-	 * updated once after every calibrate_cycles, goes by ensuring we 
-	 * stay in line with our cycle time 
+	 * teenyat instances can simulate a fixed cpu speed of 1 MHz (1 us period).
+	 * This is simulated by having each cycle perform a busy loop of nothing
+	 * which loops mhz_loop_cnt times in hopes it adds the right delay to
+	 * approximate the target 1 us period of clock rate.  After every
+	 * window of calibrate_cycles completes, we evaluate the real-world time
+	 * that has passed to determine whether the simulation has been going too
+	 * fast or slow.  If too fast, we increase the mhz_loop_cnt to extend each
+	 * future cycle.  If too slow, we decrease it.
 	 */
 	struct{
-		uint64_t busy_loop_cnt;
+		/* How many times to busy loop to simulate 1 us */
+		uint64_t mhz_loop_cnt;
 		/* The number of cycles remaining before the next recalibration */
-		int16_t cycles_until_calibrate;
-		/* Reference clock cycle */
+		uint16_t cycles_until_calibrate;
+		/* Reference time in microseconds */
 		uint64_t epoch;
 		/* Last time calibrated in microseconds */
 		uint64_t last_calibration_time;
-		/**
-		 * target frequency in MHz a value of 1 results in 1MHz 
-		 * while a value of 2 results in 2MHz etc....
-		 */
-		uint16_t target_mhz;
 		/* The total number of cycles needed before recalibration */
 		int16_t calibrate_cycles;
-	} clock_manager;
+	} clock_rate;
 	/**
 	 * The number of cycles this instance has been running since initialization
 	 * or reset.
 	 */
 	uint64_t cycle_cnt;
+	/** 
+	 * Base offset for the cycle count peripheral
+	*/
+	uint64_t cycle_count_base;
+	/** 
+	 * Base offset for the wall time peripheral
+	*/
+	uint64_t wall_time_base;
 	/**
 	 * An extra pointer for system developers so data can follow a TeenyAT
 	 * instance through read/write callback functions, for example.
@@ -368,18 +391,9 @@ struct teenyat {
 #define TNY_REG_D    6
 #define TNY_REG_E    7
 
-#define TNY_XINT0    0
-#define TNY_XINT1    1
-#define TNY_XINT2    2
-#define TNY_XINT3    3
-#define TNY_XINT4    4
-#define TNY_XINT5    5
-#define TNY_XINT6    6
-#define TNY_XINT7    7
-
 /**
  * @brief
- *   Initialize a 1MHz instance of the TeenyAT and 
+ *   Initialize a 1 MHz instance of the TeenyAT and 
  *   buffer the file for future resets.
  *
  * @param t
@@ -407,41 +421,6 @@ bool tny_init_from_file(teenyat *t, FILE *bin_file,
 
 /**
  * @brief
- *   Initialize a clock instance of TeenyAT with a given MHz clock rate.
- *
- * @param t
- *   The TeenyAT instance to initialize
- *
- * @param bin_file
- *   The pre-assembled .bin file to load and execute
- *
- * @param bus_read
- *   Callback function for handling read requests
- *
- * @param bus_write
- *   Callback function for handling write requests
- *
- * @param MHz
- *   The simulated clock speed in MHz 
- *
- * @return
- *   True on success, flase otherwise.
- *
- * @note
- *   Upon failed initialization, the t->initialized member can be assumed false,
- *   but the state of all other members is undefined.
- *
- * @note
- *   During testing it was found that most host machines can run 1MHz effectively
- *   so that was chosen as the standard clock rate.
- */
- bool tny_init_clocked(teenyat *t, FILE *bin_file,
-					   TNY_READ_FROM_BUS_FNPTR bus_read,
-					   TNY_WRITE_TO_BUS_FNPTR bus_write,
-					   uint16_t MHz);
-
-/**
- * @brief
  *   Initialize an unclocked instance of TeenyAT.
  *
  * @param t
@@ -466,26 +445,6 @@ bool tny_init_from_file(teenyat *t, FILE *bin_file,
 bool tny_init_unclocked(teenyat *t, FILE *bin_file,
 						TNY_READ_FROM_BUS_FNPTR bus_read,
 						TNY_WRITE_TO_BUS_FNPTR bus_write);
-
-/**
- * @brief
- *   Helper function for setting the initial pace
- *   count of a clocked instance of the TeenyAT
- *
- * @param t
- *   The TeenyAT instance to set pace count of
- *
- * @param calibrate_cycles
- *   The calibrate cycles to be set
- *
- * @return
- *   True on success, false otherwise.
- *   Attempting to reset an uninitialized TeenyAT will always return false.
- *
- * @note
- *   This function also sets the current calibration window
- */
-bool tny_set_calibration_window(teenyat *t,int16_t calibrate_cycles);
 
 /**
  * @brief
@@ -588,7 +547,7 @@ void tny_port_change(teenyat *t, TNY_PORT_CHANGE_FNPTR port_change);
  * @param external_interrupt
  *   A number from 0-7 denoting which external interrupt to queue
  */
-void tny_external_interrupt(teenyat* t, tny_uword external_interrupt);
+void tny_external_interrupt(teenyat* t, tny_xint external_interrupt);
 
 #ifdef __cplusplus
 }

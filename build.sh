@@ -83,7 +83,7 @@ fi
 
 cd "$BUILD_DIR"
 cmake -DCMAKE_BUILD_TYPE="$BUILD_TYPE" ..
-cmake --build . $VERBOSE_FLAG
+cmake --build . --parallel $VERBOSE_FLAG
 
 popd > /dev/null  # restore the initial directory
 

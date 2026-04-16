@@ -113,7 +113,7 @@ Check out [his personal website](https://jtstreib.com/main/).
 Here in the output, you can trace how many cycles it takes for the assembly above to switch the LED's state.  It's like a simple custom osciliscope!
 
 ```
-........@@@@@@@.......@@@@@@@.......@@@@@@@.......@@@@@@@.......@@@@@@@.......
+.......@@@@@@......@@@@@@......@@@@@@......@@@@@@......@@@@@@......@@@@@@.....
 ```
 ---
 

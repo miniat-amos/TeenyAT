@@ -3,9 +3,12 @@
 ; sets up an interreupt handler for the keyboard then performs
 ; a simple loop coloring the screen.  Instead of that loop,
 ; checking for key presses, the interrupt handler processes
-; those events quickly, resulting in a quick shift in the
-; colors displayed and the key pressed printed out to the
-; terminal.
+; those events quickly, resulting in:
+; 1) a shift in the colors displayed
+; 2) the key pressed printed out to the terminal
+; 3) the CPU is toggled between clocked and unclocked modes
+;    by flipping the "unclocked" bit of the Control
+;    Status Register (csr).
 
 ; TeenyAT Constants
 .const PORT_A_DIR                0x8000
@@ -16,7 +19,9 @@
 .const RAND_BITS                 0x8011
 .const INTERRUPT_VECTOR_TABLE    0x8E00
 .const INTERRUPT_ENABLE_REGISTER 0x8E10
+
 .const CONTROL_STATUS_REGISTER   0x8EFF
+.const CSR_UNCLOCKED_BIT         6
 
 ; LCD Peripherals
 .const LIVESCREEN 0x9000
@@ -74,12 +79,23 @@
     jmp !main
 
 ;-----------  Interrupt handler for keyboard  -----------
-; Prints the key to the terminal and bumps up the color
-; display... easier seen than described :-)
+; Prints the key to the terminal, bumps up the color
+; display (easier seen than described), and toggles
+; whether the CPU is clocked.
 !key_pressed
     psh rC
+
+    ; print the key
     lod rC, [ KEY ]
     str [ TERM ], rC
+
+    ; toggle whether CPU is clocked
+    lod rC, [ CONTROL_STATUS_REGISTER ]
+    btf rC, CSR_UNCLOCKED_BIT
+    str [ CONTROL_STATUS_REGISTER ], rC
+
+    ; shift the colors displayed for "bump" effect
     add rA, CHANGE_AMT
+
     pop rC
     rti

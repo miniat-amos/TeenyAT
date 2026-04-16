@@ -38,7 +38,7 @@
 #endif
 
 tny_uword tny_random(teenyat *t);
-uint64_t  tny_calibrate_1_MHZ(void);
+uint64_t  tny_calibrate_1_us(void);
 
 static void set_elg_flags(teenyat *t, tny_sword alu_result) {
 	t->flags.equals  = (alu_result == 0);
@@ -118,9 +118,17 @@ bool tny_init_from_file(teenyat *t, FILE *bin_file,
 	t->bus_read = bus_read ? bus_read : default_bus_read;
 	t->bus_write = bus_write ? bus_write : default_bus_write;
 
-	t->clock_manager.calibrate_cycles = TNY_DEFAULT_CALIBRATE_CYCLES;
-	t->clock_manager.busy_loop_cnt = tny_calibrate_1_MHZ();
-	t->clock_manager.target_mhz = 1;
+	/*
+	 * Initialize the clock_rate structure.  Note the epoch and
+	 * last_calibration_time members are not set here as their times
+	 * are set at the moment of the first clock cycle.  To keep this
+	 * organized, lines that set them (below) are commented out.
+	 */
+	t->clock_rate.calibrate_cycles = TNY_DEFAULT_CALIBRATE_CYCLES;
+	t->clock_rate.cycles_until_calibrate = TNY_DEFAULT_CALIBRATE_CYCLES;
+	// t->clock_rate.epoch = <<< SET ON FIRST CLOCK CYCLE >>> ;
+	// t->clock_rate.last_calibration_time = <<< SET ON FIRST CLOCK CYCLE >>> ;
+	t->clock_rate.mhz_loop_cnt = tny_calibrate_1_us();
 
 	if(!tny_reset(t)) {
 		return false;
@@ -131,45 +139,58 @@ bool tny_init_from_file(teenyat *t, FILE *bin_file,
 	return true;
 }
 
-bool tny_init_clocked(teenyat *t, FILE *bin_file,
-                      TNY_READ_FROM_BUS_FNPTR bus_read,
-                      TNY_WRITE_TO_BUS_FNPTR bus_write,
-                      uint16_t MHz){
-
-	if(!t) return false;
-	/* Cannot have negative or zero target mhz */
-	if(MHz == 0 ) return false;
-
-	bool result = tny_init_from_file(t,bin_file,bus_read,bus_write);
-	t->clock_manager.target_mhz = MHz;
-
-	return result;
-}
-
 bool tny_init_unclocked(teenyat *t, FILE *bin_file,
                         TNY_READ_FROM_BUS_FNPTR bus_read,
-                        TNY_WRITE_TO_BUS_FNPTR bus_write){
+                        TNY_WRITE_TO_BUS_FNPTR bus_write) {
 
 	if(!t) return false;
 
 	bool result = tny_init_from_file(t,bin_file,bus_read,bus_write);
-	tny_set_calibration_window(t,-1);
+	t->control_status_register.csr.unclocked = 1;
 	
 	return result;
 }
 
-bool tny_set_calibration_window(teenyat *t,int16_t calibrate_cycles){
-	if(!t) return false;
-	t->clock_manager.calibrate_cycles = calibrate_cycles;
-	t->clock_manager.cycles_until_calibrate = calibrate_cycles;
-	return true;
+void tny_setup_random_generator(teenyat *t) {
+	/*
+	 * Initialize each teenyat with a unique random number stream
+	 */
+	static uint64_t stream = 0;
+
+	/*
+	 * find a random seed
+	 */
+	uint64_t seed = (intptr_t)&time << 32;
+	seed ^= (intptr_t)&printf;
+	seed ^= time(NULL);
+	/* make seed "more" random w/ /dev/urandom if there */
+	FILE *f = fopen("/dev/urandom", "rb");
+	if(f != NULL) {
+		uint64_t entropy_bits;
+		if(fread(&entropy_bits, sizeof(entropy_bits), 1, f) == sizeof(entropy_bits)) {
+			seed ^= entropy_bits;
+		}
+		fclose(f);
+	}
+
+	/* Set increment to arbitrary odd constant that goes up by stream */
+	t->random.increment = ((intptr_t)&tny_reset + stream) | 1ULL;
+	stream += 2;
+
+	/*
+	 * Set initial state and "put it in the past"
+	 */
+	t->random.state = seed + t->random.increment;
+	(void)tny_random(t);
+
+	return;
 }
 
 bool tny_reset(teenyat *t) {
 	if(!t) return false;
 
 	/* restore ram to it's initial post-bin-load state */
-	memcpy(t->ram, t->bin_image, TNY_RAM_SIZE);
+	memcpy(t->ram, t->bin_image, TNY_RAM_SIZE * sizeof(tny_word));
 
 	t->reg[TNY_REG_PC].u = 0x0;
 	t->reg[TNY_REG_SP].u = 0x7FFF;
@@ -198,6 +219,7 @@ bool tny_reset(teenyat *t) {
 	/* Disable all architectural features */
 	t->control_status_register.csr.interrupt_enable = 0;
 	t->control_status_register.csr.interrupt_clearing = 0;
+	t->control_status_register.csr.clock_divisor_scale = 0;
 	t->control_status_register.csr.reserved = 0;
 
 	/* Clear & disable all interrupts by default */
@@ -211,42 +233,15 @@ bool tny_reset(teenyat *t) {
 	/* Maybe dont memset? could simulate randomness... */
 	memset(t->interrupt_vector_table, 0, sizeof(t->interrupt_vector_table));
 
-	/*
-	 * Initialize each teenyat with a unique random number stream
-	 */
-	static uint64_t stream = 1;  // start at >=1 for increment constant to be unique
-
-	/*
-	 * find a random seed
-	 */
-	uint64_t seed = (intptr_t)&time << 32;
-	seed ^= (intptr_t)&printf;
-	seed ^= time(NULL);
-	/* make seed "more" random w/ /dev/urandom if there */
-	FILE *f = fopen("/dev/urandom", "rb");
-	if(f != NULL) {
-		uint64_t entropy_bits;
-		if(fread(&entropy_bits, sizeof(entropy_bits), 1, f) == sizeof(entropy_bits)) {
-			seed ^= entropy_bits;
-		}
-		fclose(f);
-	}
-
-	/* Set increment to arbitrary odd constant that goes up by stream */
-	t->random.increment = ((intptr_t)&tny_reset + stream) | 1ULL;
-	stream++;
-
-	/*
-	 * Set initial state and "put it in the past"
-	 */
-	t->random.state = seed + t->random.increment;
-	(void)tny_random(t);
+	/* Initialize a unique random number generator stream */
+	tny_setup_random_generator(t);
 
 	/* Set up our initial calibrated cycles */
-	t->clock_manager.cycles_until_calibrate = t->clock_manager.calibrate_cycles;
+	t->clock_rate.cycles_until_calibrate = t->clock_rate.calibrate_cycles;
 
 	t->delay_cycles = 0;
 	t->cycle_cnt = 0;
+	t->cycle_count_base = 0;
 
 	return true;
 }
@@ -314,14 +309,13 @@ void tny_set_ports(teenyat *t, tny_word *a, tny_word *b) {
 	return;
 }
 
-void tny_external_interrupt(teenyat* t, tny_uword external_interrupt) {
+void tny_external_interrupt(teenyat* t, tny_xint external_interrupt) {
 	/*
 	 * Make a mask with a 1 in the position of the external interrupt number
 	 * offset so external interrupt 0..7 is mapped to bits 8..15 as the
 	 * external eight interrupts are mapped to the interrupt vector table
 	 * as ints 8..15.
 	 * 
-	 * external_interrupt > 7 are wrapped
 	 */
 	tny_uword iqr_mask = 1U << ((external_interrupt % 8) + 8);
 	/* mask in the interrupt into the upper half of our iqr */
@@ -330,7 +324,13 @@ void tny_external_interrupt(teenyat* t, tny_uword external_interrupt) {
 	return;
 }
 
-/* Assumes that bits is non-zero */
+/**
+ * Priority scans a bit pattern and
+ * returns the bit index of the least signifigant 1
+ *
+ * Assumes that bits is non-zero
+ *
+ * */
 tny_uword tny_get_interrupt_index(tny_uword bits) {
 	tny_uword n = 0;
 	if (!(bits & 0x000000FF)) { n +=  8; bits >>=  8; }
@@ -366,11 +366,59 @@ void handle_interrupts(teenyat *t) {
 	return;
 }
 
+void tny_setup_clock_timing(teenyat *t) {
+	uint64_t now = us_clock();
+	t->clock_rate.epoch = now;
+	t->wall_time_base = now;
+	t->clock_rate.last_calibration_time = t->clock_rate.epoch;
+
+	return;
+}
+
+void tny_adjust_clock_rate_stall(teenyat *t) {
+	uint64_t now_us = us_clock();
+	uint64_t us_elapsed = now_us - t->clock_rate.last_calibration_time;
+	uint64_t mhz_loop_count = t->clock_rate.mhz_loop_cnt * t->clock_rate.calibrate_cycles;
+	t->clock_rate.mhz_loop_cnt = mhz_loop_count / us_elapsed;
+
+	uint64_t time_since_epoch_us = now_us - t->clock_rate.epoch;
+	if(time_since_epoch_us > t->cycle_cnt) {
+		/* too slow, speed up by busy looping 5% less */
+		t->clock_rate.mhz_loop_cnt = (t->clock_rate.mhz_loop_cnt * 95) / 100;
+	}
+	else if(time_since_epoch_us < t->cycle_cnt) {
+		/* too fast, slow down by busy looping 5% more*/
+		/* NOTE: 1+ ensures even tiny busy_loop_count will at least go up by 1 */
+		t->clock_rate.mhz_loop_cnt = 1 + (t->clock_rate.mhz_loop_cnt * 105) / 100;
+	}
+
+	t->clock_rate.last_calibration_time = now_us;
+	t->clock_rate.cycles_until_calibrate = t->clock_rate.calibrate_cycles;
+
+	return;
+}
+
+void tny_clock_rate_stall(teenyat *t) {
+	/* Busy wait to fix the cycle rate */
+	for(volatile uint64_t i = 0; i < t->clock_rate.mhz_loop_cnt; i++);
+
+	return;
+}
+
+void tny_manage_clock_rate(teenyat *t) {
+	if(--(t->clock_rate.cycles_until_calibrate) == 0) {
+		tny_adjust_clock_rate_stall(t);
+	}
+
+	tny_clock_rate_stall(t);
+
+	return;
+}
+
 void tny_clock(teenyat *t) {
 	/* Setup clock timing on first cycle */
 	if(t->cycle_cnt == 0){
-		t->clock_manager.epoch = us_clock();
-		t->clock_manager.last_calibration_time = t->clock_manager.epoch;
+		tny_setup_clock_timing(t);
 	}
 
 	t->cycle_cnt++;
@@ -465,6 +513,23 @@ void tny_clock(teenyat *t) {
 				case TNY_INTERRUPT_QUEUE_REGISTER:
 					t->reg[reg1] = t->interrupt_queue_register;
 					break;
+				case TNY_CYCLE_COUNT:
+				{
+					uint64_t CD = 1ULL << (t->control_status_register.csr.clock_divisor_scale);
+					/* Convert CPU cycles to timer cycles using the clock divisor */
+					uint64_t cycles = (t->cycle_cnt - t->cycle_count_base) / CD;
+					t->reg[reg1].u = (tny_uword)(cycles);
+				}
+					break; 	
+				case TNY_WALL_TIME:
+				{
+					/* Convert microseconds to 1/16 second ticks */
+					static const uint64_t us_per_tick = 1000000ULL / 16ULL; // 62500
+					/* One tick is equal to 1/16 of a second */
+					uint64_t ticks = (us_clock() - t->wall_time_base) / us_per_tick;
+					t->reg[reg1].u = (tny_uword)(ticks);
+					break;
+				}
 				default:
 					/* Check if reading from interrupt service */
 					if(addr >= TNY_INTERRUPT_VECTOR_TABLE_START &&
@@ -527,13 +592,34 @@ void tny_clock(teenyat *t) {
 					/* Do nothing */
 					break;
 				case TNY_CONTROL_STATUS_REGISTER:
+				{
+					bool u1 = t->control_status_register.csr.unclocked;
 					t->control_status_register = t->reg[reg2];
+
+					/*
+					 * Reset CPU rate timing control if changing from unclocked
+					 * to clocked mode.
+					 */
+					bool u2 = t->control_status_register.csr.unclocked;
+					if(u1 && !u2) {
+						t->clock_rate.cycles_until_calibrate = t->clock_rate.calibrate_cycles;
+						uint64_t now = us_clock();
+						t->clock_rate.epoch = now;
+						t->clock_rate.last_calibration_time = now;
+					}
 					break;
+				}
 				case TNY_INTERRUPT_ENABLE_REGISTER:
 					t->interrupt_enable_register = t->reg[reg2];
 					break;
 				case TNY_INTERRUPT_QUEUE_REGISTER:
 					t->interrupt_queue_register = t->reg[reg2];
+					break;
+				case TNY_CYCLE_COUNT_RESET:
+					t->cycle_count_base = t->cycle_cnt;
+					break;
+				case TNY_WALL_TIME_RESET:
+					t->wall_time_base = us_clock();
 					break;
 				default:
 					/* Check if writing to interrupt service */
@@ -567,20 +653,24 @@ void tny_clock(teenyat *t) {
 			}
 			break;
 		case TNY_OPCODE_PSH:
-			t->reg[TNY_REG_SP].u &= TNY_MAX_RAM_ADDRESS;
-			t->ram[t->reg[TNY_REG_SP].u].u = t->reg[reg2].s + immed;
-			t->reg[TNY_REG_SP].u--;
-			t->reg[TNY_REG_SP].u &= TNY_MAX_RAM_ADDRESS;
-			/*
-			 * To promote student use of registers, all bus operations,
-			 * including RAM access comes with an extra penalty.
-			 */
-			t->delay_cycles += TNY_BUS_DELAY;
-			break;
+			{
+				tny_word tmp;
+				tmp.s = t->reg[reg2].s + immed;
+				t->reg[reg1].u &= TNY_MAX_RAM_ADDRESS;
+				t->ram[t->reg[reg1].u] = tmp;
+				t->reg[reg1].u--;
+				t->reg[reg1].u &= TNY_MAX_RAM_ADDRESS;
+				/*
+				* To promote student use of registers, all bus operations,
+				* including RAM access comes with an extra penalty.
+				*/
+				t->delay_cycles += TNY_BUS_DELAY;
+				break;
+			}
 		case TNY_OPCODE_POP:
-			t->reg[TNY_REG_SP].u++;
-			t->reg[TNY_REG_SP].u &= TNY_MAX_RAM_ADDRESS;
-			t->reg[reg1] = t->ram[t->reg[TNY_REG_SP].u];
+			t->reg[reg2].u++;
+			t->reg[reg2].u &= TNY_MAX_RAM_ADDRESS;
+			t->reg[reg1] = t->ram[t->reg[reg2].u];  // POP ignores immediate
 			/*
 			 * To promote student use of registers, all bus operations,
 			 * including RAM access comes with an extra penalty.
@@ -627,24 +717,37 @@ void tny_clock(teenyat *t) {
 			t->delay_cycles += TNY_BUS_DELAY;
 			break;
 		case TNY_OPCODE_ADD:
-			tmp = (uint32_t)(t->reg[reg1].s) + (uint32_t)((uint32_t)(t->reg[reg2].s) + (uint32_t)immed);
-			t->flags.carry = tmp & (1 << 16);
-			t->reg[reg1].s = tmp;
-			set_elg_flags(t, t->reg[reg1].s);
-			break;
+			{
+				uint16_t right = t->reg[reg2].s + immed;
+				uint16_t left = t->reg[reg1].u;
+				tmp = (uint32_t)left + (uint32_t)right;
+				t->flags.carry = tmp & (1 << 16);
+				t->reg[reg1].s = tmp;
+				set_elg_flags(t, t->reg[reg1].s);
+				break;
+			}
 		case TNY_OPCODE_SUB:
-			tmp = (uint32_t)(t->reg[reg1].s) - (uint32_t)((uint32_t)(t->reg[reg2].s) + (uint32_t)immed);
-			t->flags.carry = tmp & (1 << 16);
-			t->reg[reg1].s = tmp;
-			set_elg_flags(t, t->reg[reg1].s);
-			break;
+			{
+				uint16_t right = t->reg[reg2].s + immed;
+				right = -right;
+				uint16_t left = t->reg[reg1].u;
+				tmp = (uint32_t)left + (uint32_t)right;
+				t->flags.carry = tmp & (1 << 16);
+				t->reg[reg1].s = tmp;
+				set_elg_flags(t, t->reg[reg1].s);
+				break;
+			}
 		case TNY_OPCODE_MPY:
-			tmp = (uint32_t)(t->reg[reg1].s) * (uint32_t)((uint32_t)(t->reg[reg2].s) + (uint32_t)immed);
-			t->flags.carry = tmp & (1 << 16);
-			t->reg[reg1].s = tmp;
-			set_elg_flags(t, t->reg[reg1].s);
-			break;
+			{
+				/* The carry flag is undefined for TeenyAT multiplication */
+				int16_t right = t->reg[reg2].s + immed;
+				int16_t left = t->reg[reg1].s;
+				t->reg[reg1].u = left * right;
+				set_elg_flags(t, t->reg[reg1].s);
+				break;
+			}
 		case TNY_OPCODE_DIV:
+			/* The carry flag is undefined for TeenyAT division */
 			if(t->reg[reg2].s + immed != 0) {
 				t->reg[reg1].s /= t->reg[reg2].s + immed;
 				set_elg_flags(t, t->reg[reg1].s);
@@ -654,6 +757,7 @@ void tny_clock(teenyat *t) {
 			}
 			break;
 		case TNY_OPCODE_MOD:
+			/* The carry flag is undefined for TeenyAT division */
 			if(t->reg[reg2].s + immed != 0) {
 				t->reg[reg1].s %= t->reg[reg2].s + immed;
 				set_elg_flags(t, t->reg[reg1].s);
@@ -738,16 +842,21 @@ void tny_clock(teenyat *t) {
 			}
 			break;
 		case TNY_OPCODE_NEG:
+			/* The carry flag is undefined for TeenyAT negation */
 			tmp = (uint32_t)0 - (uint32_t)(t->reg[reg1].s);
-			t->flags.carry = tmp & (1 << 16);
 			t->reg[reg1].s = tmp;
 			set_elg_flags(t, t->reg[reg1].s);
 			break;
 		case TNY_OPCODE_CMP:
-			tmp = (uint32_t)(t->reg[reg1].s) - (uint32_t)((uint32_t)(t->reg[reg2].s) + (uint32_t)immed);
-			t->flags.carry = tmp & (1 << 16);
-			set_elg_flags(t, (tny_sword)tmp);
-			break;
+			{
+				uint16_t right = t->reg[reg2].s + immed;
+				right = -right;
+				uint16_t left = t->reg[reg1].u;
+				tmp = (uint32_t)left + (uint32_t)right; 
+				t->flags.carry = tmp & (1 << 16);
+				set_elg_flags(t, (tny_sword)tmp);
+				break;
+			}
 		case TNY_OPCODE_JMP:
 			{
 				bool flags_checked = false;
@@ -774,11 +883,10 @@ void tny_clock(teenyat *t) {
 			}
 			break;
 		case TNY_OPCODE_LUP:
-			tmp = (uint32_t)(t->reg[reg1].s) - 1;
-			t->flags.carry = tmp & (1 << 16);
-			t->reg[reg1].s = tmp;
-			set_elg_flags(t, (tny_sword)tmp);
-			if(tmp != 0) {
+			/* The carry flag is undefined for TeenyAT LUP-ing */
+			t->reg[reg1].s = (uint32_t)(t->reg[reg1].s) - 1;
+			set_elg_flags(t, t->reg[reg1].s);
+			if(t->reg[reg1].s != 0) {
 				set_pc(t, t->reg[reg2].s + immed);
 			}
 			break;
@@ -803,11 +911,13 @@ void tny_clock(teenyat *t) {
 				/*
 				 * Make a mask with a 1 in the position of the interrupt number
 				 *
-				 * interrupt > 15 are wrapped
 				 */
-				tny_uword interrupt_mask = 1U << (interrupt_number % 16);
-				/* mask in the interrupt into the upper half of our iqr */
-				t->interrupt_queue_register.u |= interrupt_mask;
+
+                if(interrupt_number >= 0 && interrupt_number < 16) {
+                    tny_uword interrupt_mask = 1U << interrupt_number;
+                    /* mask in the interrupt into the upper half of our iqr */
+                    t->interrupt_queue_register.u |= interrupt_mask;
+                }
 			}
 			break;
 		case TNY_OPCODE_RTI:
@@ -826,32 +936,9 @@ void tny_clock(teenyat *t) {
 	}
 
 	/* Jump out if unclocked instance of the TeenyAT */
-	if(t->clock_manager.cycles_until_calibrate < 0) return;
-
-	if(--(t->clock_manager.cycles_until_calibrate) == 0) {
-		/* Time to recalibrate our busy loop count */
-		uint64_t now_us = us_clock();
-		uint64_t us_elapsed = now_us - t->clock_manager.last_calibration_time;
-		uint64_t mhz_loop_count = t->clock_manager.busy_loop_cnt * t->clock_manager.calibrate_cycles / t->clock_manager.target_mhz;
-		t->clock_manager.busy_loop_cnt = mhz_loop_count / us_elapsed;
-
-		uint64_t time_since_epoch_us = now_us - t->clock_manager.epoch;
-		if(time_since_epoch_us > t->cycle_cnt) {
-			/* too slow, speed up by busy looping 5% less */
-			t->clock_manager.busy_loop_cnt = (t->clock_manager.busy_loop_cnt * 95) / 100;
-		}
-		else if(time_since_epoch_us < t->cycle_cnt) {
-			/* too fast, slow down by busy looping 5% more*/
-			/* NOTE: 1+ ensures even tiny busy_loop_count will at least go up by 1 */
-			t->clock_manager.busy_loop_cnt = 1 + (t->clock_manager.busy_loop_cnt * 105) / 100;
-		}
-	
-		t->clock_manager.last_calibration_time = now_us;
-		t->clock_manager.cycles_until_calibrate = t->clock_manager.calibrate_cycles;
+	if(!t->control_status_register.csr.unclocked) {
+		tny_manage_clock_rate(t);
 	}
-
-	/* Busy wait to fix the cycle rate */
-	for(volatile uint64_t i = 0; i < t->clock_manager.busy_loop_cnt; i++);
 	
 	return;
 }
@@ -894,7 +981,7 @@ tny_uword tny_random(teenyat *t) {
  * This function will estimate the number of iterations needed in
  * a busy loop to consume 1 us (clock period for 1 MHz).
  */ 
-uint64_t tny_calibrate_1_MHZ(void){
+uint64_t tny_calibrate_1_us(void){
 	const uint64_t TRIAL_CNT = 5212004;
 	uint64_t start = us_clock();
 
