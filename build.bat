@@ -93,29 +93,42 @@ if %errorlevel% NEQ 0 (
     goto :EOF
 )
 
-echo.
-echo ========================================================================
-echo To complete your setup of the TeenyAT and make it easier to use the
-echo library in code or use its systems and assembler, consider setting up
-echo and editing the enviornment variables below.  From the Windows menu,
-echo start typing "environment" to access the application to edit your
-echo environment variables.
-echo ========================================================================
+:: Add various environment variables progamatically for the user
+@echo off
+set TEENYAT_BUILD_ROOT=%CD%\build
+set BIN_PATH=%TEENYAT_BUILD_ROOT%\out\bin
+
+echo Setting up TeenyAT build environment...
+echo Build root: %TEENYAT_BUILD_ROOT%
 echo.
 
-set TEENYAT_BUILD_ROOT=%CD%
+echo 1) Setting TEENYAT_BUILD_ROOT directory.
+setx TEENYAT_BUILD_ROOT "%TEENYAT_BUILD_ROOT%"
 
-echo 1) Define the root of your build directory (modify as necessary).
-echo Create a variable, TEENYAT_BUILD_ROOT and set it to %TEENYAT_BUILD_ROOT%\build
 echo.
-echo 2) Set up the include directory for headers when compiling.
-echo Edit/add CPATH to include %%TEENYAT_BUILD_ROOT%%\out\include
+echo 2) Setting CPATH for headers when compiling.
+setx CPATH "%TEENYAT_BUILD_ROOT%\out\include"
+
 echo.
-echo 3) Update your PATH to run tnasm, lcd or edison and use the DLL.
-echo Edit PATH to include %%TEENYAT_BUILD_ROOT%%\out\bin
+echo 3) Setting LIBRARY_PATH for static library linking (.a).
+setx LIBRARY_PATH "%TEENYAT_BUILD_ROOT%\out\lib"
+
 echo.
-echo 4) Set up the library directory for static library linking (.a).
-echo Edit/add LIBRARY_PATH to include %%TEENYAT_BUILD_ROOT%%\out\lib
+echo 4) Updating PATH to enable running tnasm, lcd or edison and use the DLL.
+
+for /f "tokens=2*" %%A in ('reg query "HKCU\Environment" /v PATH') do set "CURRENT_USER_PATH=%%B"
+
+echo %CURRENT_USER_PATH% | findstr /C:"%BIN_PATH%" >nul
+
+::Only add to the PATH if it doesn't exist
+if %errorlevel%==0 (
+    echo.
+    echo Already in PATH, skipping.
+) else (
+    setx PATH "%CURRENT_USER_PATH%;%BIN_PATH%"
+)
+
 echo.
+echo Done. Restart your terminal for changes to take effect.
 
 endlocal
