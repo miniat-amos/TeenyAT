@@ -310,6 +310,15 @@ bool tny_reset(teenyat *t);
 
 /**
  * @brief
+ *   Free an instance of the TeenyAT
+ *
+ * @param t
+ *   The TeenyAT instance
+ */
+void tny_free(teenyat *t);
+
+/**
+ * @brief
  *   Advance the TeenyAT instance by one clock cycle
  *
  * This function provides the TeenyAT with something similar to a CPU clock

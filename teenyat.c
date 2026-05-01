@@ -304,6 +304,13 @@ teenyat* tny_init_unclocked(FILE *bin_file,
 	return t;
 }
 
+void tny_free(teenyat* t) {
+
+    if(t == NULL) {
+        return;
+    }
+
+    free(t);
 }
 
 void tny_setup_random_generator(teenyat *t) {
