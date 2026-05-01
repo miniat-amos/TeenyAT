@@ -247,8 +247,6 @@ union tny_word {
  *   Initialize a 1 MHz instance of the TeenyAT and 
  *   buffer the file for future resets.
  *
- * @param t
- *   The TeenyAT instance to initialize
  *
  * @param bin_file
  *   The pre-assembled .bin file to load and execute
@@ -260,13 +258,13 @@ union tny_word {
  *   Callback function for handling write requests
  *
  * @return
- *   True on success, flase otherwise.
+ *   The initialized instance of the TeenyAT
  *
  * @note
  *   Upon failed initialization, the t->initialized member can be assumed false,
  *   but the state of all other members is undefined.
  */
-bool tny_init_from_file(teenyat *t, FILE *bin_file,
+teenyat* tny_init_from_file(FILE *bin_file,
                         TNY_READ_FROM_BUS_FNPTR bus_read,
                         TNY_WRITE_TO_BUS_FNPTR bus_write);
 
@@ -274,9 +272,6 @@ bool tny_init_from_file(teenyat *t, FILE *bin_file,
  * @brief
  *   Initialize an unclocked instance of TeenyAT.
  *
- * @param t
- *   The TeenyAT instance to initialize
- *
  * @param bin_file
  *   The pre-assembled .bin file to load and execute
  *
@@ -287,13 +282,13 @@ bool tny_init_from_file(teenyat *t, FILE *bin_file,
  *   Callback function for handling write requests
  *
  * @return
- *   True on success, flase otherwise.
+ *   The initialized instance of the TeenyAT
  *
  * @note
  *   Upon failed initialization, the t->initialized member can be assumed false,
  *   but the state of all other members is undefined.
  */
-bool tny_init_unclocked(teenyat *t, FILE *bin_file,
+teenyat* tny_init_unclocked(FILE *bin_file,
 						TNY_READ_FROM_BUS_FNPTR bus_read,
 						TNY_WRITE_TO_BUS_FNPTR bus_write);
 

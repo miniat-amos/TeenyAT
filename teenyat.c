@@ -8,6 +8,7 @@
 #include <assert.h>
 #include <inttypes.h>
 #include <stdint.h>
+#include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
@@ -249,15 +250,15 @@ static void default_bus_write(teenyat *t, tny_uword addr, tny_word data, uint16_
 	return;
 }
 
-bool tny_init_from_file(teenyat *t, FILE *bin_file,
+teenyat* tny_init_from_file(FILE *bin_file,
                         TNY_READ_FROM_BUS_FNPTR bus_read,
                         TNY_WRITE_TO_BUS_FNPTR bus_write) {
 
-	if(!t) {
-		return false;
-	}
+    /* allocate teenyat instance */
+    teenyat* t = calloc(1, sizeof(teenyat));
+
 	t->initialized = false;
-	if(!bin_file) return false;
+	if(!bin_file) return NULL;
 
 	/* Clear the entire instance */
 	memset(t, 0, sizeof(teenyat));
@@ -265,7 +266,7 @@ bool tny_init_from_file(teenyat *t, FILE *bin_file,
 	/* backup .bin file */
 	size_t words_read = fread(t->bin_image, sizeof(tny_word), TNY_RAM_SIZE, bin_file);
 	if((words_read <= 0) || ferror(bin_file)) {
-		return false;
+		return NULL;
 	}
 
 	/* store bus callbacks */
@@ -285,24 +286,24 @@ bool tny_init_from_file(teenyat *t, FILE *bin_file,
 	t->clock_rate.mhz_loop_cnt = tny_calibrate_1_us();
 
 	if(!tny_reset(t)) {
-		return false;
+		return NULL;
 	}
 
 	t->initialized = true;
 
-	return true;
+	return t;
 }
 
-bool tny_init_unclocked(teenyat *t, FILE *bin_file,
+teenyat* tny_init_unclocked(FILE *bin_file,
                         TNY_READ_FROM_BUS_FNPTR bus_read,
                         TNY_WRITE_TO_BUS_FNPTR bus_write) {
 
-	if(!t) return false;
-
-	bool result = tny_init_from_file(t,bin_file,bus_read,bus_write);
+	teenyat* t = tny_init_from_file(bin_file,bus_read,bus_write);
 	t->control_status_register.csr.unclocked = 1;
 	
-	return result;
+	return t;
+}
+
 }
 
 void tny_setup_random_generator(teenyat *t) {
