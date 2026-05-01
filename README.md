@@ -65,13 +65,13 @@ The TeenyAT is designed to make system development as simple as possible so you 
 
 int main(int argc, char *argv[]) {
 	FILE *bin_file = fopen("tbone.bin", "rb");
-	teenyat t;
-	tny_init_from_file(&t, bin_file, NULL, NULL);
+	teenyat* t;
+	t = tny_init_from_file(bin_file, NULL, NULL);
 
 	tny_word port_a;
 	for ( int i=0; i <= 77; i++ ) {
-		tny_clock(&t);
-		tny_get_ports(&t,&port_a, NULL);
+		tny_clock(t);
+		tny_get_ports(t,&port_a, NULL);
 
 		if(port_a.bits.bit0 == 0) {
 			printf("."); // LED Off
