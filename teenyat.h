@@ -404,6 +404,30 @@ void tny_port_change(teenyat *t, TNY_PORT_CHANGE_FNPTR port_change);
  */
 void tny_external_interrupt(teenyat* t, tny_xint external_interrupt);
 
+/**
+ * @brief
+ *   Set the ex_data member inside of a teenyat instance
+ *
+ * @param t
+ *   The TeenyAT instance
+ *
+ * @param data
+ *   Void pointer to the ex_data
+ */
+void tny_set_ex_data(teenyat* t, void* data);
+
+/**
+ * @brief
+ *   Get the ex_data member inside of a teenyat instance
+ *
+ * @param t
+ *   The TeenyAT instance
+ *
+ * @return
+ *   Void pointer stored in ex_data
+ */
+void* tny_get_ex_data(teenyat* t);
+
 #ifdef __cplusplus
 }
 #endif

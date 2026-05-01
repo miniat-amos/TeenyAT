@@ -486,6 +486,23 @@ void tny_external_interrupt(teenyat* t, tny_xint external_interrupt) {
 	return;
 }
 
+void tny_set_ex_data(teenyat* t, void* data) {
+    if(t == NULL) {
+        return;
+    }
+
+    t->ex_data = data;
+}
+
+void* tny_get_ex_data(teenyat* t) {
+    if(t == NULL) {
+        return NULL;
+    }
+
+    return t->ex_data;
+}
+
+
 /**
  * Priority scans a bit pattern and
  * returns the bit index of the least signifigant 1
