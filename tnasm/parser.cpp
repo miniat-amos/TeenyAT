@@ -1171,7 +1171,7 @@ bool p_code_13_line() {
 
         tny_word &f = inst.first;
         f.instruction.opcode = token_to_opcode(oper->id);
-        f.instruction.teeny = 1;
+        f.instruction.teeny = 0;  // jump instructions can never be teeny
         f.instruction.reg1 = sreg->value.u;
         f.instruction.reg2 = 0;
 
@@ -1189,10 +1189,13 @@ bool p_code_13_line() {
             f.inst_flags.carry = 1;
         }
 
-        address++;
+        inst.second.s = 0;
+
+        address+=2;
 
         if(pass > 1) {
             bin_words.push_back(f);
+            bin_words.push_back(inst.second);
         }
 
         result = true;
