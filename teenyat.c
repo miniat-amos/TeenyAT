@@ -193,7 +193,7 @@ bool tny_reset(teenyat *t) {
 	memcpy(t->ram, t->bin_image, TNY_RAM_SIZE * sizeof(tny_word));
 
 	t->reg[TNY_REG_PC].u = 0x0;
-	t->reg[TNY_REG_SP].u = 0x7FFF;
+	t->reg[TNY_REG_SP].u = TNY_MAX_RAM_ADDRESS;
 	t->reg[TNY_REG_ZERO].u = 0;
 	t->reg[TNY_REG_A].u = 0;
 	t->reg[TNY_REG_B].u = 0;
