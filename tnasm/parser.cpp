@@ -1171,7 +1171,22 @@ bool p_code_13_line() {
 
         tny_word &f = inst.first;
         f.instruction.opcode = token_to_opcode(oper->id);
-        f.instruction.teeny = 1;
+
+        /*
+         *  _   _       _
+         * | \ | | ___ | |_ ___   _
+         * |  \| |/ _ \| __/ _ \ (_)
+         * | |\  | (_) | ||  __/  _
+         * |_| \_|\___/ \__\___| (_)
+         * 
+         * "p_code_13" lines of code are expected to all be "jump"
+         * instructions, whether conditional or not.  All forms of jumping
+         * instructions are NOT teeny ever as the immed4 field of the first
+         * instruction word is used instead to identify which flags are
+         * evaluated for the jump.
+         */
+        f.instruction.teeny = 0;
+
         f.instruction.reg1 = sreg->value.u;
         f.instruction.reg2 = 0;
 
@@ -1189,10 +1204,16 @@ bool p_code_13_line() {
             f.inst_flags.carry = 1;
         }
 
-        address++;
+        inst.second.s = 0;
+
+        /*
+         * Jump instructions are all two words
+         */
+        address += 2;
 
         if(pass > 1) {
             bin_words.push_back(f);
+            bin_words.push_back(inst.second);
         }
 
         result = true;
