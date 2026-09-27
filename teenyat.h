@@ -133,11 +133,10 @@ typedef void(*TNY_PORT_CHANGE_FNPTR)(teenyat *t, bool is_port_a, tny_word port);
 #define TNY_DEFAULT_CALIBRATE_CYCLES 500
 
 typedef struct alu_flags {
-	bool greater : 1;
-	bool less    : 1;
-	bool equals  : 1;
-	bool carry   : 1;
-	int reserved: 12;
+	bool greater;
+	bool less;
+	bool equals;
+	bool carry;
 } alu_flags;
 
 typedef enum tny_xint {
