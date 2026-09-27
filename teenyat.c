@@ -8,11 +8,166 @@
 #include <assert.h>
 #include <inttypes.h>
 #include <stdint.h>
+#include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
 
 #include "teenyat.h"
+
+/* Opaque type definition of the teenyAT 
+ * this prevents users of the header from 
+ * modifying internal struct members
+ *
+ */
+struct teenyat {
+	/** Has this TeenyAT ever been initialized */
+	bool initialized;
+	/** Memory used for a program's code/data */
+	tny_word ram[TNY_RAM_SIZE];
+	/** copy of original bin file for resets */
+	tny_word bin_image[TNY_RAM_SIZE];
+    /** The 16 addresses in which we can jump to in ram for interrupts */
+    tny_word interrupt_vector_table[TNY_INTERRUPT_CNT];
+	/**
+	 * Registers...
+	 *
+	 * reg[0]: Zero Register (rZ)... always contains zero and is read only
+	 *
+	 * reg[1]: Program Counter (PC)
+	 *
+	 * reg[2]: Stack Pointer (SP)... address of the next top
+	 *
+	 * reg[3]-[7]: General Purpose Registers (rA -- rE)
+	 */
+	tny_word reg[8];
+	/**
+	 * Flag bits are set by CMP and all ALU instructions.
+     *
+     * Access the bits directly through the inst_flags member of the tny_word union
+     *
+     * Carry is set/cleared by arithmetic, shift and rotate instructions.
+     * For shift/rotate instructions, the final bit shifted out of storage
+     * determines the flag.  If the shift length is zero, the flag is
+     * unchanged.
+     *
+     * Equals is set/cleared if the result of a CMP or ALU instruction is 0 or not
+     *
+     * Less is effectively the sign bit of the CMP or ALU result
+     *
+     * Greater is set/cleared if CMP or ALU result is positive and non-zero
+     *
+     **/
+    alu_flags flags;
+	/**
+	 * System calllback function to handle TeenyAT read requests
+	 */
+	TNY_READ_FROM_BUS_FNPTR bus_read;
+	/**
+	 * System calllback function to handle TeenyAT write requests
+	 */
+	TNY_WRITE_TO_BUS_FNPTR bus_write;
+	/**
+	 * The number of remaining cycles to delay to simulate the cost of the
+	 * previous instruction.
+	 */
+	uint64_t delay_cycles;
+	/**
+	 * The held values on port A
+	 */
+	tny_word port_a;
+	/**
+	 * The held values on port B
+	 */
+	tny_word port_b;
+	/**
+	 * The I/O directions for each bit of port A.
+	 * 
+	 * 0 indicates output, 1 indicates input.
+	 */
+	tny_word port_a_directions;
+	/**
+	 * The I/O directions for each bit of port B.
+	 * 
+	 * 0 indicates output, 1 indicates input.
+	 */
+	tny_word port_b_directions;
+	/**
+	 * System callback for whenever output port pins have changed
+	 */
+	TNY_PORT_CHANGE_FNPTR port_change;
+
+	/**
+	 * The system control register allows us to enable
+	 * and disable features of the architecture
+	 */
+	tny_word control_status_register;
+	/*
+	 * Determines which interrups are enabled
+	 */
+	tny_word interrupt_enable_register;
+	/*
+	 * Our priority queue of interrupts in which to
+	 * service
+	 */
+	tny_word interrupt_queue_register;
+	/*
+	 * These are the address & flags we should preserve during an interrupt
+	 */
+	tny_word interrupt_return_address;
+	alu_flags interrupt_return_flags;
+
+	/**
+	 * Each teenyat instance has a unique random number generator stream,
+	 * seeded at initialization.  These are using the PCG-XSH-RR with a 64-bit
+	 * state and 32-bit output based on the algorithm described at
+	 * https://en.wikipedia.org/wiki/Permuted_congruential_generator
+	 */
+	struct {
+		uint64_t state;
+		uint64_t increment;
+	} random;
+	/**
+	 * teenyat instances can simulate a fixed cpu speed of 1 MHz (1 us period).
+	 * This is simulated by having each cycle perform a busy loop of nothing
+	 * which loops mhz_loop_cnt times in hopes it adds the right delay to
+	 * approximate the target 1 us period of clock rate.  After every
+	 * window of calibrate_cycles completes, we evaluate the real-world time
+	 * that has passed to determine whether the simulation has been going too
+	 * fast or slow.  If too fast, we increase the mhz_loop_cnt to extend each
+	 * future cycle.  If too slow, we decrease it.
+	 */
+	struct{
+		/* How many times to busy loop to simulate 1 us */
+		uint64_t mhz_loop_cnt;
+		/* The number of cycles remaining before the next recalibration */
+		uint16_t cycles_until_calibrate;
+		/* Reference time in microseconds */
+		uint64_t epoch;
+		/* Last time calibrated in microseconds */
+		uint64_t last_calibration_time;
+		/* The total number of cycles needed before recalibration */
+		int16_t calibrate_cycles;
+	} clock_rate;
+	/**
+	 * The number of cycles this instance has been running since initialization
+	 * or reset.
+	 */
+	uint64_t cycle_cnt;
+	/** 
+	 * Base offset for the cycle count peripheral
+	*/
+	uint64_t cycle_count_base;
+	/** 
+	 * Base offset for the wall time peripheral
+	*/
+	uint64_t wall_time_base;
+	/**
+	 * An extra pointer for system developers so data can follow a TeenyAT
+	 * instance through read/write callback functions, for example.
+	 */
+	void *ex_data;
+};
 
 /*
  * Platform Independent microsecond clock function
@@ -95,15 +250,15 @@ static void default_bus_write(teenyat *t, tny_uword addr, tny_word data, uint16_
 	return;
 }
 
-bool tny_init_from_file(teenyat *t, FILE *bin_file,
+teenyat* tny_init_from_file(FILE *bin_file,
                         TNY_READ_FROM_BUS_FNPTR bus_read,
                         TNY_WRITE_TO_BUS_FNPTR bus_write) {
 
-	if(!t) {
-		return false;
-	}
+    /* allocate teenyat instance */
+    teenyat* t = calloc(1, sizeof(teenyat));
+
 	t->initialized = false;
-	if(!bin_file) return false;
+	if(!bin_file) return NULL;
 
 	/* Clear the entire instance */
 	memset(t, 0, sizeof(teenyat));
@@ -111,7 +266,7 @@ bool tny_init_from_file(teenyat *t, FILE *bin_file,
 	/* backup .bin file */
 	size_t words_read = fread(t->bin_image, sizeof(tny_word), TNY_RAM_SIZE, bin_file);
 	if((words_read <= 0) || ferror(bin_file)) {
-		return false;
+		return NULL;
 	}
 
 	/* store bus callbacks */
@@ -131,24 +286,31 @@ bool tny_init_from_file(teenyat *t, FILE *bin_file,
 	t->clock_rate.mhz_loop_cnt = tny_calibrate_1_us();
 
 	if(!tny_reset(t)) {
-		return false;
+		return NULL;
 	}
 
 	t->initialized = true;
 
-	return true;
+	return t;
 }
 
-bool tny_init_unclocked(teenyat *t, FILE *bin_file,
+teenyat* tny_init_unclocked(FILE *bin_file,
                         TNY_READ_FROM_BUS_FNPTR bus_read,
                         TNY_WRITE_TO_BUS_FNPTR bus_write) {
 
-	if(!t) return false;
-
-	bool result = tny_init_from_file(t,bin_file,bus_read,bus_write);
+	teenyat* t = tny_init_from_file(bin_file,bus_read,bus_write);
 	t->control_status_register.csr.unclocked = 1;
 	
-	return result;
+	return t;
+}
+
+void tny_free(teenyat* t) {
+
+    if(t == NULL) {
+        return;
+    }
+
+    free(t);
 }
 
 void tny_setup_random_generator(teenyat *t) {
@@ -323,6 +485,23 @@ void tny_external_interrupt(teenyat* t, tny_xint external_interrupt) {
 
 	return;
 }
+
+void tny_set_ex_data(teenyat* t, void* data) {
+    if(t == NULL) {
+        return;
+    }
+
+    t->ex_data = data;
+}
+
+void* tny_get_ex_data(teenyat* t) {
+    if(t == NULL) {
+        return NULL;
+    }
+
+    return t->ex_data;
+}
+
 
 /**
  * Priority scans a bit pattern and

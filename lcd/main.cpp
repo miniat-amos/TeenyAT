@@ -154,10 +154,10 @@ int main(int argc, char *argv[])
     initScreen(0xA81); 
 
     std::string fileName = argv[1];
-    teenyat t;
+    teenyat* t = NULL;
     FILE *bin_file = fopen(fileName.c_str(), "rb");
     if(bin_file != NULL) {
-        tny_init_from_file(&t, bin_file, bus_read, bus_write);
+        t = tny_init_from_file(bin_file, bus_read, bus_write);
         fclose(bin_file);
     }else {
         std::cout << "Failed to init bin file (invalid path?)" << std::endl;
@@ -170,12 +170,13 @@ int main(int argc, char *argv[])
             current_frame = 0;
         }
         if(key_pressed(window)) {
-            tny_external_interrupt(&t, TNY_XINT0);
+            tny_external_interrupt(t, TNY_XINT0);
         }
-        tny_clock(&t);
+        tny_clock(t);
         current_frame++;
     }
 
+    tny_free(t);
     tigrFree(window);
     return EXIT_SUCCESS;
 }

@@ -151,11 +151,11 @@ int main(int argc, char* argv[])
     }
 
     std::string fileName = argv[1];
-    teenyat t;
+    teenyat* t = NULL;
     FILE *bin_file = fopen(fileName.c_str(), "rb");
     if(bin_file != NULL) {
-        tny_init_from_file(&t, bin_file, bus_read, bus_write);
-        tny_port_change(&t,port_change);
+        t = tny_init_from_file(bin_file, bus_read, bus_write);
+        tny_port_change(t,port_change);
         fclose(bin_file);
     }else {
         std::cout << "Failed to init bin file (invalid path?)" << std::endl;
@@ -176,9 +176,9 @@ int main(int argc, char* argv[])
 
     auto last_update_time = std::chrono::steady_clock::now();
     while(!tigrClosed(window) && !tigrKeyDown(window, TK_ESCAPE)) {
-        process_mouse(&t);
-        process_keyboard(&t);
-        if(!CLOCK_PAUSED) tny_clock(&t);
+        process_mouse(t);
+        process_keyboard(t);
+        if(!CLOCK_PAUSED) tny_clock(t);
         auto now = std::chrono::steady_clock::now();
         auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(now - last_update_time);
         
@@ -186,15 +186,16 @@ int main(int argc, char* argv[])
         if(duration.count() >= 50) {
             /* Render all components so aplhas fill out  */
             lcd_render_full_screen();
-            led_array_draw(&t); 
-            segment_render_display(&t);
+            led_array_draw(t); 
+            segment_render_display(t);
             linear_fader_render();
             render_buzzers();
             last_update_time = now;
             tigrUpdate(window); 
         }
     }
-
+    
+    tny_free(t);
     kill_board();
     free_audio();
     return EXIT_SUCCESS;
