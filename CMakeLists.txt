@@ -1,4 +1,10 @@
 cmake_minimum_required(VERSION 3.10)
+
+# Without this, some macOS test systems failed to build because old target
+# macOS versions had no std::filesystem support.  Set to first working major
+# version after support was introduced.
+set(CMAKE_OSX_DEPLOYMENT_TARGET "11" CACHE STRING "Minimum macOS version")
+
 project(teenyat C CXX)
 
 if(MSVC)
